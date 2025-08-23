@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace WOMS.Server.Validations
+﻿namespace WOMS.Server.Validations
 {
 	public class ValidationBase
 	{

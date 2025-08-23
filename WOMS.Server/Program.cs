@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using WOMS.Server.Data;
 using WOMS.Server.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,13 +43,9 @@ app.MapScalarApiReference("/docs", options =>
         _ = options.AddServer(new ScalarServer("https://localhost:7150") { Description = "Developer Mode" });
 
     if (app.Environment.IsDevelopment())
-        _ = options.AddServer(new ScalarServer("https://his.esoftmm.com")
-        { Description = "UAT Local Mode" });
+        _ = options.AddServer(new ScalarServer("https://localhost:7150")
+        { Description = "UAT Local Mode" }); // THis is  Testing Mode For Analystic
 
-
-    if (app.Environment.IsProduction())
-        _ = options.AddServer(new ScalarServer("https://his.esoftmm.com")
-        { Description = "Production Mode" });
 });
 
 app.UseHttpsRedirection();

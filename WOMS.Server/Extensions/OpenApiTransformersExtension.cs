@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.OpenApi;
-using Microsoft.OpenApi.Models;
-
-namespace WOMS.Server.Extensions;
+﻿namespace WOMS.Server.Extensions;
 
 public static class OpenApiTransformersExtension
 {
@@ -24,7 +20,7 @@ public static class OpenApiTransformersExtension
         {
             document.Info = new()
             {
-                Title = "QF MS Authentication API",
+                Title = "Fc WOMS Authentication API",
                 Version = "v2",
                 Description = "API for processing auth for users."
             };

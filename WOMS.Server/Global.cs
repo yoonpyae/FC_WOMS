@@ -14,6 +14,10 @@
 //global using WOMS.Server.Services.Repository.Base;
 //global using WOMS.Server.Validations;
 
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.OpenApi;
+global using Microsoft.OpenApi.Models;
+
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.AspNetCore.Mvc;
@@ -22,7 +26,7 @@ global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Query;
 global using Microsoft.IdentityModel.Tokens;
 
-//global using Newtonsoft.Json;
+global using Newtonsoft.Json;
 
 global using Scalar.AspNetCore;
 
@@ -44,13 +48,7 @@ internal class GLOBAL
         Uri uri = new(origin);
         _ = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "n/a";
 
-        bool isAllowed = uri.Host.Equals("hr.esoftmm.com", StringComparison.OrdinalIgnoreCase)
-                         || uri.Host.Equals("hr.esoftmm.com", StringComparison.OrdinalIgnoreCase);
-        //if (!isAllowed && env.Contains("DEV", StringComparison.OrdinalIgnoreCase))
-        //    isAllowed = uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase);
-
-        if (!isAllowed)
-            isAllowed = uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase);
+        bool isAllowed = uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase);
 
         return isAllowed;
     }
@@ -60,13 +58,6 @@ internal class GLOBAL
         List<string> excludeURL =
         [
             "localhost:7150",
-            "/api/master/ecgtests/attachment",
-            "/api/master/ultrasoundtests/attachment",
-            "/api/master/xraytests/attachment",
-            "/api/master/physiotherapies/attachment",
-            "/api/master/checkuptypes/attachment",
-            "/api/master/doctors/uploadphoto",
-            "/api/master/doctors/uploadsign",
         ];
         return excludeURL;
     }

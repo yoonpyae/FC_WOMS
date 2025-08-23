@@ -34,6 +34,17 @@ bld/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
+
+# Build output
+bin/
+obj/
+
+# ASP.NET Core
+*.dll
+*.exe
+*.db
+*.pdb
+
 # Uncomment if you have tasks that create the project's static files in wwwroot
 #wwwroot/
 
@@ -284,6 +295,7 @@ FakesAssemblies/
 # Node.js Tools for Visual Studio
 .ntvs_analysis.dat
 node_modules/
+dist/
 
 # Visual Studio 6 build log
 *.plg
