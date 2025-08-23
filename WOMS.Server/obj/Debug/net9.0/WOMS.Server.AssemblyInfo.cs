@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WOMS.Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4cd72c8a9f8dad6d1ad6cfc7dddb21cd9cf2cb77")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+239f6759dda9fea971d37f7579f5c37bab73ba28")]
 [assembly: System.Reflection.AssemblyProductAttribute("WOMS.Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WOMS.Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
