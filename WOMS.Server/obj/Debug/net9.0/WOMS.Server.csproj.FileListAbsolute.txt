@@ -337,3 +337,5 @@ C:\repos\FC_WOMS\WOMS.Server\obj\Debug\net9.0\refint\WOMS.Server.dll
 C:\repos\FC_WOMS\WOMS.Server\obj\Debug\net9.0\WOMS.Server.pdb
 C:\repos\FC_WOMS\WOMS.Server\obj\Debug\net9.0\WOMS.Server.genruntimeconfig.cache
 C:\repos\FC_WOMS\WOMS.Server\obj\Debug\net9.0\ref\WOMS.Server.dll
+C:\repos\FC_WOMS\WOMS.Server\obj\Debug\net9.0\WOMS.Server.sourcelink.json
+C:\repos\FC_WOMS\WOMS.Server\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
