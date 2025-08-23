@@ -1,0 +1,134 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\repos\\FC_WOMS\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\repos\\FC_WOMS\\WOMS.Server\\Migrations\\20250823093403_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WOMS.Server\\Migrations\\20250823093403_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9A7F6A33-5DBA-48FE-A586-F552C0489E5C}|WOMS.Server\\WOMS.Server.csproj|c:\\repos\\fc_woms\\woms.server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9A7F6A33-5DBA-48FE-A586-F552C0489E5C}|WOMS.Server\\WOMS.Server.csproj|solutionrelative:woms.server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9A7F6A33-5DBA-48FE-A586-F552C0489E5C}|WOMS.Server\\WOMS.Server.csproj|c:\\repos\\fc_woms\\woms.server\\woms.server.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{9A7F6A33-5DBA-48FE-A586-F552C0489E5C}|WOMS.Server\\WOMS.Server.csproj|solutionrelative:woms.server\\woms.server.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9A7F6A33-5DBA-48FE-A586-F552C0489E5C}|WOMS.Server\\WOMS.Server.csproj|c:\\repos\\fc_woms\\woms.server\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{9A7F6A33-5DBA-48FE-A586-F552C0489E5C}|WOMS.Server\\WOMS.Server.csproj|solutionrelative:woms.server\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9A7F6A33-5DBA-48FE-A586-F552C0489E5C}|WOMS.Server\\WOMS.Server.csproj|c:\\repos\\fc_woms\\woms.server\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{9A7F6A33-5DBA-48FE-A586-F552C0489E5C}|WOMS.Server\\WOMS.Server.csproj|solutionrelative:woms.server\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9A7F6A33-5DBA-48FE-A586-F552C0489E5C}|WOMS.Server\\WOMS.Server.csproj|c:\\repos\\fc_woms\\woms.server\\extensions\\servicecollectionextension.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9A7F6A33-5DBA-48FE-A586-F552C0489E5C}|WOMS.Server\\WOMS.Server.csproj|solutionrelative:woms.server\\extensions\\servicecollectionextension.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9A7F6A33-5DBA-48FE-A586-F552C0489E5C}|WOMS.Server\\WOMS.Server.csproj|c:\\repos\\fc_woms\\woms.server\\global.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9A7F6A33-5DBA-48FE-A586-F552C0489E5C}|WOMS.Server\\WOMS.Server.csproj|solutionrelative:woms.server\\global.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "20250823093403_InitialCreate.cs",
+              "DocumentMoniker": "C:\\repos\\FC_WOMS\\WOMS.Server\\Migrations\\20250823093403_InitialCreate.cs",
+              "RelativeDocumentMoniker": "WOMS.Server\\Migrations\\20250823093403_InitialCreate.cs",
+              "ToolTip": "C:\\repos\\FC_WOMS\\WOMS.Server\\Migrations\\20250823093403_InitialCreate.cs",
+              "RelativeToolTip": "WOMS.Server\\Migrations\\20250823093403_InitialCreate.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-23T09:34:04.04Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "WOMS.Server.csproj",
+              "DocumentMoniker": "C:\\repos\\FC_WOMS\\WOMS.Server\\WOMS.Server.csproj",
+              "RelativeDocumentMoniker": "WOMS.Server\\WOMS.Server.csproj",
+              "ToolTip": "C:\\repos\\FC_WOMS\\WOMS.Server\\WOMS.Server.csproj",
+              "RelativeToolTip": "WOMS.Server\\WOMS.Server.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-08-22T16:22:00.225Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "C:\\repos\\FC_WOMS\\WOMS.Server\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "WOMS.Server\\Properties\\launchSettings.json",
+              "ToolTip": "C:\\repos\\FC_WOMS\\WOMS.Server\\Properties\\launchSettings.json",
+              "RelativeToolTip": "WOMS.Server\\Properties\\launchSettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-08-22T16:21:05.59Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\repos\\FC_WOMS\\WOMS.Server\\appsettings.json",
+              "RelativeDocumentMoniker": "WOMS.Server\\appsettings.json",
+              "ToolTip": "C:\\repos\\FC_WOMS\\WOMS.Server\\appsettings.json",
+              "RelativeToolTip": "WOMS.Server\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-08-22T16:17:45.292Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\repos\\FC_WOMS\\WOMS.Server\\Program.cs",
+              "RelativeDocumentMoniker": "WOMS.Server\\Program.cs",
+              "ToolTip": "C:\\repos\\FC_WOMS\\WOMS.Server\\Program.cs",
+              "RelativeToolTip": "WOMS.Server\\Program.cs",
+              "ViewState": "AgIAABcAAAAAAAAAAAAwwBoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-22T16:16:28.769Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Global.cs",
+              "DocumentMoniker": "C:\\repos\\FC_WOMS\\WOMS.Server\\Global.cs",
+              "RelativeDocumentMoniker": "WOMS.Server\\Global.cs",
+              "ToolTip": "C:\\repos\\FC_WOMS\\WOMS.Server\\Global.cs",
+              "RelativeToolTip": "WOMS.Server\\Global.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-22T16:01:20.977Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ServiceCollectionExtension.cs",
+              "DocumentMoniker": "C:\\repos\\FC_WOMS\\WOMS.Server\\Extensions\\ServiceCollectionExtension.cs",
+              "RelativeDocumentMoniker": "WOMS.Server\\Extensions\\ServiceCollectionExtension.cs",
+              "ToolTip": "C:\\repos\\FC_WOMS\\WOMS.Server\\Extensions\\ServiceCollectionExtension.cs",
+              "RelativeToolTip": "WOMS.Server\\Extensions\\ServiceCollectionExtension.cs",
+              "ViewState": "AgIAAFQAAAAAAAAAAAAgwF8AAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-22T16:00:41.232Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

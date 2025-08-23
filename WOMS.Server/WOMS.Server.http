@@ -1,0 +1,6 @@
+@WOMS.Server_HostAddress = http://localhost:5166
+
+GET {{WOMS.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
