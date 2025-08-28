@@ -1,0 +1,53 @@
+<!-- button  -->
+<p-button label="Lab Test" [style]="{ width:'100%' }" (onClick)="showDialog()"></p-button>
+
+<!-- dialog  -->
+<p-dialog [header]="'Lab Test - ' + mode" maskStyleClass="backdrop-blur-sm" [(visible)]="labTestModalVisible"
+    (onHide)="onDialogHide()" [breakpoints]="{
+        '1920px': '50vw',
+        '1440px': '30vw',
+        '1024px': '30vw',
+        '768px': '80vw',
+        '425px': '100vw',
+        '375px': '100vw',
+        '320px': '100vw',
+      }" [modal]="true" [style]="{ 'min-width': '50vw' }" [draggable]="false" [resizable]="false">
+
+    <!-- table  -->
+    <p-table #dt3 [value]="labTests" [(selection)]="selectedLabTest" [rows]="20" [showGridlines]="false"
+        [loading]="labTestloading" [tableStyle]="{ 'min-width': '50rem' }" styleClass="p-datatable-striped"
+        selectionMode="multiple" dataKey="labTestName" class="p-datatable-sm h-[300px]" [metaKeySelection]="metaKey">
+
+        <!-- header -->
+        <ng-template pTemplate="header">
+            <tr class="whitespace-nowrap">
+                <th pFrozenColumn class="w-4">#</th>
+                <th pSortableColumn="labTestName">TestName <p-sortIcon field="labTestName"></p-sortIcon></th>
+                <th pSortableColumn="laboratory">Laboratory <p-sortIcon field="laboratory"></p-sortIcon>
+                </th>
+                <th pSortableColumn="fee">Fee <p-sortIcon field="fee"></p-sortIcon></th>
+            </tr>
+        </ng-template>
+
+        <!-- body  -->
+        <ng-template pTemplate="body" let-labTest>
+            <tr class="whitespace-nowrap" [pSelectableRow]="labTest">
+                <td>
+                    <p-tableCheckbox [value]="labTest"></p-tableCheckbox>
+                </td>
+                <td>{{ labTest.labTestName }}</td>
+                <td>{{ labTest.accessory || 'N/A' }}</td>
+                <td>{{ labTest.fee | number:'1.0-0'}}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <!-- footer  -->
+    <div class="grid-cols-2 flex gap-2 mt-5">
+        <!-- Save -->
+        <p-button icon="pi pi-check" severity="success" label="Save" (click)="submit()" />
+
+        <!-- Cancel -->
+        <p-button icon="pi pi-times" label="Cancel" (click)="cancel()" />
+    </div>
+</p-dialog>

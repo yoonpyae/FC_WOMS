@@ -1,6 +1,4 @@
-using WOMS.Server.Extensions;
-
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
@@ -21,7 +19,14 @@ builder.Services.AddMiscConfig();
 // Core
 builder.Services.AddCoreScopedConfig();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
+
+app.UseDefaultFiles();
+
+app.UseMiddleware<EncryptionMiddleware>();
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
+app.UseStaticFiles();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -40,18 +45,30 @@ app.MapScalarApiReference("/docs", options =>
     options.HideModels = true;
 
     if (app.Environment.IsStaging())
+    {
         _ = options.AddServer(new ScalarServer("https://localhost:7150") { Description = "Developer Mode" });
+    }
 
     if (app.Environment.IsDevelopment())
+    {
         _ = options.AddServer(new ScalarServer("https://localhost:7150")
         { Description = "UAT Local Mode" }); // THis is  Testing Mode For Analystic
-
+    }
 });
 
 app.UseHttpsRedirection();
 
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseCors("AllowedCorsOrigins");
+
+app.UseAntiforgery();
 app.MapControllers();
 
+app.MapFallbackToFile("/index.html");
+
 app.Run();
+

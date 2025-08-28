@@ -1,0 +1,41 @@
+<p-button label="Lab Sub Group" [style]="{ width:'100%' }" (onClick)="modalVisible=true"></p-button>
+<p-dialog [header]="'Lab Sub Group -' + mode " [(visible)]="modalVisible" [breakpoints]="{
+    '1920px': '50vw',
+    '1440px': '30vw',
+    '1024px': '30vw',
+    '768px': '80vw',
+    '425px': '100vw',
+    '375px': '100vw',
+    '320px': '100vw'
+  }" [modal]="true" [style]="{ 'min-width': '50vw' }" [draggable]="false" [resizable]="false">
+
+    <p-table #dt4 [value]="labSubGroups" [(selection)]="selectedLabSubGroup" [rows]="20" [showGridlines]="false"
+        [loading]="labSubloading" [tableStyle]="{ 'min-width': '50rem' }" styleClass="p-datatable-striped"
+        selectionMode="single" dataKey="labTestGroupName" class="p-datatable-sm h-[300px]">
+        <ng-template pTemplate="header">
+            <tr class="whitespace-nowrap">
+                <th pFrozenColumn class="w-4">#</th>
+                <th pSortableColumn="labTestGroupName">Sub Group Name<p-sortIcon field="labTestGroupName"></p-sortIcon>
+                </th>
+                <th pSortableColumn="laboratory">Laboratory <p-sortIcon field="laboratory"></p-sortIcon></th>
+                <th pSortableColumn="fee">Fee <p-sortIcon field="fee"></p-sortIcon></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-labSubGroup>
+            <tr class="whitespace-nowrap" [pSelectableRow]="labSubGroup">
+                <td><span class="pi pi-circle" [class.pi-check-circle]="selectedLabSubGroup === labSubGroup"></span>
+                </td>
+                <td>{{ labSubGroup.labTestGroupName }}</td>
+                <td>{{ labSubGroup.accessory }}</td>
+                <td>{{ labSubGroup.fee }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <ng-template pTemplate="footer">
+        <div class="flex flex-row justify-center gap-3 w-full">
+            <button pButton icon="pi pi-check" label="Add" severity="success" (click)="submit()"></button>
+            <button pButton icon="pi pi-times" label="Cancel" severity="secondary" (click)="cancel()"></button>
+        </div>
+    </ng-template>
+</p-dialog>

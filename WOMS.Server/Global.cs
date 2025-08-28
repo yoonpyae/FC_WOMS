@@ -1,18 +1,18 @@
-//global using WOMS.Server.Attributes;
-//global using WOMS.Server.Data;
-//global using WOMS.Server.Entities;
-//global using WOMS.Server.Extensions;
-//global using WOMS.Server.Helper;
-//global using WOMS.Server.Interceptors;
-//global using WOMS.Server.Interfaces;
-//global using WOMS.Server.Interfaces.Repositories;
-//global using WOMS.Server.Interfaces.Repositories.Base;
-//global using WOMS.Server.Middlewares;
-//global using WOMS.Server.Models;
-//global using WOMS.Server.Services;
-//global using WOMS.Server.Services.Repository;
-//global using WOMS.Server.Services.Repository.Base;
-//global using WOMS.Server.Validations;
+global using WOMS.Server.Attributes;
+global using WOMS.Server.Data;
+global using WOMS.Server.Entities;
+global using WOMS.Server.Extensions;
+global using WOMS.Server.Helper;
+global using WOMS.Server.Interceptors;
+global using WOMS.Server.Interfaces;
+global using WOMS.Server.Interfaces.Repositories;
+global using WOMS.Server.Interfaces.Repositories.Base;
+global using WOMS.Server.Middlewares;
+global using WOMS.Server.Models;
+global using WOMS.Server.Services;
+global using WOMS.Server.Services.Repository;
+global using WOMS.Server.Services.Repository.Base;
+global using WOMS.Server.Validations;
 
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.OpenApi;
@@ -37,7 +37,7 @@ global using System.Net.Mime;
 global using System.Text;
 global using System.Text.Json.Serialization;
 
-//global using AuthorizeAttribute = WOMS.Server.Attributes.AuthorizeAttribute;
+global using AuthorizeAttribute = WOMS.Server.Attributes.AuthorizeAttribute;
 
 namespace WOMS.Server;
 

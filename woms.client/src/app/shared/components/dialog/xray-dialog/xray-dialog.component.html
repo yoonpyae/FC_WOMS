@@ -1,0 +1,90 @@
+<p-button label="X-Ray" [style]="{ width:'100%' }" (onClick)="showDialog()"></p-button>
+
+<p-dialog [header]="'X-Ray - ' + mode" [(visible)]="modalVisible" maskStyleClass="backdrop-blur-sm" [breakpoints]="{
+    '1920px': '30vw',
+    '1440px': '40vw',
+    '1024px': '50vw',
+    '768px': '60vw',
+    '425px': '80vw',
+    '375px': '100vw',
+    '320px': '100vw',
+  }" [modal]="true" [style]="{ 'min-width': '50vw'}" [draggable]="false" [resizable]="false" (onHide)="onDialogHide()"
+          [closable]="false">
+
+
+  <div class="flex-grow overflow-y-auto lg:h-[300px] md:h-[350px] sm:h-[340px] h-[200px]">
+    <p-table #dt1 [value]="xrayTests" [loading]="loading" styleClass="p-datatable-striped" sortField="createdOn"
+             [sortOrder]="-1" [showCurrentPageReport]="true" [globalFilterFields]="['xrayTestName', 'fee']"
+             [tableStyle]="{ 'min-width': '50rem' }" selectionMode="multiple" [(selection)]="selectedXray"
+             [metaKeySelection]="metaKey" dataKey="xrayTestId">
+      <ng-template #caption>
+        <div class="grid grid-cols-12 mb-4">
+          <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
+          </div>
+          <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
+            <p-iconfield iconPosition="left" class="ml-auto">
+              <p-inputicon>
+                <i class="pi pi-search"></i>
+              </p-inputicon>
+              <input #search pInputText type="text" (input)="dt1.filterGlobal(search.value, 'contains')"
+                     placeholder="Search keyword" [style]="{ width: '100%' }"/>
+            </p-iconfield>
+          </div>
+        </div>
+      </ng-template>
+      <ng-template #header>
+        <tr style="white-space: nowrap">
+          <th pFrozenColumn [style]="{ width: '10px' }">#</th>
+          <th pSortableColumn="xrayTestId">
+            Id
+            <p-sortIcon field="xrayTestId"></p-sortIcon>
+          </th>
+          <th pSortableColumn="xrayTestName">
+            Name
+            <p-sortIcon field="xrayTestName"></p-sortIcon>
+          </th>
+          <th pSortableColumn="fee">
+            Fee
+            <p-sortIcon field="fee"></p-sortIcon>
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-xraytest let-rowIndex="rowIndex">
+        <tr style="white-space: nowrap" [pSelectableRow]="xraytest" [pSelectableRowIndex]="rowIndex">
+          <td>
+            <p-tableCheckbox [value]="xraytest"></p-tableCheckbox>
+          </td>
+          <td>{{ xraytest.xrayTestId }}</td>
+          <td>{{ xraytest.xrayTestName }}</td>
+
+          <td [pEditableColumn]="xraytest.fee" pEditableColumnField="fee" style="width: 150px;">
+            <p-cellEditor>
+              <ng-template #input>
+                <input pInputText type="number" [(ngModel)]="xraytest.fee" [disabled]="xraytest.isFixed"
+                       class="w-full text-righ"/>
+              </ng-template>
+              <ng-template #output>
+                <span class="w-full block" [ngClass]="{ 'text-gray-500 ': xraytest.isFixed }">
+                  {{ xraytest.fee | number: '1.0-0' }}
+                  <i *ngIf="xraytest.isFixed" class="pi pi-lock ml-1 text-sm text-gray-400"></i>
+                </span>
+              </ng-template>
+            </p-cellEditor>
+          </td>
+
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Submit -->
+  <div class="flex flex-wrap gap-2 md:gap-3">
+    <!-- Save -->
+    <p-button type="button" icon="pi pi-check" severity="success" label="Save" (click)="submit()"></p-button>
+
+    <!-- Cancel -->
+    <p-button type="button" icon="pi pi-times" label="Cancel" (click)="cancel()"></p-button>
+
+  </div>
+
+</p-dialog>

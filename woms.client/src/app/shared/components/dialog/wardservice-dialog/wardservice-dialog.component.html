@@ -1,0 +1,99 @@
+<p-button label="Service" [style]="{ width:'100%' }" (onClick)="showDialog()"></p-button>
+
+<p-dialog [header]="'Service - ' + mode" [(visible)]="modalVisible" maskStyleClass="backdrop-blur-sm" [breakpoints]="{
+    '1920px': '30vw',
+    '1440px': '40vw',
+    '1024px': '50vw',
+    '768px': '60vw',
+    '425px': '80vw',
+    '375px': '100vw',
+    '320px': '100vw',
+}" [modal]="true" [style]="{ 'min-width': '50vw'}" [draggable]="false" [resizable]="false" [closable]="false"
+          (onHide)="onDialogHide()">
+
+  <!-- #region table -->
+  <!-- #region table -->
+  <div class="flex-grow overflow-y-auto lg:h-[300px] md:h-[350px] sm:h-[340px] h-[200px]">
+    <p-table #dt1 [value]="wardServices" sortField="createdOn" [loading]="loading" styleClass="p-datatable-striped"
+             [showCurrentPageReport]="true" [globalFilterFields]="['wardServiceName','capacity','fee','isFixed']"
+             [tableStyle]="{ 'min-width': '50rem' }" selectionMode="multiple" [(selection)]="selectedWardService"
+             [metaKeySelection]="metaKey" dataKey="wardId" editable="true">
+
+      <!-- #region caption -->
+      <ng-template #caption>
+        <div class="grid grid-cols-12 mb-4">
+          <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
+          </div>
+          <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
+            <p-iconfield iconPosition="left" class="ml-auto">
+              <p-inputIcon>
+                <i class="pi pi-search"></i>
+              </p-inputIcon>
+              <input #search pInputText (input)="dt1.filterGlobal(search.value, 'contains')"
+                     placeholder="Search keyword" [style]="{'width':'100%'}"/>
+            </p-iconfield>
+          </div>
+        </div>
+      </ng-template>
+      <!-- #endregion -->
+
+      <!-- #region header -->
+      <ng-template #header>
+        <tr class="whitespace-nowrap">
+          <th pFrozenColumn [style]="{'width': '10px'}">#</th>
+          <th pSortableColumn="wardId">Id
+            <p-sortIcon field="wardId"></p-sortIcon>
+          </th>
+          <th pSortableColumn="wardServiceName">WardService Name
+            <p-sortIcon field="wardServiceName"></p-sortIcon>
+          </th>
+          <th pSortableColumn="fee">Fee
+            <p-sortIcon field="fee"></p-sortIcon>
+          </th>
+        </tr>
+      </ng-template>
+      <!-- #endregion -->
+
+      <!-- #region body -->
+      <ng-template #body let-wardService let-rowIndex="rowIndex">
+        <tr class="whitespace-nowrap" [pSelectableRow]="wardService" [pSelectableRowIndex]="rowIndex">
+          <td>
+            <p-tableCheckbox [value]="wardService"></p-tableCheckbox>
+          </td>
+          <td>{{ wardService.wardId }}</td>
+          <td>{{ wardService.wardServiceName }}</td>
+
+          <td [pEditableColumn]="wardService.fee" pEditableColumnField="fee" style="width: 150px;">
+            <p-cellEditor>
+              <ng-template #input>
+                <input pInputText type="number" [(ngModel)]="wardService.fee"
+                       [disabled]="wardService.isFixed" class="w-full text-righ"/>
+              </ng-template>
+              <ng-template #output>
+                                <span class="w-full block" [ngClass]="{ 'text-gray-500 ': wardService.isFixed }">
+                                    {{ wardService.fee | number: '1.0-0' }}
+                                  <i *ngIf="wardService.isFixed" class="pi pi-lock ml-1 text-sm text-gray-400"></i>
+                                </span>
+              </ng-template>
+            </p-cellEditor>
+          </td>
+
+        </tr>
+      </ng-template>
+      <!-- #endregion -->
+    </p-table>
+  </div>
+  <!-- #endregion table -->
+
+
+  <!-- Submit -->
+  <div class="flex flex-wrap gap-2 md:gap-3">
+    <!-- Save -->
+    <p-button type="button" icon="pi pi-check" severity="success" label="Save" (click)="submit()"></p-button>
+
+    <!-- Cancel -->
+    <p-button type="button" icon="pi pi-times" label="Cancel" (click)="cancel()"></p-button>
+
+  </div>
+
+</p-dialog>

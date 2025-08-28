@@ -24,7 +24,19 @@ public partial class WOMSDbContext : DbContext
 
     public virtual DbSet<AspNetUserToken> AspNetUserTokens { get; set; }
 
+    public virtual DbSet<Hospital> Hospitals { get; set; }
+
+    public virtual DbSet<PacketType> PacketTypes { get; set; }
+
+    public virtual DbSet<State> States { get; set; }
+
+    public virtual DbSet<StockItem> StockItems { get; set; }
+
+    public virtual DbSet<Supplier> Suppliers { get; set; }
+
     public virtual DbSet<TokenClaim> TokenClaims { get; set; }
+
+    public virtual DbSet<Township> Townships { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -52,6 +64,21 @@ public partial class WOMSDbContext : DbContext
                         j.ToTable("AspNetUserRoles");
                         j.HasIndex(new[] { "RoleId" }, "IX_AspNetUserRoles_RoleId");
                     });
+        });
+
+        modelBuilder.Entity<Hospital>(entity =>
+        {
+            entity.Property(e => e.HospitalId).ValueGeneratedNever();
+        });
+
+        modelBuilder.Entity<State>(entity =>
+        {
+            entity.Property(e => e.StateId).ValueGeneratedNever();
+        });
+
+        modelBuilder.Entity<Township>(entity =>
+        {
+            entity.Property(e => e.TownshipId).ValueGeneratedNever();
         });
 
         OnModelCreatingPartial(modelBuilder);

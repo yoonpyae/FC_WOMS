@@ -99,56 +99,58 @@ public static class ServiceCollectionExtension
     public static IServiceCollection AddJWTAuthConfig(this IServiceCollection services, IConfiguration configuration)
     {
         // Adding JWT Authentication  
-        //_ = services.AddAuthentication(options =>
-        //    {
-        //        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        //        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        //        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        //    })
-        //    // Adding Jwt Bearer  
-        //    .AddJwtBearer(options =>
-        //    {
-        //        options.SaveToken = true;
-        //        options.RequireHttpsMetadata = false;
-        //        options.TokenValidationParameters = new TokenValidationParameters()
-        //        {
-        //            ValidateIssuer = true,
-        //            ValidateAudience = true,
-        //            ValidAudience = configuration["JWT:ValidAudience"],
-        //            ValidIssuer = configuration["JWT:ValidIssuer"],
-        //            IssuerSigningKey =
-        //                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"] ?? "")),
-        //            ClockSkew = TimeSpan.FromDays(1)
-        //        };
-        //    });
+        _ = services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+            // Adding Jwt Bearer  
+            .AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidAudience = configuration["JWT:ValidAudience"],
+                    ValidIssuer = configuration["JWT:ValidIssuer"],
+                    IssuerSigningKey =
+                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"] ?? "")),
+                    ClockSkew = TimeSpan.FromDays(1)
+                };
+            });
 
-        //_ = services.AddAuthorization(options =>
-        //{
-        //    //options.AddPolicy("Master_Company_Policy", p => p.RequireClaim("Master_Company", ["Read", "Write", "Full Access"]));
-        //    //options.AddPolicy("ReadAccess", p => p.RequireClaim("Master_Read", "Company"));
-        //    //options.AddPolicy("Write Access", p => p.RequireClaim("Master_Write", ["Company", "Branch"]));
-        //});
+        _ = services.AddAuthorization(options =>
+        {
+            //options.AddPolicy("Master_Company_Policy", p => p.RequireClaim("Master_Company", ["Read", "Write", "Full Access"]));
+            //options.AddPolicy("ReadAccess", p => p.RequireClaim("Master_Read", "Company"));
+            //options.AddPolicy("Write Access", p => p.RequireClaim("Master_Write", ["Company", "Branch"]));
+        });
 
         return services;
     }
 
     public static IServiceCollection AddCoreScopedConfig(this IServiceCollection services)
     {
-        //_ = services.AddScoped<ITokenBuilder, TokenBuilder>();
-        //_ = services.AddScoped<IConvertion, Convertion>();
-        //_ = services.AddScoped<IFileService, FileService>();
-        //_ = services.AddScoped<IRandomizer, Randomizer>();
-        //_ = services.AddScoped<IIdGenerateService, IdGenerateService>();
-        //// _ = services.AddScoped<IFirebaseNotification, FirebaseNotification>();
+        _ = services.AddScoped<ITokenBuilder, TokenBuilder>();
+        _ = services.AddScoped<IConvertion, Convertion>();
+        _ = services.AddScoped<IFileService, FileService>();
+        _ = services.AddScoped<IRandomizer, Randomizer>();
+        _ = services.AddScoped<IIdGenerateService, IdGenerateService>();
+        // _ = services.AddScoped<IFirebaseNotification, FirebaseNotification>();
 
-        //_ = services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
-        //// _ = services.AddScoped<ISP_RepositoryWrapper, SP_RepositoryWrapper>();
+        _ = services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
+        // _ = services.AddScoped<ISP_RepositoryWrapper, SP_RepositoryWrapper>();
 
-        //_ = services.AddScoped<ValidateModelAttribute>();
+        _ = services.AddScoped<ValidateModelAttribute>();
 
-        //_ = services.AddScoped<AuthorizeAttribute>();
+        _ = services.AddScoped<AuthorizeAttribute>();
 
-        //_ = services.AddAntiforgery();
+        _ = services.AddAntiforgery();
+        services.AddHttpContextAccessor();
+
 
         return services;
     }
