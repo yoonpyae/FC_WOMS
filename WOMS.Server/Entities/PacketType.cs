@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WOMS.Server.Entities;
 
-[PrimaryKey("TypeCode", "HospitalId")]
+[PrimaryKey("TypeCode", "ClinicId")]
 [Table("PacketType")]
 public partial class PacketType
 {
@@ -14,7 +14,7 @@ public partial class PacketType
     public long TypeCode { get; set; }
 
     [Key]
-    public long HospitalId { get; set; }
+    public long ClinicId { get; set; }
 
     [StringLength(200)]
     public string? TypeName { get; set; }
