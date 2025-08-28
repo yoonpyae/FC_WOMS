@@ -37,6 +37,7 @@ public class BranchesController(IRepositoryWrapper repo) : ControllerBase
     [EndpointDescription("Creates new Branch Test.")]
     public async Task<IActionResult> Create(Branch model)
     {
+        model.ClinicId = 1;
         model.CreatedOn = DateTime.Now;
         model.CreatedBy = User.Identity?.Name ?? string.Empty;
 
