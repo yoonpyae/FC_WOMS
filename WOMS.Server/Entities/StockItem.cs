@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WOMS.Server.Entities;
 
-[PrimaryKey("ItemCode", "HospitalId")]
+[PrimaryKey("ItemCode", "ClinicId")]
 [Table("StockItem")]
 public partial class StockItem
 {
@@ -15,7 +15,7 @@ public partial class StockItem
     public string ItemCode { get; set; } = null!;
 
     [Key]
-    public long HospitalId { get; set; }
+    public long ClinicId { get; set; }
 
     [StringLength(200)]
     public string? ItemName { get; set; }
