@@ -57,7 +57,7 @@ internal class GLOBAL
     {
         List<string> excludeURL =
         [
-            "localhost:7150",
+            "localhost:7126",
         ];
         return excludeURL;
     }
