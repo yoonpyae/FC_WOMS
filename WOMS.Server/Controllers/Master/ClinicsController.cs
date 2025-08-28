@@ -39,7 +39,7 @@ public class ClinicsController(IRepositoryWrapper repo) : ControllerBase
 
         repo.Clinics.Create(model);
         return await repo.SaveAsync()
-            ? ResponseHelper.Created_Result("/api/Clinic", null,
+            ? ResponseHelper.Created_Result("/api/clinic", null,
                 new DefaultResponseMessageModel("Successfully created new Clinic.", ""))
             : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to create Clinic", ""));
     }
