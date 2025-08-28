@@ -30,10 +30,6 @@ public partial class Clinic
     [StringLength(500)]
     public string? Note { get; set; }
 
-    public long? PlanId { get; set; }
-
-    public DateOnly? PlanExpireDate { get; set; }
-
     [Column(TypeName = "datetime")]
     public DateTime? CreatedOn { get; set; }
 
