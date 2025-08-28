@@ -4,9 +4,9 @@
       <h2 class="font-bold mt-2 text-center">Site Setting</h2>
       <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-2">
-          <label>Default Clinic</label>
-          <p-select [options]="clinics" [(ngModel)]="selectedClinic" [style]="{ 'width':'100%' }"
-            [disabled]="disabledClinic" optionLabel="clinicName" [showClear]="true"
+          <label>Default Branch</label>
+          <p-select [options]="branchs" [(ngModel)]="selectedbranch" [style]="{ 'width':'100%' }"
+            [disabled]="disabledbranch" optionLabel="branchName" [showClear]="true"
             placeholder="Select a Branch"></p-select>
         </div>
         <div>
