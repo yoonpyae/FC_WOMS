@@ -22,7 +22,7 @@ namespace WOMS.Server.Services.Repository
         private IAspNetUserRepo? _aspNetUser;
         private IAspNetRoleRepo? _aspNetRole;
         private ITokenClaimRepo? _tokenClaim;
-        private IHospitalRepo? _hospital;
+        private IClinicRepo? _clinic;
         private IStateRepo? _state;
         private ITownshipRepo? _township;
 
@@ -63,12 +63,12 @@ namespace WOMS.Server.Services.Repository
             }
         }
 
-        public IHospitalRepo Hospitals
+        public IClinicRepo Clinics
         {
             get
             {
-                _hospital ??= new HospitalRepo(Context);
-                return _hospital;
+                _clinic ??= new ClinicRepo(Context);
+                return _clinic;
             }
         }
 
