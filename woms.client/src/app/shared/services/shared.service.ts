@@ -10,13 +10,13 @@ export class SharedService {
 
   constructor(private http: HttpClient, private cookieService: CookieService) { }
 
-  //#region HospitalId
+  //#region ClinicId
 
-  setDefaultHospitalId(value: string): void {
+  setDefaultClinicId(value: string): void {
     this.cookieService.set('default_hospital', value);
   }
 
-  getDefaultHospitalId(): string | null {
+  getDefaultClinicId(): string | null {
     return this.cookieService.get('default_hospital');
   }
 
