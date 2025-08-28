@@ -46,12 +46,12 @@ app.MapScalarApiReference("/docs", options =>
 
     if (app.Environment.IsStaging())
     {
-        _ = options.AddServer(new ScalarServer("https://localhost:7150") { Description = "Developer Mode" });
+        _ = options.AddServer(new ScalarServer("https://localhost:7126") { Description = "Developer Mode" });
     }
 
     if (app.Environment.IsDevelopment())
     {
-        _ = options.AddServer(new ScalarServer("https://localhost:7150")
+        _ = options.AddServer(new ScalarServer("https://localhost:7126")
         { Description = "UAT Local Mode" }); // THis is  Testing Mode For Analystic
     }
 });
