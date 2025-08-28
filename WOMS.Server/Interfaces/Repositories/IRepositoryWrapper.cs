@@ -13,6 +13,7 @@ namespace WOMS.Server.Interfaces.Repositories
         IClinicRepo Clinics { get; }
         IStateRepo States { get; }
         ITownshipRepo Townships { get; }
+        IBranchRepo Branchs { get; }
 
         #endregion
 
