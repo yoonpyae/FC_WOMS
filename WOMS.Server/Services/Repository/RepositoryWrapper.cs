@@ -93,7 +93,7 @@ namespace WOMS.Server.Services.Repository
             }
         }
 
-        public IBranchRepo Branchs
+        public IBranchRepo Branches
         {
             get
             {
