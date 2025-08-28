@@ -24,7 +24,11 @@ public partial class WOMSDbContext : DbContext
 
     public virtual DbSet<AspNetUserToken> AspNetUserTokens { get; set; }
 
-    public virtual DbSet<Hospital> Hospitals { get; set; }
+    public virtual DbSet<Branch> Branches { get; set; }
+
+    public virtual DbSet<Clinic> Clinics { get; set; }
+
+    public virtual DbSet<MainStock> MainStocks { get; set; }
 
     public virtual DbSet<PacketType> PacketTypes { get; set; }
 
@@ -66,9 +70,16 @@ public partial class WOMSDbContext : DbContext
                     });
         });
 
-        modelBuilder.Entity<Hospital>(entity =>
+        modelBuilder.Entity<Branch>(entity =>
         {
-            entity.Property(e => e.HospitalId).ValueGeneratedNever();
+            entity.HasOne(d => d.Clinic).WithMany(p => p.Branches)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Branch_Clinic");
+        });
+
+        modelBuilder.Entity<Clinic>(entity =>
+        {
+            entity.Property(e => e.ClinicId).ValueGeneratedNever();
         });
 
         modelBuilder.Entity<State>(entity =>
