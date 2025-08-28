@@ -30,12 +30,7 @@ public partial class Branch
     public string? Email { get; set; }
 
     [StringLength(256)]
-    public string? HouseNo { get; set; }
-
-    public int? StreetId { get; set; }
-
-    [StringLength(256)]
-    public string? StreetName { get; set; }
+    public string? AddressDetail { get; set; }
 
     public int? TownshipId { get; set; }
 
