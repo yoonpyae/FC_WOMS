@@ -1,6 +1,6 @@
 ﻿namespace WOMS.Server.Interfaces
 {
-    public interface IBranchRepo:IRepositoryBase<Branch>
+    public interface IBranchRepo : IRepositoryBase<Branch>
     {
     }
 }
