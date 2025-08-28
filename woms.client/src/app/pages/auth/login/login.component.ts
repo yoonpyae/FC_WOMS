@@ -73,7 +73,7 @@ export class LoginComponent implements OnInit {
           this.setValueToSession(res);
           this.isLoading = false;
 
-          if (this.sharedService.getDefaultClinicId() != "") {
+          if (this.sharedService.getDefaultBranchId() != "") {
             this.router.navigate(['/dashboard']);
           }
           else {
