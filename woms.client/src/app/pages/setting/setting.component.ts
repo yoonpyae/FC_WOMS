@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ClinicModel } from '@core_models/master/clinic.model';
-import { HospitalService } from '@core_services/master/hospital.service';
+import { ClinicService } from '@core_services/master/clinic.service';
 import { SharedService } from '@shared_services/shared.service';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -27,7 +27,7 @@ export class SettingComponent implements OnInit {
   disabledClinic: boolean = false;
 
   constructor(
-    private hospitalService: HospitalService,
+    private clinicService: ClinicService,
     private sharedService: SharedService,
     private messageService: MessageService,
     private router: Router,
@@ -38,13 +38,13 @@ export class SettingComponent implements OnInit {
   }
 
   loadData() {
-    this.hospitalService.get().subscribe({
+    this.clinicService.get().subscribe({
       next: (res) => {
         this.clinics = res.data as ClinicModel[];
         let userRole = this.sharedService.getUserRole() ?? '';
-        // if (userRole == 'hospital') {
-        //   this.disabledHospital = true;
-        //   this.selectedHospital = this.hospitals[0];
+        // if (userRole == 'Clinic') {
+        //   this.disabledClinic = true;
+        //   this.selectedClinic = this.Clinics[0];
         // }
       },
     });
@@ -52,10 +52,10 @@ export class SettingComponent implements OnInit {
 
   onSubmit(): void {
     if (this.selectedClinic == null) {
-      this.messageService.add({ key: 'globalMessage', severity: 'warn', summary: "Warning", detail: "Please choose Hospital." });
+      this.messageService.add({ key: 'globalMessage', severity: 'warn', summary: "Warning", detail: "Please choose Clinic." });
     }
     else {
-      this.sharedService.setDefaultHospitalId(this.selectedClinic?.clinicId.toString());
+      this.sharedService.setDefaultClinicId(this.selectedClinic?.clinicId.toString());
       this.router.navigate(['/dashboard']);
     }
   }
