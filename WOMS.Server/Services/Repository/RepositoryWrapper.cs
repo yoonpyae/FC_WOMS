@@ -25,12 +25,13 @@ namespace WOMS.Server.Services.Repository
         private IClinicRepo? _clinic;
         private IStateRepo? _state;
         private ITownshipRepo? _township;
+        private IBranchRepo? _branch;
 
         #endregion
 
         #region View Variables
 
-      
+
         #endregion
 
         #region Tables Properties
@@ -92,11 +93,20 @@ namespace WOMS.Server.Services.Repository
             }
         }
 
+        public IBranchRepo Branchs
+        {
+            get
+            {
+                _branch ??= new BranchRepo(Context);
+                return _branch;
+            }
+        }
+
         #endregion
 
         #region View Properties
 
-    
+
 
         #endregion
 
