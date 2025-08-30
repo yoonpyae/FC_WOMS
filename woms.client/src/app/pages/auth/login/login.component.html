@@ -1,36 +1,35 @@
-<div class="flex items-center justify-center min-h-screen min-w-screen overflow-hidden">
-  <div class="flex flex-col items-center justify-center">
-    <div class="w-full bg-white py-12 px-10 sm:px-14 rounded-3xl border border-slate-300 shadow-lg">
-      <div class="text-center mb-5">
-        <div class="text-gray-900 text-3xl font-medium mb-3">Welcome, Fmaily Clinics!</div>
-        <span class="text-gray-600 font-medium">Sign in to continue</span>
+<div class="flex items-center justify-center min-h-screen ">
+  <div class="flex flex-col items-center justify-center w-full max-w-md">
+    <div class="w-full py-10 px-8 sm:px-10 rounded-2xl borde shadow-xl">
+      <div class="text-center mb-8">
+        <div class="text-2xl font-semibold mb-2 tracking-tight">Welcome, Family Clinics!</div>
+        <span class="text-gray-500 font-normal text-base">Sign in to continue</span>
       </div>
       <div>
-        <label for="username1" class="block text-gray-900 text-lg font-medium mb-2">Username</label>
-        <input id="username1" pInputText type="text" [(ngModel)]="username" placeholder="Enter username ..."
-          class="w-full mb-5 p-4 border border-gray-300 rounded">
+        <label for="username1" class="block text-base font-medium mb-1">Username</label>
+        <input id="username1" pInputText type="text" [(ngModel)]="username" placeholder="Enter username"
+          class="w-full mb-6 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B6C7] transition">
 
-        <label for="password1" class="block text-gray-900 font-medium text-xl mb-2">Password</label>
-        <p-password id="password1" [(ngModel)]="password" placeholder="Enter password ..." [style]="{width:'100%'}"
-          [toggleMask]="true" styleClass="mb-5"
-          inputStyleClass="w-full p-4 border border-gray-300 rounded"></p-password>
-        <div class="flex items-center justify-between mb-5 gap-5">
+        <label for="password1" class="block font-medium text-base mb-1">Password</label>
+        <p-password id="password1" [(ngModel)]="password" placeholder="Enter password" [style]="{width:'100%'}"
+          [toggleMask]="true" styleClass="mb-6"
+          inputStyleClass="w-full p-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B6C7] transition"></p-password>
+        <div class="flex items-center justify-between mb-6">
           <div class="flex items-center">
             <p-checkbox id="rememberme1" [binary]="true" styleClass="mr-2" [(ngModel)]="isRemberMeChecked"></p-checkbox>
-            <label for="rememberme1" class="text-base text-primary">Remember me</label>
+            <label for="rememberme1" class="text-sm text-[#00B6C7] font-medium cursor-pointer">Remember me</label>
           </div>
-          <a class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</a>
+          <a class="text-sm font-medium text-[#00B6C7] hover:underline cursor-pointer transition">Forgot password?</a>
         </div>
         <div *ngIf="!isLoading">
-          <button pButton pRipple class="w-full p-4 text-lg bg-blue-500 text-white rounded" (click)="login()">Sign
-            In</button>
+          <p-button pRipple (click)="login()" label="Sign In"
+            styleClass="w-full p-3 bg-[#00B6C7] border-0 text-white rounded-lg font-semibold text-base hover:bg-[#0096a7] transition"></p-button>
         </div>
         <div *ngIf="isLoading">
-          <button pButton pRipple
-            class="w-full p-4 text-xl text-center justify-center gap-3 bg-gray-300 text-gray-500 rounded"
-            [disabled]="true">
-            <i class="pi pi-spin pi-spinner" style="font-size: 1.5rem"></i> Please wait
-          </button>
+          <p-button pRipple [disabled]="true"
+            styleClass="w-full p-3 bg-[#00B6C7] border-0 text-white rounded-lg font-semibold text-base">
+            <i class="pi pi-spin pi-spinner mr-2" style="font-size: 1.2rem"></i> Please wait
+          </p-button>
         </div>
       </div>
     </div>
