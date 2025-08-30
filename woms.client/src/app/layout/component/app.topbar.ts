@@ -44,10 +44,10 @@ export interface layoutConfig {
       <app-lazy-progress-bar></app-lazy-progress-bar>
       <div class="layout-topbar-logo-container flex justify-center">
         <a class="layout-topbar-logo flex justify-between items-center gap-4" routerLink="/dashboard">
-          <img src="images/es-logo-removebg-preview-resize.png" class="h-8 object-contain">
+          <img src="images/Family_Clinics_Logo_only.png" class="h-14 object-contain">
           <h4 class="text-lg font-bold"></h4>
         </a>
-        <h5>Hospital</h5>
+            <h5>FAMILY CLINIC</h5>
       </div>
       <div class="flex justify-between items-center">
         <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
