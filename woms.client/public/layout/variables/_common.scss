@@ -1,5 +1,5 @@
 :root {
-    --primary-color: var(--p-primary-color);
+    --primary-color: #00B6C7; 
     --primary-contrast-color: var(--p-primary-contrast-color);
     --text-color: var(--p-text-color);
     --text-color-secondary: var(--p-text-muted-color);
@@ -17,4 +17,11 @@
     --focus-ring-color: var(--p-focus-ring-color);
     --focus-ring-offset: var(--p-focus-ring-offset);
     --focus-ring-shadow: var(--p-focus-ring-shadow);
+    --p-button-primary-background: #00B6C7;
+    --p-button-primary-hover-background: #0096a7;
+    --p-button-primary-active-background: #00B6C7;
+    --p-button-primary-border-color: #00B6C7;
+    --p-button-primary-hover-border-color: #0096a7;
+    --p-button-primary-active-border-color:#00B6C7;
+    --p-button-primary-focus-ring-color: #00B6C7;
 }
