@@ -14,6 +14,7 @@ namespace WOMS.Server.Interfaces.Repositories
         IStateRepo States { get; }
         ITownshipRepo Townships { get; }
         IBranchRepo Branches { get; }
+        ISupplierRepo Suppliers { get; }
 
         #endregion
 
