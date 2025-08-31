@@ -26,6 +26,7 @@ namespace WOMS.Server.Services.Repository
         private IStateRepo? _state;
         private ITownshipRepo? _township;
         private IBranchRepo? _branch;
+        private ISupplierRepo? _supplier;
 
         #endregion
 
@@ -102,6 +103,14 @@ namespace WOMS.Server.Services.Repository
             }
         }
 
+        public ISupplierRepo Suppliers
+        {
+            get
+            {
+                _supplier ??= new SupplierRepo(Context);
+                return _supplier;
+            }
+        }
         #endregion
 
         #region View Properties
