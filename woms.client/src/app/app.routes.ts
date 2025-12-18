@@ -17,7 +17,7 @@ import { AuthGuardService } from '@shared_services/auth-guard.service';
 // import { AdmissionPackageComponent } from './pages/master/admission-package/admission-package.component';
 // import { OtServiceComponent } from './pages/master/ot-service/ot-service.component';
 // import { WardServiceComponent } from './pages/master/ward-service/ward-service.component';
-// import { SupplierComponent } from './pages/master/supplier/supplier.component';
+import { SupplierComponent } from './pages/master/supplier/supplier.component';
 // import { LaboratoryComponent } from './pages/master/laboratory/laboratory.component';
 // import { CheckupCompanyComponent } from './pages/master/checkup-company/checkup-company.component';
 // import { CheckuptypesComponent } from './pages/master/checkuptypes/checkuptypes.component';
@@ -95,7 +95,7 @@ export const routes: Routes = [
 					// { path: 'ot-service', component: OtServiceComponent, data: { title: 'OT Serivce' } },
 					// { path: 'ward-service', component: WardServiceComponent, data: { title: 'Ward Service' } },
 					// { path: 'lab-test', component: LabtestComponent, data: { title: 'Lab Test' } },
-					// { path: 'supplier', component: SupplierComponent, data: { title: 'Supplier' } },
+					{ path: 'supplier', component: SupplierComponent, data: { title: 'Supplier' } },
 					// { path: 'laboratory', component: LaboratoryComponent, data: { title: 'laboratory' } },
 					// { path: 'checkup-company', component: CheckupCompanyComponent, data: { title: 'Checkup Company' } },
 					// { path: 'checkup-types', component: CheckuptypesComponent, data: { title: 'Checkup Types' } },
