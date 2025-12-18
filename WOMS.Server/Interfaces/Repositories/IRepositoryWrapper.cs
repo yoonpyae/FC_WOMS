@@ -15,12 +15,15 @@ namespace WOMS.Server.Interfaces.Repositories
         ITownshipRepo Townships { get; }
         IBranchRepo Branches { get; }
         ISupplierRepo Suppliers { get; }
+        IPacketTypeRepo PacketTypes { get; }
+        IMainStockRepo MainStocks { get; }
+        IStockItemRepo StockItems { get; }
 
         #endregion
 
         #region Views Variables
 
-
+        IViMainStockRepo ViMainStocks { get; }
 
         #endregion
 
