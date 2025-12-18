@@ -147,7 +147,7 @@ export class SupplierComponent implements OnInit {
       this.loggerService.info(this.selectedSupplier);
 
       this.supplierform.controls['supplierId'].setValue(this.selectedSupplier.supplierId);
-      this.supplierform.controls['clinicId'].setValue(this.selectedSupplier.cliniclId);
+      this.supplierform.controls['clinicId'].setValue(this.selectedSupplier.clinicId);
       this.supplierform.controls['companyName'].setValue(this.selectedSupplier.companyName);
       this.supplierform.controls['contactPerson'].setValue(this.selectedSupplier.contactPerson);
       this.supplierform.controls['address'].setValue(this.selectedSupplier.address);
@@ -232,7 +232,7 @@ export class SupplierComponent implements OnInit {
   submit(): void {
     if (this.supplierform.valid) {
       let model = this.supplierform.value as SupplierModel;
-      model.cliniclId = Number.parseInt((this.sharedService.getDefaultClinicId() ?? '0'));
+      model.clinicId = Number.parseInt((this.sharedService.getDefaultClinicId() ?? '0'));
       this.loggerService.info(model);
       this.isSubmitting = true;
 
