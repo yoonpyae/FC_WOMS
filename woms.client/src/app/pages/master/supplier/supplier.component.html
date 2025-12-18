@@ -1,0 +1,215 @@
+<div class="card">
+    <p-table #dt1 [value]="suppliers" [paginator]="true" [rows]="20" [loading]="loading" sortField="createdOn"
+        [sortOrder]="-1" styleClass="p-datatable-striped" [showCurrentPageReport]="true"
+        [globalFilterFields]="['supplierId','balance','phone','email','companyName','address']"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [rowsPerPageOptions]="[20,50,100]" selectionMode="single" [(selection)]="selectedSupplier" dataKey="supplierId">
+        <ng-template #caption>
+
+            <div class="grid grid-cols-12 mb-4">
+                <div class=" md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
+                    <p-toast></p-toast>
+                    <p-splitButton label="Create" icon="pi pi-plus" [model]="items"
+                        (onClick)="create()"></p-splitButton>
+                </div>
+                <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
+                    <p-iconfield iconPosition="left" class="ml-auto">
+                        <p-inputicon>
+                            <i class="pi pi-search"></i>
+                        </p-inputicon>
+                        <input #search pInputText type="text" (input)="dt1.filterGlobal(search.value, 'contains')"
+                            placeholder="Search keyword" class="w-full" />
+                    </p-iconfield>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template #header>
+            <tr style="white-space:nowrap">
+                <th pFrozenColumn [style]="{ width:'10px' }">#</th>
+                <th pSortableColumn="supplierId">Id
+                    <p-sortIcon field="supplierId"></p-sortIcon>
+                </th>
+                <th pSortableColumn="companyName">Company Name
+                    <p-sortIcon field="companyName"></p-sortIcon>
+                </th>
+
+                <th pSortableColumn="contactPerson">Contact Person
+                    <p-sortIcon field="contactPerson"></p-sortIcon>
+                </th>
+                <th pSortableColumn="address">Address
+                    <p-sortIcon field="address"></p-sortIcon>
+                </th>
+                <th pSortableColumn="phone">Phone
+                    <p-sortIcon field="phone"></p-sortIcon>
+                </th>
+                <th pSortableColumn="email">Email
+                    <p-sortIcon field="email"></p-sortIcon>
+                </th>
+                <th pSortableColumn="balance">Balance
+                    <p-sortIcon field="balance"></p-sortIcon>
+                </th>
+                <th pSortableColumn="status">Status
+                    <p-sortIcon field="status"></p-sortIcon>
+                </th>
+                <th pSortableColumn="createdOn">Created On
+                    <p-sortIcon field="createdOn"></p-sortIcon>
+                </th>
+                <th pSortableColumn="createdBy">Created By
+                    <p-sortIcon field="createdBy"></p-sortIcon>
+                </th>
+                <th pSortableColumn="updatedOn">Updated On
+                    <p-sortIcon field="updatedOn"></p-sortIcon>
+                </th>
+                <th pSortableColumn="updatedBy">Updated By
+                    <p-sortIcon field="updatedBy"></p-sortIcon>
+                </th>
+
+            </tr>
+        </ng-template>
+        <ng-template #body let-supplier>
+            <tr style="white-space:nowrap" [pSelectableRow]="supplier">
+                <td>
+                    <span class="pi pi-circle" [class.pi-check-circle]="selectedSupplier===supplier"></span>
+                </td>
+                <td>{{ supplier.supplierId }}</td>
+                <td>{{ supplier.companyName }}</td>
+                <td>{{ supplier.contactPerson}}</td>
+                <td>{{ supplier.address}}</td>
+                <td>{{ supplier.phone}}</td>
+                <td>{{ supplier.email== null ? 'N/A' : supplier.email }}</td>
+                <td style="text-align: right">{{ supplier.balance | number : '1.0-2'}}</td>
+
+                <td>
+                    <p-tag value="{{ supplier.status?'Active':'InActive' }}"
+                        [severity]="supplier.status?'success':'info'"
+                        icon="{{ supplier.status?'pi pi-check':'pi pi-minus-circle' }}" [rounded]="true"></p-tag>
+                </td>
+
+                <td>{{ supplier.createdOn | date : 'dd/MMM/yyyy hh:mm:ss a' }}</td>
+                <td>{{ supplier.createdBy }}</td>
+                <td>{{ supplier.updatedOn | date : 'dd/MMM/yyyy hh:mm:ss a' }}</td>
+                <td>{{ supplier.updatedBy }}</td>
+
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog header="{{isEdit?'Edit Supplier':'Create Supplier'}}" [(visible)]="modalVisible"
+    maskStyleClass="backdrop-blur-sm" [breakpoints]="{
+      '1920px': '40vw',
+      '1440px': '30vw',
+      '1024px': '60vw',
+      '768px': '80vw',
+      '425px': '100vw',
+      '375px': '100vw',
+      '320px': '100vw'}" [modal]="true" [style]="{ 'min-width': '40vw' }" [draggable]="false" [resizable]="false"
+    (onHide)="clearSection()">
+
+    <form [formGroup]="supplierform" (submit)="submit()">
+        <div class="grid grid-cols-12 gap-4">
+
+            <!-- Company Name -->
+            <div class="col-span-6">
+                <div class="flex flex-col gap-2">
+                    <label>Company Name</label>
+                    <input formControlName="companyName" pInputText placeholder="Enter Company Name..." required />
+                    <small
+                        *ngIf="supplierform.controls['companyName'].invalid && supplierform.get('companyName')?.dirty"
+                        class="p-text text-sm text-red-500">
+                        Company Name is required.
+                    </small>
+
+                </div>
+            </div>
+
+            <!-- Contact Person -->
+            <div class="col-span-6 flex flex-col gap-2">
+                <label>Contatct Person</label>
+                <input formControlName="contactPerson" pInputText placeholder="Enter Contact Person..." required />
+            </div>
+
+            <!-- address -->
+            <div class="col-span-6 flex flex-col gap-2">
+                <label>Address</label>
+                <input formControlName="address" pInputText placeholder="Enter address..." required />
+                <small *ngIf="supplierform.controls['address'].invalid && supplierform.get('address')?.dirty"
+                    class="p-text text-sm text-red-500">
+                    Address is Required
+                </small>
+            </div>
+
+            <!-- Phone -->
+            <div class="col-span-6 flex flex-col gap-2">
+                <label>Phone</label>
+                <input formControlName="phone" pInputText placeholder="Enter Phone Number..." required />
+                <small
+                    *ngIf="supplierform.controls['phone'].invalid && supplierform.get('phone')?.dirty && supplierform.get('phone')?.untouched"
+                    class="p-text text-sm text-red-500">
+                    Phone is required
+                </small>
+                <small
+                    *ngIf="supplierform.controls['phone'].invalid && supplierform.get('phone')?.dirty && supplierform.get('phone')?.touched"
+                    class="p-text text-sm text-red-500">
+                    Phone Format is invalid
+                </small>
+            </div>
+
+            <!-- Email -->
+            <div class="col-span-6 flex flex-col gap-2">
+                <label>Email</label>
+                <input formControlName="email" pInputText placeholder="Enter Email.." required />
+                <small
+                    *ngIf="supplierform.controls['email'].invalid && supplierform.get('email')?.dirty && supplierform.get('email')?.untouched"
+                    class="p-text text-sm text-red-500">
+                    Email is Required
+                </small>
+                <small
+                    *ngIf="supplierform.controls['email'].invalid && supplierform.get('email')?.dirty && supplierform.get('email')?.touched"
+                    class="p-text text-sm text-red-500">
+                    Email format is invalid.
+                </small>
+            </div>
+
+            <!-- Balance -->
+            <div class="col-span-6 flex flex-col gap-2">
+                <label>Balance</label>
+                <input min="0" type="number" pInputText formControlName="balance"
+                    (keydown)="preventNegativeInput($event)" />
+
+                <small *ngIf="supplierform.controls['balance'].invalid && supplierform.get('balance')?.dirty"
+                    class="p-text text-sm text-red-500">
+                    Balance is Required
+                </small>
+            </div>
+
+            <!-- Status -->
+            <div class="col-span-12">
+                <div class="flex gap-2">
+                    <p-toggle-switch formControlName="status"></p-toggle-switch>
+                    <span class="text-md font-medium">Status</span>
+                </div>
+            </div>
+
+            <!-- Button -->
+            <div class="col-span-12">
+                <div class="flex flex-col mb-2 gap-2">
+                    <p-button icon="pi pi-check" label="{{ isEdit?'Update':'Save' }}" type="submit"
+                        [loading]="isSubmitting" [severity]="isEdit?'info':'success'"></p-button>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</p-dialog>
+
+<p-confirmDialog [breakpoints]="{
+      '1920px': '30vw',
+      '1440px': '60vw',
+      '1024px': '100vw',
+      '768px': '100vw',
+      '425px': '150vw',
+      '375px': '100vw',
+      '320px': '100vw'}" [style]="{ width: '30vw' }" key="supplierDeleteDialog" position="bottom"
+    rejectButtonStyleClass="p-button-outlined"></p-confirmDialog>
