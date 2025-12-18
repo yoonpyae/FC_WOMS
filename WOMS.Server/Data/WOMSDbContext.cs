@@ -42,6 +42,8 @@ public partial class WOMSDbContext : DbContext
 
     public virtual DbSet<Township> Townships { get; set; }
 
+    public virtual DbSet<ViMainStock> ViMainStocks { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AspNetRole>(entity =>
@@ -90,6 +92,11 @@ public partial class WOMSDbContext : DbContext
         modelBuilder.Entity<Township>(entity =>
         {
             entity.Property(e => e.TownshipId).ValueGeneratedNever();
+        });
+
+        modelBuilder.Entity<ViMainStock>(entity =>
+        {
+            entity.ToView("VI_MainStock");
         });
 
         OnModelCreatingPartial(modelBuilder);
