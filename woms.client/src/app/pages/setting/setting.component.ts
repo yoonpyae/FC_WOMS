@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BranchModel } from '@core_models/master/branch.model';
 import { BranchService } from '@core_services/master/branch.service';
+import { ClinicService } from '@core_services/master/clinic.service';
 import { SharedService } from '@shared_services/shared.service';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -27,6 +28,7 @@ export class SettingComponent implements OnInit {
   disabledbranch: boolean = false;
 
   constructor(
+    private clinicService: ClinicService,
     private branchService: BranchService,
     private sharedService: SharedService,
     private messageService: MessageService,
@@ -56,6 +58,7 @@ export class SettingComponent implements OnInit {
     }
     else {
       this.sharedService.setDefaultBranchId(this.selectedbranch?.branchId.toString());
+      this.sharedService.setDefaultClinicId(this.selectedbranch?.clinicId.toString());
       this.router.navigate(['/dashboard']);
     }
   }
