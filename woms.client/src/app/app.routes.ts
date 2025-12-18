@@ -28,8 +28,8 @@ import { SettingComponent } from './pages/setting/setting.component';
 // import { LabSubGroupComponent } from './pages/master/lab-sub-group/lab-sub-group.component';
 // import { DetailComponent as DoctorDetailComponent } from './pages/master/doctor/detail/detail.component';
 // import { PurchaseComponent } from './pages/stock/purchase/purchase.component';
-// import { PacketTypeComponent } from "./pages/stock/packet-type/packet-type.component";
-// import { MainStockComponent } from './pages/stock/main-stock/main-stock.component';
+import { PacketTypeComponent } from "./pages/stock/packet-type/packet-type.component";
+import { MainStockComponent } from './pages/stock/main-stock/main-stock.component';
 // import { PharmacyStockComponent } from "./pages/stock/pharmacy-stock/pharmacy-stock.component";
 // import { StockIssueComponent } from './pages/stock/stock-issue/stock-issue.component';
 // import { DamageVoucherComponent } from './pages/stock/damage-voucher/damage-voucher.component';
@@ -121,8 +121,8 @@ export const routes: Routes = [
 				path: 'stock',
 				children: [
 					// { path: 'stock-items', component: StockItemComponent, data: { title: 'Stock Item' } },
-					// { path: 'packet-types', component: PacketTypeComponent, data: { title: 'Packet Type' } },
-					// { path: 'main-stocks', component: MainStockComponent, data: { title: 'Main Stock' } },
+					{ path: 'packet-types', component: PacketTypeComponent, data: { title: 'Packet Type' } },
+					{ path: 'main-stocks', component: MainStockComponent, data: { title: 'Main Stock' } },
 					// { path: 'pharmacy-stocks', component: PharmacyStockComponent, data: { title: 'Pharmacy Stock' } },
 					{
 						path: 'stock-issue',
@@ -173,18 +173,6 @@ export const routes: Routes = [
 
 				canActivate: [AuthGuardService],
 				data: { title: 'Pharmacy Voucher' }
-			},
-			{
-
-				path: 'admission',
-				children: [
-					// { path: 'admission', component: AdmissionComponent, data: { title: 'Admission' } },
-					// { path: 'detail/:id', component: AdmissionDetailComponent },
-					// { path: 'detail', component: AdmissionDetailComponent },
-					// { path: 'admission/detail', component: AdmissionDetailComponent },
-					// { path: 'admission-voucher', component: AdmissionVoucherComponent, data: { title: 'Admission-Voucher' } },
-					// { path: 'admission-lab-voucher', component: AdmLabVoucherComponent, data: { title: 'Admission-Lab-Voucher' } },
-				]
 			},
 			{
 				path: 'opd',
