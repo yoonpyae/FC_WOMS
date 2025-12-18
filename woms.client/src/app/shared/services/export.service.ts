@@ -3,7 +3,6 @@ import { ElementRef, Injectable } from '@angular/core';
 import { saveAs } from 'file-saver';
 import { Nullable } from 'primeng/ts-helpers';
 import * as ExcelJS from 'exceljs';
-import * as FileSaver from 'file-saver';
 
 @Injectable({
   providedIn: 'root'
