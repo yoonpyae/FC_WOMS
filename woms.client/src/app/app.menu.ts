@@ -91,15 +91,6 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
         ]
       },
       {
-        label: 'Admission',
-        icon: 'pi pi-user',
-        items: [
-          { label: 'Admission', routerLink: ['/admission/admission'] },
-          { label: 'Voucher', routerLink: ['/admission/admission-voucher'] },
-          { label: 'Lab Voucher', routerLink: ['/admission/admission-lab-voucher'] },
-        ]
-      },
-      {
         label: 'OPD',
         icon: 'pi pi-users',
         items: [
@@ -109,16 +100,6 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
           { label: 'OPD Doctor Attach', routerLink: ['/opd/opd-doctor-attach'] },
         ]
       },
-      {
-        label: 'OT',
-        icon: 'pi pi-wrench',
-        items: [
-          {
-            label: 'OT Stock', routerLink: ['/ot/ot-stock']
-          },
-          { label: 'OT Case Voucher', routerLink: ['/ot/ot-case-voucher'] }
-        ]
-      }
     ],
   },
 ];
