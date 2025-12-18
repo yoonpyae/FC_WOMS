@@ -1,0 +1,189 @@
+<!-- #region card -->
+<div class="card">
+    <!-- #region table -->
+    <p-table #dt1 [value]="mainstocks" [paginator]="true" [rows]="20" sortField="createdOn" [loading]="loading"
+        [sortOrder]="-1" styleClass="p-datatable-striped" [showCurrentPageReport]="true"
+        [globalFilterFields]="['itemCode','typeCode', 'itemName','typeName']" [tableStyle]="{ 'min-width': '50rem' }"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [rowsPerPageOptions]="[20,50,100]" selectionMode="single" [(selection)]="selectedMainStock" dataKey="itemCode">
+
+        <!-- #region caption -->
+        <ng-template #caption>
+            <div class="grid grid-cols-12 mb-4">
+                <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
+                    <p-toast></p-toast>
+                    <p-splitButton label="Edit" icon="pi pi-pen-to-square" [model]="items"
+                        (onClick)="update()"></p-splitButton>
+                </div>
+                <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
+                    <p-iconfield iconPosition="left" class="ml-auto">
+                        <p-inputicon>
+                            <i class="pi pi-search"></i>
+                        </p-inputicon>
+                        <input #search pInputText type="text" (input)="dt1.filterGlobal(search.value, 'contains')"
+                            placeholder=" Search keyword" [style]="{'width':'100%'}" />
+                    </p-iconfield>
+                </div>
+            </div>
+        </ng-template>
+        <!-- #endregion -->
+
+        <!-- #region header -->
+        <ng-template #header>
+            <tr class="whitespace-nowrap">
+                <th pFrozenColumn [style]="{'width' : '10px'}">#</th>
+                <th pSortableColumn="itemCode">Item Code
+                    <p-sortIcon field="itemCode"></p-sortIcon>
+                </th>
+                <th pSortableColumn="itemName">Item Name
+                    <p-sortIcon field="itemName"></p-sortIcon>
+                </th>
+                <th pSortableColumn="typeName">Type Name
+                    <p-sortIcon field="typeName"></p-sortIcon>
+                </th>
+                <th pSortableColumn="purchasePrice">Purchase Price
+                    <p-sortIcon field="purchasePrice"></p-sortIcon>
+                </th>
+                <th pSortableColumn="salePrice">Sale Price
+                    <p-sortIcon field="salePrice"></p-sortIcon>
+                </th>
+                <th pSortableColumn="avgPrice">Average Price
+                    <p-sortIcon field="avgPrice"></p-sortIcon>
+                </th>
+                <th pSortableColumn="groundBalance">Ground Balance
+                    <p-sortIcon field="groundBalance"></p-sortIcon>
+                </th>
+                <th pSortableColumn="status">Status
+                    <p-sortIcon field="status"></p-sortIcon>
+                </th>
+                <th pSortableColumn="createdOn">Created On
+                    <p-sortIcon field="createdOn"></p-sortIcon>
+                </th>
+                <th pSortableColumn="createdBy">Created By
+                    <p-sortIcon field="createdBy"></p-sortIcon>
+                </th>
+                <th pSortableColumn="updatedOn">Update On
+                    <p-sortIcon field="updatedOn"></p-sortIcon>
+                </th>
+                <th pSortableColumn="updatedBy">Updated By
+                    <p-sortIcon field="updatedBy"></p-sortIcon>
+                </th>
+            </tr>
+        </ng-template>
+        <!-- #endregion -->
+
+        <!-- #region body -->
+        <ng-template #body let-mainStock>
+            <tr class="whitespace-nowrap" [pSelectableRow]="mainStock">
+                <td>
+                    <span class="pi pi-circle" [class.pi-check-circle]="selectedMainStock === mainStock"></span>
+                </td>
+                <td>{{ mainStock.itemCode }}</td>
+                <td>{{ mainStock.itemName }}</td>
+                <td>{{ mainStock.typeName }}</td>
+                <td>{{ mainStock.purchasePrice | number : '1.0-0' }}</td>
+                <td>{{ mainStock.salePrice | number : '1.0-0' }}</td>
+                <td>{{ mainStock.avgPrice | number : '1.0-0' }}</td>
+                <td>{{ mainStock.groundBalance | number: '1.0-0'}}</td>
+                <td>
+                    <p-tag value="{{ mainStock.status?'Active':'Inactive' }}"
+                        [severity]="mainStock.status?'success':'info'"
+                        icon="{{ mainStock.status?'pi pi-check':'pi pi-minus-circle' }}" [rounded]="true"></p-tag>
+                </td>
+                <td>{{ mainStock.createdOn | date: 'dd/MMM/yyyy hh:mm:ss a' }}</td>
+                <td>{{ mainStock.createdBy }}</td>
+                <td>{{ mainStock.updatedOn | date: 'dd/MMM/yyyy hh:mm:ss a' }}</td>
+                <td>{{ mainStock.updatedBy }}</td>
+
+            </tr>
+        </ng-template>
+        <!-- #endregion -->
+    </p-table>
+    <!-- #endregion -->
+</div>
+<!-- #endregion -->
+
+<!-- #region dialog -->
+<p-dialog header="{{isEdit? 'Edit Main Stock' : 'Create Main Stock'}}" [(visible)]="modalVisible" [breakpoints]="{
+    '1920px': '30vw',
+    '1440px': '30vw',
+    '1024px': '30vw',
+    '768px': '80vw',
+    '425px': '100vw',
+    '375px': '100vw',
+    '320px': '100vw'}" [modal]="true" [style]="{ 'min-width': '30vw' }" maskStyleClass="backdrop-blur-sm"
+    [draggable]="false" [resizable]="false" (onHide)="clearSection()">
+
+    <form [formGroup]="mainStockForm" (submit)="submit()">
+        <div class="grid grid-cols-12 gap-4">
+            <div class="col-span-12 flex flex-col gap-2">
+                <label>Item Code</label>
+                <input formControlName="itemCode" pInputText type='text' placeholder="Enter Item Code..." />
+            </div>
+
+            <div class="col-span-12 flex flex-col gap-2">
+                <label>Packet Type</label>
+                <p-select [options]="packetTypes" [(ngModel)]="selectedPacketType" optionLabel="typeName"
+                    (onChange)="onPacketTypeChange()" placeholder="Select a Packet Type" [showClear]="true"
+                    class="w-full" [ngModelOptions]="{ standalone: true }" [filter]="true" [ngClass]="{
+                    'ng-dirty ng-invalid': mainStockForm.controls['typeCode'].invalid &&
+                    (mainStockForm.get('typeCode')?.touched || mainStockForm.get('typeCode')?.dirty)
+                }" />
+            </div>
+
+            <div class="col-span-12 flex flex-col gap-2">
+                <label>Purchase Price</label>
+                <input formControlName="purchasePrice" pInputText type="number" placeholder="Enter Purchase Price..."
+                    required min="0" (keypress)="preventNegativeInput($event)" />
+                <small
+                    *ngIf="mainStockForm.controls['purchasePrice'].invalid && mainStockForm.get('purchasePrice')?.dirty"
+                    class="p-text text-sm text-red-500">
+                    Purchase Price is required.
+                </small>
+            </div>
+
+            <div class="col-span-12 flex flex-col gap-2">
+                <label>Sale Price</label>
+                <input formControlName="salePrice" pInputText type="number" placeholder="Enter Sale Price..." required
+                    min="0" (keypress)="preventNegativeInput($event)" />
+                <small *ngIf="mainStockForm.controls['salePrice'].invalid && mainStockForm.get('salePrice')?.dirty"
+                    class="p-text text-sm text-red-500">
+                    Sale Price is required.
+                </small>
+            </div>
+
+            <div class="col-span-12 flex flex-col gap-2">
+                <label>Ground Balance</label>
+                <input formControlName="groundBalance" pInputText type="number" placeholder="Enter Ground Balance.."
+                    required min="0" (keypress)="preventNegativeInput($event)" />
+                <small
+                    *ngIf="mainStockForm.controls['groundBalance'].invalid && mainStockForm.get('groundBalance')?.dirty"
+                    class="p-text text-sm text-red-500">
+                    Ground Balance is required.
+                </small>
+            </div>
+
+            <div class="col-span-12 flex gap-2">
+                <p-toggle-switch formControlName="status"></p-toggle-switch>
+                <span class="text-md font-medium mt-1">Status</span>
+            </div>
+            <div class="flex flex-col mb-2 gap-2">
+                <p-button icon="pi pi-check" label="{{ isEdit?'Update':'Save' }}" type="submit" [loading]="isSubmitting"
+                    [severity]="isEdit?'info':'success'"></p-button>
+            </div>
+        </div>
+    </form>
+</p-dialog>
+<!-- #endregion -->
+
+<!-- #region confirmDialog -->
+<p-confirmDialog [breakpoints]="{
+    '1920px': '30vw',
+    '1440px': '50vw',
+    '1024px': '70vw',
+    '768px': '90vw',
+    '425px': '100vw',
+    '375px': '100vw',
+    '320px': '100vw'}" [style]="{ 'min-width': '30vw' }" key="mainStockDeleteDialog" position="bottom"
+    rejectButtonStyleClass="p-button-outlined"></p-confirmDialog>
+<!-- #endregion -->
