@@ -27,13 +27,17 @@ namespace WOMS.Server.Services.Repository
         private ITownshipRepo? _township;
         private IBranchRepo? _branch;
         private ISupplierRepo? _supplier;
+        private IPacketTypeRepo? _packetType;
+        private IMainStockRepo? _mainStock;
+        private IStockItemRepo? _stockItem;
 
         #endregion
 
         #region View Variables
-
+        private IViMainStockRepo? _viMainStock;
 
         #endregion
+
 
         #region Tables Properties
 
@@ -74,8 +78,6 @@ namespace WOMS.Server.Services.Repository
             }
         }
 
-      
-
         public IStateRepo States
         {
             get
@@ -111,11 +113,45 @@ namespace WOMS.Server.Services.Repository
                 return _supplier;
             }
         }
+
+        public IPacketTypeRepo PacketTypes
+        {
+            get
+            {
+                _packetType ??= new PacketTypeRepo(Context);
+                return _packetType;
+            }
+        }
+
+        public IMainStockRepo MainStocks
+        {
+            get
+            {
+                _mainStock ??= new MainStockRepo(Context);
+                return _mainStock;
+            }
+        }
+
+        public IStockItemRepo StockItems
+        {
+            get
+            {
+                _stockItem ??= new StockItemRepo(Context);
+                return _stockItem;
+            }
+        }
         #endregion
 
         #region View Properties
 
-
+        public IViMainStockRepo ViMainStocks
+        {
+            get
+            {
+                _viMainStock ??= new ViMainStockRepo(Context);
+                return _viMainStock;
+            }
+        }
 
         #endregion
 
