@@ -7,7 +7,7 @@ import { filter, map } from 'rxjs';
   providedIn: 'root'
 })
 export class TitleService {
-  private appName = 'ES Hospital Panel';
+  private appName = 'Family Clinics Panel';
 
   constructor(private titleService: Title) {}
 
