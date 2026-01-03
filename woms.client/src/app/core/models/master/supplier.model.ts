@@ -1,6 +1,6 @@
 export interface SupplierModel {
     supplierId: number;
-    clinicId: number;
+    branchId: number;
     companyName: null;
     contactPerson: null | string;
     address: null;
