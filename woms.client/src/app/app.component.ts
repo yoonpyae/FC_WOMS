@@ -11,7 +11,7 @@ import { filter, map, startWith } from 'rxjs';
   templateUrl: './app.component.html'
 })
 export class AppComponent {
-  title = 'ES_HIS';
+  title = 'FC_WOMS';
 
 
   constructor(
