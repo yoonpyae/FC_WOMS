@@ -2,6 +2,7 @@ export interface MainStockModel {
     itemCode: string;
     typeCode: number;
     clinicId: number;
+    branchId: number;
     purchasePrice: number;
     salePrice: number;
     groundBalance: number;
@@ -23,6 +24,7 @@ export interface ViMainStockModel {
     typeCode: number;
     typeName: string;
     clinicId: number;
+    branchId: number;
     purchasePrice?: number;
     salePrice?: number;
     avgPrice?: number;
