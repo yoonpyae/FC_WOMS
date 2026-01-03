@@ -84,7 +84,7 @@ export class SupplierComponent implements OnInit {
   private formBuilder = inject(FormBuilder);
   public supplierform: FormGroup = this.formBuilder.group({
     supplierId: [0],
-    clinicId: [0],
+    branchId: [0],
     companyName: ['', Validators.required],
     contactPerson: [''],
     address: ['', Validators.required],
@@ -108,9 +108,9 @@ export class SupplierComponent implements OnInit {
   }
 
   loadData(): void {
-    let clinicId: number = Number.parseInt((this.sharedService.getDefaultClinicId() ?? "0"));
+    let branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
     this.loading = true;
-    this.supplierService.get(clinicId).subscribe({
+    this.supplierService.get(branchId).subscribe({
       next: res => {
         this.suppliers = res.data as SupplierModel[];
         this.loading = false;
@@ -125,13 +125,13 @@ export class SupplierComponent implements OnInit {
   }
 
   create(): void {
-    let clinicId: number = Number.parseInt((this.sharedService.getDefaultClinicId() ?? "0"));
-    this.supplierService.getAutoId(clinicId).subscribe({
+    let branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
+    this.supplierService.getAutoId(branchId).subscribe({
       next: res => {
         this.supplierform.reset();
         this.supplierform.controls['balance'].setValue(0);
         this.supplierform.controls['supplierId'].setValue(res.data as number);
-        this.supplierform.controls['clinicId'].setValue(clinicId);
+        this.supplierform.controls['branchId'].setValue(branchId);
         this.supplierform.controls['status'].setValue(false);
 
         this.isEdit = false;
@@ -147,7 +147,7 @@ export class SupplierComponent implements OnInit {
       this.loggerService.info(this.selectedSupplier);
 
       this.supplierform.controls['supplierId'].setValue(this.selectedSupplier.supplierId);
-      this.supplierform.controls['clinicId'].setValue(this.selectedSupplier.clinicId);
+      this.supplierform.controls['branchId'].setValue(this.selectedSupplier.branchId);
       this.supplierform.controls['companyName'].setValue(this.selectedSupplier.companyName);
       this.supplierform.controls['contactPerson'].setValue(this.selectedSupplier.contactPerson);
       this.supplierform.controls['address'].setValue(this.selectedSupplier.address);
@@ -207,7 +207,7 @@ export class SupplierComponent implements OnInit {
     // Define the columns to be exported
     const columns = [
       { key: 'supplierId', value: 'Supplier ID' },
-      { key: 'clinicId', value: 'Hospital ID' },
+      { key: 'branchId', value: 'Hospital ID' },
       { key: 'companyName', value: 'Company Name' },
       { key: 'contactPerson', value: 'Contact Person' },
       { key: 'address', value: 'Address' },
@@ -232,7 +232,7 @@ export class SupplierComponent implements OnInit {
   submit(): void {
     if (this.supplierform.valid) {
       let model = this.supplierform.value as SupplierModel;
-      model.clinicId = Number.parseInt((this.sharedService.getDefaultClinicId() ?? '0'));
+      model.branchId = Number.parseInt((this.sharedService.getDefaultBranchId() ?? '0'));
       this.loggerService.info(model);
       this.isSubmitting = true;
 
