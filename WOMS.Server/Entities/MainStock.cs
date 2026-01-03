@@ -20,6 +20,8 @@ public partial class MainStock
     [Key]
     public long ClinicId { get; set; }
 
+    public long BranchId { get; set; }
+
     public double PurchasePrice { get; set; }
 
     public double AvgPrice { get; set; }
