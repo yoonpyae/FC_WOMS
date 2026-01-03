@@ -1,0 +1,676 @@
+<div class="card">
+    <p-table #dt1 [value]="doctor" [paginator]="true" [rows]="20" [loading]="loading" styleClass="p-datatable-striped"
+        sortField="createdOn" [sortOrder]="-1" [showCurrentPageReport]="true"
+        [globalFilterFields]="['doctorId','spalized','ecgfee','xrayFee','degree','name']"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [rowsPerPageOptions]="[20,50,100]" selectionMode="single" [(selection)]="selectedDoctor" dataKey="doctorId">
+
+        <ng-template #caption>
+
+            <div class="grid grid-cols-12 mb-4">
+                <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
+                    <p-toast></p-toast>
+                    <p-splitButton label="Create" icon="pi pi-plus" [model]="items"
+                        (onClick)="create()"></p-splitButton>
+                </div>
+                <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
+                    <p-iconfield iconPosition="left" class="ml-auto">
+                        <p-inputicon>
+                            <i class="pi pi-search"></i>
+                        </p-inputicon>
+                        <input #search pInputText type="text" (input)="dt1.filterGlobal(search.value, 'contains')"
+                            placeholder="Search keyword" class="w-full" />
+                    </p-iconfield>
+                </div>
+            </div>
+        </ng-template>
+        
+        <ng-template #header>
+            <tr style="white-space:nowrap">
+                <th pFrozenColumn [style]="{ width:'10px' }">#</th>
+                <th></th>
+                <th pSortableColumn="doctorId">Id
+                    <p-sortIcon field="doctorId"></p-sortIcon>
+                </th>
+                <th pSortableColumn="name">Doctor Name
+                    <p-sortIcon field="name"></p-sortIcon>
+                </th>
+                <th pSortableColumn="degree">Degree
+                    <p-sortIcon field="degree"></p-sortIcon>
+                </th>
+                <th pSortableColumn="spalized">Specialized
+                    <p-sortIcon field="spalized"></p-sortIcon>
+                </th>
+                <th pSortableColumn="referFee">Refer Fee
+                    <p-sortIcon field="referFee"></p-sortIcon>
+                </th>
+                <th pSortableColumn="opdreferFee">OPD-Refer Fee
+                    <p-sortIcon field="opdreferFee"></p-sortIcon>
+                </th>
+                <th pSortableColumn="consultantFee">Consultant Fee
+                    <p-sortIcon field="consultantFee"></p-sortIcon>
+                </th>
+                <th pSortableColumn="ecgfee">ECG fee
+                    <p-sortIcon field="ecgfee"></p-sortIcon>
+                </th>
+                <th pSortableColumn="xrayFee">X-Ray Fee
+                    <p-sortIcon field="xrayFee"></p-sortIcon>
+                </th>
+                <th pSortableColumn="ultrasoundFee">Ultrasound Fee
+                    <p-sortIcon field="ultrasoundFee"></p-sortIcon>
+                </th>
+                <th pSortableColumn="roundFee">Round Fee
+                    <p-sortIcon field="roundFee"></p-sortIcon>
+                </th>
+                <th pSortableColumn="Mon Day">Monday
+                    <p-sortIcon field="monTime"></p-sortIcon>
+                </th>
+                <th pSortableColumn="Tue Day">Tuesday
+                    <p-sortIcon field="tueTime"></p-sortIcon>
+                </th>
+                <th pSortableColumn="Wed Day">Wednesday
+                    <p-sortIcon field="wedTime"></p-sortIcon>
+                </th>
+                <th pSortableColumn="Thu day">Thursday
+                    <p-sortIcon field="thuTime"></p-sortIcon>
+                </th>
+                <th pSortableColumn="Fri Day">Friday
+                    <p-sortIcon field="friTime"></p-sortIcon>
+                </th>
+                <th pSortableColumn="Sat Day">Saturday
+                    <p-sortIcon field="satTime"></p-sortIcon>
+                </th>
+                <th pSortableColumn="Sun Day">Sunday
+                    <p-sortIcon field="sunTime"></p-sortIcon>
+                </th>
+                <th pSortableColumn="status">Status
+                    <p-sortIcon field="status"></p-sortIcon>
+                </th>
+                <th pSortableColumn="createdOn">Created On
+                    <p-sortIcon field="createdOn"></p-sortIcon>
+                </th>
+                <th pSortableColumn="createdBy">Created By
+                    <p-sortIcon field="createdBy"></p-sortIcon>
+                </th>
+                <th pSortableColumn="updatedOn">Updated On
+                    <p-sortIcon field="updatedOn"></p-sortIcon>
+                </th>
+                <th pSortableColumn="updatedBy">Updated By
+                    <p-sortIcon field="updatedBy"></p-sortIcon>
+                </th>
+
+            </tr>
+        </ng-template>
+        <ng-template #body let-doctor>
+            <tr style="white-space:nowrap" [pSelectableRow]="doctor">
+                <td>
+                    <span class="pi pi-circle" [class.pi-check-circle]="selectedDoctor===doctor"></span>
+                </td>
+                <td>
+                    <p-avatar label="{{ doctor.name[0].toUpperCase() }}"
+                        [style]="{'background-color':'#5695FE', 'color': '#ffffff'}" shape="circle"
+                        [routerLink]="['./detail', (doctor.doctorId)]" appendTo="body"></p-avatar>
+                </td>
+                <td>{{ doctor.doctorId }}</td>
+
+                <td>{{ doctor.name }}</td>
+                <td>{{ doctor.degree }}</td>
+                <td>{{ doctor.spalized }}</td>
+                <td style="text-align: right">{{ doctor.referFee | number : '1.0-2'}}</td>
+                <td style="text-align: right">{{ doctor.opdreferFee | number : '1.0-2'}}</td>
+                <td style="text-align: right">{{ doctor.consultantFee | number : '1.0-2'}}</td>
+                <td style="text-align: right">{{ doctor.ecgfee | number : '1.0-2'}}</td>
+                <td style="text-align: right">{{ doctor.xrayFee | number : '1.0-2'}}</td>
+                <td style="text-align: right">{{ doctor.ultrasoundFee | number : '1.0-2'}}</td>
+                <td style="text-align: right">{{ doctor.roundFee | number : '1.0-2'}}</td>
+                <td>{{ doctor.monTime }}</td>
+                <td>{{ doctor.tueTime }}</td>
+                <td>{{ doctor.wedTime }}</td>
+                <td>{{ doctor.thuTime }}</td>
+                <td>{{ doctor.friTime }}</td>
+                <td>{{ doctor.satTime }}</td>
+                <td>{{ doctor.sunTime }}</td>
+                <td>
+                    <p-tag value="{{ doctor.status?'Active':'InActive' }}" [severity]="doctor.status?'success':'info'"
+                        icon="{{ doctor.status?'pi pi-check':'pi pi-minus-circle' }}" [rounded]="true"></p-tag>
+                </td>
+                <td>{{ doctor.createdOn | date : 'dd/MMM/yyyy hh:mm:ss a' }}</td>
+                <td>{{ doctor.createdBy }}</td>
+                <td>{{ doctor.updatedOn | date : 'dd/MMM/yyyy hh:mm:ss a' }}</td>
+                <td>{{ doctor.updatedBy }}</td>
+
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog header="{{isEdit?'Edit Doctor':'Create Doctor'}}" [(visible)]="modalVisible" [breakpoints]="{
+      '1920px': '60vw',
+      '1440px': '30vw',
+      '1024px': '30vw',
+      '768px': '80vw',
+      '425px': '100vw',
+      '375px': '100vw',
+      '320px': '100vw'}" [modal]="true"
+    [style]="{width: '50vw', height: '50vh', minWidth: '100vw', minHeight: '100vh'}" [draggable]="false"
+    [resizable]="false" (onHide)="clearSection()">
+
+    <form [formGroup]="doctorForm" (submit)="submit()">
+        <div class="grid grid-cols-12 gap-4">
+            <div class="col-span-12 sm:col-span-12 md:col-span-8 xl:col-span-8 2xl:col-span-8 flex flex-col gap-2">
+                <div class="grid 2xl:grid-cols-12 grid-cols-8 gap-3">
+
+                    <!-- Doctor Name -->
+                    <div
+                        class="col-span-4 sm:col-span-4 md:col-span-4 lg:col-span-4 2xl:col-span-6 flex flex-col gap-2">
+                        <label>Doctor Name</label>
+                        <input formControlName="name" pInputText placeholder="Enter Doctor Name..." required />
+                        <small *ngIf="doctorForm.controls['name'].invalid && doctorForm.get('name')?.dirty"
+                            class="p-text text-sm text-red-500">
+                            Doctor Name is required.
+                        </small>
+                    </div>
+
+                    <!-- Degree -->
+                    <div
+                        class="col-span-4 sm:col-span-4 md:col-span-4 lg:col-span-4 2xl:col-span-6 flex flex-col gap-2">
+                        <label>Degree</label>
+                        <input formControlName="degree" pInputText placeholder="Enter Degree..." required />
+                        <small *ngIf="doctorForm.controls['degree'].invalid && doctorForm.get('degree')?.dirty"
+                            class="p-text text-sm text-red-500">
+                            Degree is required.
+                        </small>
+                    </div>
+
+                    <!-- Specialized -->
+                    <div
+                        class="col-span-4 sm:col-span-4 md:col-span-4 lg:col-span-4 2xl:col-span-6 flex flex-col gap-2">
+                        <label>Specialized</label>
+                        <input formControlName="spalized" pInputText placeholder="Enter Specialized..." required />
+                        <small *ngIf="doctorForm.controls['spalized'].invalid && doctorForm.get('spalized')?.dirty"
+                            class="p-text text-sm text-red-500">
+                            Specialized is required.
+                        </small>
+                    </div>
+
+                    <!-- Refer Fee -->
+                    <div
+                        class="col-span-4 sm:col-span-4 md:col-span-4 lg:col-span-4 2xl:col-span-6 flex flex-col gap-2">
+                        <label>Refer Fee</label>
+                        <input min="0" type="number" pInputText formControlName="referFee"
+                            (keydown)="preventNegativeInput($event)" />
+
+                        <small *ngIf="doctorForm.controls['referFee'].invalid && doctorForm.get('referFee')?.dirty"
+                            class="p-text text-sm text-red-500">
+                            Refer Fee is Required
+                        </small>
+                    </div>
+
+                    <!-- opdreferFee -->
+                    <div
+                        class="col-span-4 sm:col-span-4 md:col-span-4 lg:col-span-4 2xl:col-span-6 flex flex-col gap-2">
+                        <label>OPD-Refer Fee</label>
+                        <input min="0" type="number" pInputText formControlName="opdreferFee"
+                            (keydown)="preventNegativeInput($event)" />
+
+                        <small
+                            *ngIf="doctorForm.controls['opdreferFee'].invalid && doctorForm.get('opdreferFee')?.dirty"
+                            class="p-text text-sm text-red-500">
+                            OpdreferFee is Required
+                        </small>
+                    </div>
+
+                    <!-- consultantFee -->
+                    <div
+                        class="col-span-4 sm:col-span-4 md:col-span-4 lg:col-span-4 2xl:col-span-6 flex flex-col gap-2">
+                        <label>ConsultantFee</label>
+                        <input min="0" type="number" pInputText formControlName="consultantFee"
+                            (keydown)="preventNegativeInput($event)" />
+
+                        <small
+                            *ngIf="doctorForm.controls['consultantFee'].invalid && doctorForm.get('consultantFee')?.dirty"
+                            class="p-text text-sm text-red-500">
+                            Consultant Fee is Required
+                        </small>
+                    </div>
+
+                    <!-- ECGfee -->
+                    <div
+                        class="col-span-4 sm:col-span-4 md:col-span-4 lg:col-span-4 2xl:col-span-6 flex flex-col gap-2">
+                        <label>ECG fee</label>
+                        <input min="0" type="number" pInputText formControlName="ecgfee"
+                            (keydown)="preventNegativeInput($event)" />
+
+                        <small *ngIf="doctorForm.controls['ecgfee'].invalid && doctorForm.get('ecgfee')?.dirty"
+                            class="p-text text-sm text-red-500">
+                            ECG fee is Required
+                        </small>
+                    </div>
+
+                    <!-- xrayFee -->
+                    <div
+                        class="col-span-4 sm:col-span-4 md:col-span-4 lg:col-span-4 2xl:col-span-6 flex flex-col gap-2">
+                        <label>X-Ray Fee</label>
+                        <input min="0" type="number" pInputText formControlName="xrayFee"
+                            (keydown)="preventNegativeInput($event)" />
+
+                        <small *ngIf="doctorForm.controls['xrayFee'].invalid && doctorForm.get('xrayFee')?.dirty"
+                            class="p-text text-sm text-red-500">
+                            X-ray Fee is Required
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-span-12 sm:col-span-12 md:col-span-4 xl:col-span-4 2xl:col-span-4 flex flex-col gap-2">
+                <div class="grid grid-cols-12 gap-4">
+
+                    <!-- ultrasoundFee -->
+
+                    <div class="col-span-6 sm:col-span-6 md:col-span-12 lg:col-span-12  flex flex-col gap-2">
+                        <label>Ultrasound Fee</label>
+                        <input min="0" type="number" pInputText formControlName="ultrasoundFee"
+                            (keydown)="preventNegativeInput($event)" />
+                        <small
+                            *ngIf="doctorForm.controls['ultrasoundFee'].invalid && doctorForm.get('ultrasoundFee')?.dirty"
+                            class="p-text text-sm text-red-500">
+                            Ultrasound Fee is Required
+                        </small>
+                    </div>
+
+                    <!-- roundFee -->
+                    <div class="col-span-6 sm:col-span-6 md:col-span-12 lg:col-span-12  flex flex-col gap-1 ">
+                        <label>Round Fee</label>
+                        <input min="0" type="number" pInputText formControlName="roundFee"
+                            (keydown)="preventNegativeInput($event)" />
+
+                        <small *ngIf="doctorForm.controls['roundFee'].invalid && doctorForm.get('roundFee')?.dirty"
+                            class="p-text text-sm text-red-500">
+                            Round Fee is Required
+                        </small>
+                    </div>
+
+                    <!-- MonTime -->
+                    <div class="col-span-12 border sm:col-span-12 xl:col-span-12 border-slate-300 rounded-xl p-4 mt-4">
+                        <div class="flex justify-between items-center">
+                            <div class="">
+                                <p-toast></p-toast>
+                                <h5 class="my-0">Monday</h5>
+                            </div>
+                            <div>
+                                <div>
+                                    <p-toggle-switch formControlName="isMonday"
+                                        (onChange)="monDayChange()"></p-toggle-switch>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-12 mt-3 gap-4">
+
+                            <div class="col-span-6 flex flex-col gap-2">
+                                <label>Start Time</label>
+                                <p-datepicker [timeOnly]="true" [showIcon]="true" [iconDisplay]="'input'"
+                                    placeholder="HH:mm" hourFormat="12" [style]="{ width: '100%' }" [showTime]="true"
+                                    class="max-w-full" appendTo="body" formControlName="_1MonDayStartHour">
+                                    <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                                        <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                                    </ng-template>
+                                </p-datepicker>
+                                <small
+                                    *ngIf="doctorForm.controls['_1MonDayStartHour'].invalid && doctorForm.get('_1MonDayStartHour')?.dirty"
+                                    class="p-text text-sm text-red-500">
+                                    Start Time is Required
+                                </small>
+                            </div>
+                            <div class="col-span-6 flex flex-col gap-2">
+                                <label>End Time</label>
+                                <p-datepicker [timeOnly]="true" [showIcon]="true" [iconDisplay]="'input'"
+                                    placeholder="HH:mm" hourFormat="12" [style]="{ width: '100%' }" [showTime]="true"
+                                    class="max-w-full" appendTo="body" formControlName="_1MonDayEndHour">
+                                    <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                                        <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                                    </ng-template>
+                                </p-datepicker>
+                                <small
+                                    *ngIf="doctorForm.controls['_1MonDayEndHour'].invalid && doctorForm.get('_1MonDayEndHour')?.dirty"
+                                    class="p-text text-sm text-red-500">
+                                    End Time is Required
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ThuTime -->
+            <div class="col-span-12 flex flex-col gap-2">
+                <div class="grid grid-cols-12 gap-4">
+
+                    <div class="border border-slate-300 rounded-xl p-4 col-span-12 sm:col-span-12 md:col-span-4">
+                        <div class="flex justify-between items-center">
+                            <div class="">
+                                <p-toast></p-toast>
+                                <h5 class="my-0">Tuesday</h5>
+                            </div>
+                            <div>
+                                <div>
+                                    <p-toggle-switch formControlName="isTuesday"
+                                        (onChange)="tueDayChange()"></p-toggle-switch>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-12 mt-3 gap-4">
+
+                            <div class="col-span-6 flex flex-col gap-2">
+                                <label>Start Time</label>
+                                <p-datepicker [timeOnly]="true" [showIcon]="true" [iconDisplay]="'input'"
+                                    placeholder="HH:mm" hourFormat="12" [style]="{ width: '100%' }" [showTime]="true"
+                                    class="max-w-full" appendTo="body" formControlName="_2TueDayStartHour">
+                                    <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                                        <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                                    </ng-template>
+                                </p-datepicker>
+                                <small
+                                    *ngIf="doctorForm.controls['_2TueDayStartHour'].invalid && doctorForm.get('_2TueDayStartHour')?.dirty"
+                                    class="p-text text-sm text-red-500">
+                                    Start Time is Required
+                                </small>
+                            </div>
+                            <div class="col-span-6 flex flex-col gap-2">
+                                <label>End Time</label>
+                                <p-datepicker [timeOnly]="true" [showIcon]="true" [iconDisplay]="'input'"
+                                    placeholder="HH:mm" hourFormat="12" [style]="{ width: '100%' }" [showTime]="true"
+                                    class="max-w-full" appendTo="body" formControlName="_2TueDayEndHour">
+                                    <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                                        <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
+                                    </ng-template>
+                                </p-datepicker>
+                                <small
+                                    *ngIf="doctorForm.controls['_2TueDayEndHour'].invalid && doctorForm.get('_2TueDayEndHour')?.dirty"
+                                    class="p-text text-sm text-red-500">
+                                    End Time is Required
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WedTime -->
+                    <div
+                        class="border border-slate-300 rounded-xl p-4 col-span-12 sm:col-span-12 md:col-span-4 xl:col-span-4 2xl:col-span-4">
+                        <div class="flex justify-between items-center">
+                            <div class="">
+                                <p-toast></p-toast>
+                                <h5 class="my-0">Wednesday</h5>
+                            </div>
+                            <div>
+                                <div>
+                                    <p-toggle-switch formControlName="isWednesday"
+                                        (onChange)="wedDayChange()"></p-toggle-switch>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-12 mt-3 gap-4">
+
+                            <div class="col-span-6 flex flex-col gap-2">
+                                <label>Start Time</label>
+                                <p-datepicker [timeOnly]="true" [showIcon]="true" [iconDisplay]="'input'"
+                                    placeholder="HH:mm" hourFormat="12" [style]="{ width: '100%' }" [showTime]="true"
+                                    class="max-w-full" appendTo="body" formControlName="_3WedDayStartHour">
+                                    <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                                        <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
+                                    </ng-template>
+                                </p-datepicker>
+                                <small
+                                    *ngIf="doctorForm.controls['_3WedDayStartHour'].invalid && doctorForm.get('_3WedDayStartHour')?.dirty"
+                                    class="p-text text-sm text-red-500">
+                                    Start Time is Required
+                                </small>
+                            </div>
+                            <div class="col-span-6 flex flex-col gap-2">
+                                <label>End Time</label>
+                                <p-datepicker [timeOnly]="true" [showIcon]="true" [iconDisplay]="'input'"
+                                    placeholder="HH:mm" hourFormat="12" [style]="{ width: '100%' }" [showTime]="true"
+                                    class="max-w-full" appendTo="body" formControlName="_3WedDayEndHour">
+                                    <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                                        <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
+                                    </ng-template>
+                                </p-datepicker>
+                                <small
+                                    *ngIf="doctorForm.controls['_3WedDayEndHour'].invalid && doctorForm.get('_3WedDayEndHour')?.dirty"
+                                    class="p-text text-sm text-red-500">
+                                    End Time is Required
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ThuTime -->
+                    <div class="border border-slate-300 rounded-xl p-4 col-span-12 sm:col-span-12 md:col-span-4">
+                        <div class="flex justify-between items-center">
+                            <div class="">
+                                <p-toast></p-toast>
+                                <h5 class="my-0">Thursday</h5>
+                            </div>
+                            <div>
+                                <div>
+                                    <p-toggle-switch formControlName="isThursday"
+                                        (onChange)="thuDayChange()"></p-toggle-switch>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-12 mt-3 gap-4">
+
+                            <div class="col-span-6 flex flex-col gap-2">
+                                <label>Start Time</label>
+                                <p-datepicker [timeOnly]="true" [showIcon]="true" [iconDisplay]="'input'"
+                                    placeholder="HH:mm" hourFormat="12" [style]="{ width: '100%' }" [showTime]="true"
+                                    class="max-w-full" appendTo="body" formControlName="_4ThuDayStartHour">
+                                    <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                                        <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                                    </ng-template>
+                                </p-datepicker>
+                                <small
+                                    *ngIf="doctorForm.controls['_4ThuDayStartHour'].invalid && doctorForm.get('_4ThuDayStartHour')?.dirty"
+                                    class="p-text text-sm text-red-500">
+                                    Start Time is Required
+                                </small>
+                            </div>
+                            <div class="col-span-6 flex flex-col gap-2">
+                                <label>End Time</label>
+                                <p-datepicker [timeOnly]="true" [showIcon]="true" [iconDisplay]="'input'"
+                                    placeholder="HH:mm" hourFormat="12" [style]="{ width: '100%' }" [showTime]="true"
+                                    class="max-w-full" appendTo="body" formControlName="_4ThuDayEndHour">
+                                    <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                                        <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                                    </ng-template>
+                                </p-datepicker>
+                                <small
+                                    *ngIf="doctorForm.controls['_4ThuDayEndHour'].invalid && doctorForm.get('_4ThuDayEndHour')?.dirty"
+                                    class="p-text text-sm text-red-500">
+                                    End Time is Required
+                                </small>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- FriTime -->
+                    <div class="border border-slate-300 rounded-xl p-4 col-span-12 sm:col-span-12 md:col-span-4">
+                        <div class="flex justify-between items-center">
+                            <div class="">
+                                <p-toast></p-toast>
+                                <h5 class="my-0">Friday</h5>
+                            </div>
+                            <div>
+                                <div>
+                                    <p-toggle-switch formControlName="isFriday"
+                                        (onChange)="friDayChange()"></p-toggle-switch>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-12 mt-3 gap-4">
+
+                            <div class="col-span-6 flex flex-col gap-2">
+                                <label>Start Time</label>
+                                <p-datepicker [timeOnly]="true" [showIcon]="true" [iconDisplay]="'input'"
+                                    placeholder="HH:mm" hourFormat="12" [style]="{ width: '100%' }" [showTime]="true"
+                                    class="max-w-full" appendTo="body" formControlName="_5FriDayStartHour">
+                                    <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                                        <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                                    </ng-template>
+                                </p-datepicker>
+                                <small
+                                    *ngIf="doctorForm.controls['_5FriDayStartHour'].invalid && doctorForm.get('_5FriDayStartHour')?.dirty"
+                                    class="p-text text-sm text-red-500">
+                                    Start Time is Required
+                                </small>
+                            </div>
+                            <div class="col-span-6 flex flex-col gap-2">
+                                <label>End Time</label>
+                                <p-datepicker [timeOnly]="true" [showIcon]="true" [iconDisplay]="'input'"
+                                    placeholder="HH:mm" hourFormat="12" [style]="{ width: '100%' }" [showTime]="true"
+                                    class="max-w-full" appendTo="body" formControlName="_5FriDayEndHour">
+                                    <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                                        <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                                    </ng-template>
+                                </p-datepicker>
+
+                                <small
+                                    *ngIf="doctorForm.controls['_5FriDayEndHour'].invalid && doctorForm.get('_5FriDayEndHour')?.dirty"
+                                    class="p-text text-sm text-red-500">
+                                    End Time is Required
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SatTime -->
+                    <div class="border border-slate-300 rounded-xl p-4 col-span-12 sm:col-span-12 md:col-span-4">
+                        <div class="flex justify-between items-center">
+                            <div class="">
+                                <p-toast></p-toast>
+                                <h5 class="my-0">Saturday</h5>
+                            </div>
+                            <div>
+                                <div>
+                                    <p-toggle-switch formControlName="isSaturday"
+                                        (onChange)="satDayChange()"></p-toggle-switch>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-12 mt-3 gap-4">
+
+                            <div class="col-span-6 flex flex-col gap-2">
+                                <label>Start Time</label>
+                                <p-datepicker [timeOnly]="true" [showIcon]="true" [iconDisplay]="'input'"
+                                    placeholder="HH:mm" hourFormat="12" [style]="{ width: '100%' }" [showTime]="true"
+                                    class="max-w-full" appendTo="body" formControlName="_6SatDayStartHour">
+                                    <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                                        <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                                    </ng-template>
+                                </p-datepicker>
+                                <small
+                                    *ngIf="doctorForm.controls['_6SatDayStartHour'].invalid && doctorForm.get('_6SatDayStartHour')?.dirty"
+                                    class="p-text text-sm text-red-500">
+                                    Start Time is Required
+                                </small>
+                            </div>
+                            <div class="col-span-6 flex flex-col gap-2">
+                                <label>End Time</label>
+                                <p-datepicker [timeOnly]="true" [showIcon]="true" [iconDisplay]="'input'"
+                                    placeholder="HH:mm" hourFormat="12" [style]="{ width: '100%' }" [showTime]="true"
+                                    class="max-w-full" appendTo="body" formControlName="_6SatDayEndHour">
+                                    <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                                        <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                                    </ng-template>
+                                </p-datepicker>
+                                <small
+                                    *ngIf="doctorForm.controls['_6SatDayEndHour'].invalid && doctorForm.get('_6SatDayEndHour')?.dirty"
+                                    class="p-text text-sm text-red-500">
+                                    End Time is Required
+                                </small>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- SunTime -->
+                    <div class="border border-slate-300 rounded-xl p-4 col-span-12 sm:col-span-12 md:col-span-4">
+                        <div class="flex justify-between items-center">
+                            <div class="">
+                                <p-toast></p-toast>
+                                <h5 class="my-0">Sunday</h5>
+                            </div>
+                            <div>
+                                <div>
+                                    <p-toggle-switch formControlName="isSunday"
+                                        (onChange)="sunDayChange()"></p-toggle-switch>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-12 mt-3 gap-4">
+
+                            <div class="col-span-6 flex flex-col gap-2">
+                                <label>Start Time</label>
+                                <p-datepicker [timeOnly]="true" [showIcon]="true" [iconDisplay]="'input'"
+                                    placeholder="HH:mm" hourFormat="12" [style]="{ width: '100%' }" [showTime]="true"
+                                    class="max-w-full" appendTo="body" formControlName="_7SunDayStartHour">
+                                    <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                                        <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                                    </ng-template>
+                                </p-datepicker>
+                                <small
+                                    *ngIf="doctorForm.controls['_7SunDayStartHour'].invalid && doctorForm.get('_7SunDayStartHour')?.dirty"
+                                    class="p-text text-sm text-red-500">
+                                    Start Time is Required
+                                </small>
+                            </div>
+                            <div class="col-span-6 flex flex-col gap-2">
+                                <label>End Time</label>
+                                <p-datepicker [timeOnly]="true" [showIcon]="true" [iconDisplay]="'input'"
+                                    placeholder="HH:mm" hourFormat="12" [style]="{ width: '100%' }" [showTime]="true"
+                                    class="max-w-full" appendTo="body" formControlName="_7SunDayEndHour">
+                                    <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                                        <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                                    </ng-template>
+                                </p-datepicker>
+                                <small
+                                    *ngIf="doctorForm.controls['_7SunDayEndHour'].invalid && doctorForm.get('_7SunDayEndHour')?.dirty"
+                                    class="p-text text-sm text-red-500">
+                                    End Time is Required
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div class="col-span-12">
+                <div class="flex gap-2">
+                    <p-toggle-switch formControlName="status"></p-toggle-switch>
+                    <span class="text-md font-medium">Status</span>
+                </div>
+            </div>
+
+            <!-- Button -->
+            <div class="col-span-12">
+                <div class="flex flex-col mb-2 gap-2">
+                    <p-button icon="pi pi-check" label="{{ isEdit?'Update':'Save' }}" type="submit"
+                        [loading]="isSubmitting" [severity]="isEdit?'info':'success'"></p-button>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</p-dialog>
+
+<p-confirmDialog [breakpoints]="{
+      '1920px': '30vw',
+      '1440px': '60vw',
+      '1024px': '100vw',
+      '768px': '100vw',
+      '425px': '150vw',
+      '375px': '100vw',
+      '320px': '100vw'}" [style]="{ width: '30vw' }" key="doctorDeleteDialog" position="bottom"
+    rejectButtonStyleClass="p-button-outlined"></p-confirmDialog>
