@@ -13,16 +13,16 @@ export class SupplierService {
   constructor(private httpClient: HttpClient) {
   }
 
-  get(clinicId: number): Observable<RootModel> {
-    return this.httpClient.get<RootModel>(`${environment.main_url}/master/supplier?clinicId=${clinicId}`);
+  get(branchId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/supplier?branchId=${branchId}`);
   }
 
-  getById(id: number, clinicId: number): Observable<RootModel> {
-    return this.httpClient.get<RootModel>(`${environment.main_url}/master/supplier/${id}?clinicId=${clinicId}`);
+  getById(id: number, branchId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/supplier/${id}?branchId=${branchId}`);
   }
 
-  getAutoId(clinicId: number): Observable<RootModel> {
-    return this.httpClient.get<RootModel>(`${environment.main_url}/master/supplier/auto-id?clinicId=${clinicId}`);
+  getAutoId(branchId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/supplier/auto-id?branchId=${branchId}`);
   }
 
   create(model: SupplierModel) {
