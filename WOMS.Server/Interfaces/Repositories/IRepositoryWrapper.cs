@@ -18,6 +18,7 @@ namespace WOMS.Server.Interfaces.Repositories
         IPacketTypeRepo PacketTypes { get; }
         IMainStockRepo MainStocks { get; }
         IStockItemRepo StockItems { get; }
+        IDoctorRepo Doctors { get; }
 
         #endregion
 
