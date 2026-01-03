@@ -1,0 +1,120 @@
+<p-toast></p-toast>
+<div class="grid grid-cols-12 gap-2">
+    <div
+        class="col-span-6 border sm:col-span-6 md:col-span-6 lg:col-span-3 xl:col-span-3 xl:col-sapn-3 bg-white border-slate-300 rounded-xl mt-1 p-4 ">
+        <p-toggle-switch></p-toggle-switch>
+        <h4>trdr</h4>
+    </div>
+
+    <div
+        class="col-span-6 sm:col-sapn-6 md:col-span-6 lg:col-sapn-4 lg:col-span-3 xl:col-span-3 2xl:col-span-3 bg-white border border-slate-300 rounded-xl  mt-1 p-4">
+        <h5>test</h5>
+    </div>
+
+
+    <div
+        class="col-span-6 sm:col-sapn-6 md:col-span-6 lg:col-sapn-4 lg:col-span-3 xl:col-span-3 2xl:col-span-3 bg-white border border-slate-300 rounded-xl  mt-1 p-4">
+
+        <h5>test</h5>
+    </div>
+
+
+    <div
+        class="col-span-6 sm:col-sapn-6 md:col-span-6 lg:col-sapn-4 lg:col-span-3 xl:col-span-3 2xl:col-span-3 bg-white border border-slate-300 rounded-xl  mt-1 p-4">
+
+        <h5>test</h5>
+    </div>
+</div>
+
+<!-- #region PersonalInformation -->
+
+<div class="card mt-2">
+
+    <div class="font-semibold">Personal Information</div>
+
+    <div class="grid grid-cols-12">
+        <div class="col-span-6 mt-4">
+
+            <div class="grid md:grid-cols-2 grid-cols-1">
+                <div>
+                    <div class="flex p-6">
+                        <div class="w-1/2 font-semibold">Full Name</div>
+                        <div class=" ">{{doctor.name}}</div>
+                    </div>
+                    <div class="flex p-6">
+                        <div class="w-1/2 font-semibold">Degree</div>
+                        <div class="">{{doctor.degree}}</div>
+                    </div>
+                    <div class="flex p-6">
+                        <div class="w-1/2 font-semibold">Specialized</div>
+                        <div class="">{{doctor.spalized}}</div>
+                    </div>
+                    <div class="flex p-6">
+                        <div class="w-1/2 font-semibold">Status</div>
+                        <div class=""><p-tag value="{{ doctor.status?'Active':'InActive' }}"
+                                [severity]="doctor.status?'success':'info'"
+                                icon="{{ doctor.status?'pi pi-check':'pi pi-minus-circle' }}" [rounded]="true"></p-tag>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-span-6">
+
+            <div class="grid md:grid-cols-2 grid-cols-1">
+                <div>
+                    <div class="flex p-6">
+                        <div class="w-1/2 font-semibold">Monday</div>
+                        <div class="">{{doctor.monTime == null ? 'N/A' : doctor.monTime}}</div>
+                    </div>
+                    <div class="flex p-6">
+                        <div class="w-1/2 font-semibold">Tuesday</div>
+                        <div class="">{{doctor.thuTime == null ? 'N/A' : doctor.tueTime}}</div>
+                    </div>
+                    <div class="flex p-6">
+                        <div class="w-1/2 font-semibold">Wednesday</div>
+                        <div class="">{{doctor.wedTime == null ? 'N/A' : doctor.wedTime}}</div>
+                    </div>
+                    <div class="flex p-6">
+                        <div class="w-1/2 font-semibold">Thursday</div>
+                        <div class="">{{doctor.thuTime == null ? 'N/A' : doctor.thuTime}}</div>
+                    </div>
+                    <div class="flex p-6">
+                        <div class="w-1/2 font-semibold">Friday</div>
+                        <div class="">{{doctor.friTime == null ? 'N/A' : doctor.friTime}}</div>
+                    </div>
+                    <div class="flex p-6">
+                        <div class="w-1/2 font-semibold">Saturday</div>
+                        <div class=" ">{{doctor.satTime == null ? 'N/A' : doctor.satTime}}</div>
+                    </div>
+                    <div class="flex p-6">
+                        <div class="w-1/2 font-semibold">Sunday</div>
+                        <div class="">{{doctor.sunTime == null ? 'N/A' : doctor.sunTime}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <p-fieldset legend="Sign Image" class="bg-gray-300">
+
+         <div class="col-12 md:col-6 lg:col-6 flex flex-column gap-3" *ngIf="!loading">
+                    <label class="font-semibold text-lg">Photo Upload</label>
+                    <div class="flex gap-3">
+                        <p-button size="small" label="Import" icon="pi pi-download" rounded="true"
+                            (click)="onImportImg()"></p-button>
+                        <input #img type="file" accept=".jpeg,.jpg,.png" (change)="onImgChange($event)"
+                            style="display: none;" />
+                        <p-button size="small" label="Upload" severity="success" icon="pi pi-upload" rounded="true"
+                            (click)="onUploadImg()"></p-button>
+                    </div>
+                </div>
+     
+    </p-fieldset>
+    
+</div>
+
+<!-- #end region -->
+
+
+<div class="card mt-1"></div>
