@@ -198,7 +198,7 @@ export class PacketTypeComponent implements OnInit {
     // Define the columns to be exported
     const columns = [
       { key: 'typeCode', value: 'Type Code' },
-      { key: 'clinicId', value: 'Hospital Id' },
+      { key: 'clinicId', value: 'Clinic Id' },
       { key: 'typeName', value: 'Type Name' },
       { key: 'capacity', value: 'Capacity' },
       { key: 'status', value: 'Status' },
