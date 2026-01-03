@@ -1,4 +1,4 @@
-namespace ES_HIS.Server.Controllers.Master;
+namespace WOMS.Server.Controllers.Master;
 
 [Authorize]
 [Route("api/master/[controller]")]
@@ -11,26 +11,26 @@ public class SupplierController(
     [HttpGet]
     [EndpointSummary("List")]
     [EndpointDescription("List all Supplier without deleted data")]
-    public async Task<IActionResult> Get(long clinicId)
+    public async Task<IActionResult> Get(long branchId)
             => ResponseHelper.OK_Result(
-               await repo.Suppliers.GetAsync(x => !x.DeletedOn.HasValue && x.ClinicId == clinicId),
+               await repo.Suppliers.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId),
                null);
 
     [HttpGet("{id:long}")]
     [EndpointSummary("Get By Id")]
     [EndpointDescription("Get Supplier by Id")]
-    public async Task<IActionResult> Get(long id, long clinicId)
+    public async Task<IActionResult> Get(long id, long branchId)
             => ResponseHelper.OK_Result(
-        await repo.Suppliers.GetFirstAsync(x => x.SupplierId == id && x.ClinicId == clinicId) ,
+        await repo.Suppliers.GetFirstAsync(x => x.SupplierId == id && x.BranchId == branchId) ,
         null);
 
     [HttpGet("auto-id")]
     [EndpointSummary("Get Auto Id")]
     [EndpointDescription("Gets an Supplier max id.")]
-    public async Task<IActionResult> GetAutoId(long clinicId)
+    public async Task<IActionResult> GetAutoId(long branchId)
     {
         Supplier? lastRecord =
-            await repo.Suppliers.GetFirstAsync(x => x.ClinicId == clinicId, q => q.OrderByDescending(x => x.SupplierId));
+            await repo.Suppliers.GetFirstAsync(x => x.BranchId == branchId, q => q.OrderByDescending(x => x.SupplierId));
 
         long maxId = lastRecord?.SupplierId ?? 0;
         maxId++;
@@ -68,7 +68,7 @@ public class SupplierController(
 
         //Re-assign values
         supplier.SupplierId = model.SupplierId;
-        supplier.ClinicId = model.ClinicId;
+        supplier.BranchId = model.BranchId;
         supplier.CompanyName = model.CompanyName;
         supplier.ContactPerson = model.ContactPerson;
         supplier.Address = model.Address;
