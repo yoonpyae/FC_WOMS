@@ -1,0 +1,31 @@
+export interface DoctorModel {
+    doctorId: number;
+    branchId: number;
+    name: string;
+    degree: string | null;
+    spalized: string | null;
+    photo: string | null;
+    sign: string | null;
+    referFee: number | null;
+    opdreferFee: number | null;
+    consultantFee: number | null;
+    ecgfee: number | null;
+    xrayFee: number | null;
+    ultrasoundFee: number | null;
+    roundFee: number | null;
+    monTime: string | null;
+    tueTime: string | null;
+    wedTime: string | null;
+    thuTime: string | null;
+    friTime: string | null;
+    satTime: string | null;
+    sunTime: string | null;
+    createdOn: string;
+    createdBy: string;
+    updatedOn: string;
+    updatedBy: string;
+    deletedOn: string | null;
+    deletedBy: string | null;
+    status: string | null;
+    remark: string | null;
+}
