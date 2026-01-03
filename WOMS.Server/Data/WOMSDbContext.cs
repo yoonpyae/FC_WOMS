@@ -28,6 +28,8 @@ public partial class WOMSDbContext : DbContext
 
     public virtual DbSet<Clinic> Clinics { get; set; }
 
+    public virtual DbSet<Doctor> Doctors { get; set; }
+
     public virtual DbSet<MainStock> MainStocks { get; set; }
 
     public virtual DbSet<PacketType> PacketTypes { get; set; }
@@ -82,6 +84,11 @@ public partial class WOMSDbContext : DbContext
         modelBuilder.Entity<Clinic>(entity =>
         {
             entity.Property(e => e.ClinicId).ValueGeneratedNever();
+        });
+
+        modelBuilder.Entity<MainStock>(entity =>
+        {
+            entity.Property(e => e.BranchId).HasDefaultValue(1L);
         });
 
         modelBuilder.Entity<State>(entity =>
