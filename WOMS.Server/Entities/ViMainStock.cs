@@ -25,6 +25,8 @@ public partial class ViMainStock
 
     public long ClinicId { get; set; }
 
+    public long BranchId { get; set; }
+
     public double PurchasePrice { get; set; }
 
     public double AvgPrice { get; set; }
