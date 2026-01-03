@@ -82,6 +82,7 @@ export class MainStockComponent implements OnInit {
     itemCode: [''],
     typeCode: [0, Validators.required],
     clinicId: [0, Validators.required],
+    branchId: [0, Validators.required],
     purchasePrice: [0, [Validators.required, Validators.min(0)]],
     salePrice: [0, [Validators.required, Validators.min(0)]],
     groundBalance: [0, [Validators.required, Validators.min(0)]],
@@ -97,7 +98,8 @@ export class MainStockComponent implements OnInit {
   loadData(): void {
     this.loading = true;
     let clinicId: number = Number.parseInt((this.sharedService.getDefaultClinicId() ?? "0"));
-    this.mainStockService.get(clinicId).subscribe({
+    let branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
+    this.mainStockService.get(clinicId, branchId).subscribe({
       next: res => {
         this.mainstocks = res.data as ViMainStockModel[];
         this.loading = false;
@@ -125,6 +127,7 @@ export class MainStockComponent implements OnInit {
       this.mainStockForm.controls['itemCode'].setValue(this.selectedMainStock.itemCode);
       // this.mainStockForm.controls['itemCode'].disable();
       this.mainStockForm.controls['clinicId'].setValue(this.selectedMainStock.clinicId);
+      this.mainStockForm.controls['branchId'].setValue(this.selectedMainStock.branchId);
       this.mainStockForm.controls['typeCode'].setValue(this.selectedMainStock.typeCode);
       this.mainStockForm.controls['purchasePrice'].setValue(this.selectedMainStock.purchasePrice);
       this.mainStockForm.controls['salePrice'].setValue(this.selectedMainStock.salePrice);
