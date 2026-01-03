@@ -10,11 +10,15 @@ namespace WOMS.Server.Controllers.Stock
         #region CRUD Operation
         [HttpGet]
         [EndpointSummary("List")]
-        [EndpointDescription("List all Main Stocks")]
-        public async Task<IActionResult> Get(long clinicId)
+        [EndpointDescription("List all Main Stocks by Clinic and Branch")]
+        public async Task<IActionResult> Get(long clinicId, long branchId) 
         {
             return ResponseHelper.OK_Result(
-                    await repo.ViMainStocks.GetAsync(x => x.ClinicId == clinicId && !x.DeletedOn.HasValue), null);
+                await repo.ViMainStocks.GetAsync(x =>
+                    x.ClinicId == clinicId &&
+                    x.BranchId == branchId &&
+                    !x.DeletedOn.HasValue
+                ), null);
         }
 
         [HttpGet("code")]
