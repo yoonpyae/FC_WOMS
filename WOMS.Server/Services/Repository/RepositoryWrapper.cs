@@ -30,6 +30,7 @@ namespace WOMS.Server.Services.Repository
         private IPacketTypeRepo? _packetType;
         private IMainStockRepo? _mainStock;
         private IStockItemRepo? _stockItem;
+        private IDoctorRepo? _doctor;
 
         #endregion
 
@@ -138,6 +139,15 @@ namespace WOMS.Server.Services.Repository
             {
                 _stockItem ??= new StockItemRepo(Context);
                 return _stockItem;
+            }
+        }
+
+        public IDoctorRepo Doctors
+        {
+            get
+            {
+                _doctor ??= new DoctorRepo(Context);
+                return _doctor;
             }
         }
         #endregion
