@@ -21,12 +21,12 @@ import { SupplierComponent } from './pages/master/supplier/supplier.component';
 // import { LaboratoryComponent } from './pages/master/laboratory/laboratory.component';
 // import { CheckupCompanyComponent } from './pages/master/checkup-company/checkup-company.component';
 // import { CheckuptypesComponent } from './pages/master/checkuptypes/checkuptypes.component';
-// import { DoctorComponent } from './pages/master/doctor/doctor.component';
+import { DoctorComponent } from './pages/master/doctor/doctor.component';
 import { SettingComponent } from './pages/setting/setting.component';
 // import { LabtestComponent } from './pages/master/lab-test/lab-test.component';
 // import { LabMainGroupComponent } from './pages/master/lab-main-group/lab-main-group.component';
 // import { LabSubGroupComponent } from './pages/master/lab-sub-group/lab-sub-group.component';
-// import { DetailComponent as DoctorDetailComponent } from './pages/master/doctor/detail/detail.component';
+import { DetailComponent as DoctorDetailComponent } from './pages/master/doctor/detail/detail.component';
 // import { PurchaseComponent } from './pages/stock/purchase/purchase.component';
 import { PacketTypeComponent } from "./pages/stock/packet-type/packet-type.component";
 import { MainStockComponent } from './pages/stock/main-stock/main-stock.component';
@@ -49,7 +49,7 @@ import { Title } from '@angular/platform-browser';
 // import { OpdDoctorAttachComponent } from './pages/opd/opd-doctor-attach/opd-doctor-attach.component';
 // import { PharmacyCreateVoucherComponent } from './pages/pharmacy-voucher/create-voucher/create-voucher.component';
 // import { PharmacyVoHistoryComponent } from './pages/pharmacy-voucher/history/history.component';
-// import { StockItemComponent } from './pages/stock/stock-item/stock-item.component';
+import { StockItemComponent } from './pages/stock/stock-item/stock-item.component';
 // import { AdmLabVoucherComponent } from './pages/admission/lab-voucher/lab-voucher.component';
 // import { AdmissionDetailComponent } from './pages/admission/admission/detail/detail.component';
 
@@ -99,16 +99,16 @@ export const routes: Routes = [
 					// { path: 'laboratory', component: LaboratoryComponent, data: { title: 'laboratory' } },
 					// { path: 'checkup-company', component: CheckupCompanyComponent, data: { title: 'Checkup Company' } },
 					// { path: 'checkup-types', component: CheckuptypesComponent, data: { title: 'Checkup Types' } },
-					// {
-					// 	path: 'doctor',
-					// 	children: [
-					// 		{ path: '', component: DoctorComponent },
-					// 		{ path: 'detail/:id', component: DoctorDetailComponent },
-					// 		{ path: 'detail', component: DoctorDetailComponent },
-					// 		{ path: 'doctor/detail', component: DoctorDetailComponent },
-					// 		{ path: '', redirectTo: 'doctor', pathMatch: 'full' },
-					// 	],
-					// },
+					{
+						path: 'doctor',
+						children: [
+							{ path: '', component: DoctorComponent },
+							{ path: 'detail/:id', component: DoctorDetailComponent },
+							{ path: 'detail', component: DoctorDetailComponent },
+							{ path: 'doctor/detail', component: DoctorDetailComponent },
+							{ path: '', redirectTo: 'doctor', pathMatch: 'full' },
+						],
+					},
 					// { path: 'lab-main-groups', component: LabMainGroupComponent, data: { title: 'Lab Main Group' } },
 					// { path: 'lab-sub-groups', component: LabSubGroupComponent, data: { title: 'Lab Sub Group' } },
 
@@ -120,7 +120,7 @@ export const routes: Routes = [
 			{
 				path: 'stock',
 				children: [
-					// { path: 'stock-items', component: StockItemComponent, data: { title: 'Stock Item' } },
+					{ path: 'stock-items', component: StockItemComponent, data: { title: 'Stock Item' } },
 					{ path: 'packet-types', component: PacketTypeComponent, data: { title: 'Packet Type' } },
 					{ path: 'main-stocks', component: MainStockComponent, data: { title: 'Main Stock' } },
 					// { path: 'pharmacy-stocks', component: PharmacyStockComponent, data: { title: 'Pharmacy Stock' } },
