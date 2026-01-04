@@ -12,6 +12,8 @@ public partial class WOMSDbContext : DbContext
     {
     }
 
+    public virtual DbSet<Appointment> Appointments { get; set; }
+
     public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
 
     public virtual DbSet<AspNetRoleClaim> AspNetRoleClaims { get; set; }
@@ -33,6 +35,16 @@ public partial class WOMSDbContext : DbContext
     public virtual DbSet<MainStock> MainStocks { get; set; }
 
     public virtual DbSet<PacketType> PacketTypes { get; set; }
+
+    public virtual DbSet<Patient> Patients { get; set; }
+
+    public virtual DbSet<Purchase> Purchases { get; set; }
+
+    public virtual DbSet<PurchaseDetail> PurchaseDetails { get; set; }
+
+    public virtual DbSet<Sale> Sales { get; set; }
+
+    public virtual DbSet<SaleDetail> SaleDetails { get; set; }
 
     public virtual DbSet<State> States { get; set; }
 
