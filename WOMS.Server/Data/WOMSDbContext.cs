@@ -30,9 +30,13 @@ public partial class WOMSDbContext : DbContext
 
     public virtual DbSet<Clinic> Clinics { get; set; }
 
+    public virtual DbSet<Consultation> Consultations { get; set; }
+
     public virtual DbSet<Doctor> Doctors { get; set; }
 
     public virtual DbSet<MainStock> MainStocks { get; set; }
+
+    public virtual DbSet<MedicalRecord> MedicalRecords { get; set; }
 
     public virtual DbSet<PacketType> PacketTypes { get; set; }
 
@@ -56,7 +60,19 @@ public partial class WOMSDbContext : DbContext
 
     public virtual DbSet<Township> Townships { get; set; }
 
+    public virtual DbSet<ViAppointment> ViAppointments { get; set; }
+
     public virtual DbSet<ViMainStock> ViMainStocks { get; set; }
+
+    public virtual DbSet<ViPatient> ViPatients { get; set; }
+
+    public virtual DbSet<ViPurchase> ViPurchases { get; set; }
+
+    public virtual DbSet<ViPurchaseDetail> ViPurchaseDetails { get; set; }
+
+    public virtual DbSet<ViSale> ViSales { get; set; }
+
+    public virtual DbSet<ViSaleDetail> ViSaleDetails { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -98,9 +114,37 @@ public partial class WOMSDbContext : DbContext
             entity.Property(e => e.ClinicId).ValueGeneratedNever();
         });
 
+        modelBuilder.Entity<Consultation>(entity =>
+        {
+            entity.HasKey(e => e.ConsultationId).HasName("PK__Consulta__5D014A98A4A2F895");
+
+            entity.Property(e => e.ConsultationDate).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.CreatedOn).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.Status).HasDefaultValue((byte)1);
+        });
+
+        modelBuilder.Entity<Doctor>(entity =>
+        {
+            entity.HasKey(e => new { e.DoctorId, e.BranchId }).HasName("PK_Doctor_1");
+        });
+
         modelBuilder.Entity<MainStock>(entity =>
         {
             entity.Property(e => e.BranchId).HasDefaultValue(1L);
+        });
+
+        modelBuilder.Entity<MedicalRecord>(entity =>
+        {
+            entity.HasKey(e => e.MedicalRecordId).HasName("PK__MedicalR__4411BA220AD136E2");
+
+            entity.Property(e => e.CreatedOn).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.RecordDate).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.Status).HasDefaultValue((byte)1);
+        });
+
+        modelBuilder.Entity<Patient>(entity =>
+        {
+            entity.HasKey(e => new { e.PatientId, e.BranchId }).HasName("PK_Patient_1");
         });
 
         modelBuilder.Entity<State>(entity =>
@@ -113,9 +157,39 @@ public partial class WOMSDbContext : DbContext
             entity.Property(e => e.TownshipId).ValueGeneratedNever();
         });
 
+        modelBuilder.Entity<ViAppointment>(entity =>
+        {
+            entity.ToView("VI_Appointment");
+        });
+
         modelBuilder.Entity<ViMainStock>(entity =>
         {
             entity.ToView("VI_MainStock");
+        });
+
+        modelBuilder.Entity<ViPatient>(entity =>
+        {
+            entity.ToView("VI_Patient");
+        });
+
+        modelBuilder.Entity<ViPurchase>(entity =>
+        {
+            entity.ToView("VI_Purchase");
+        });
+
+        modelBuilder.Entity<ViPurchaseDetail>(entity =>
+        {
+            entity.ToView("VI_PurchaseDetail");
+        });
+
+        modelBuilder.Entity<ViSale>(entity =>
+        {
+            entity.ToView("VI_Sale");
+        });
+
+        modelBuilder.Entity<ViSaleDetail>(entity =>
+        {
+            entity.ToView("VI_SaleDetail");
         });
 
         OnModelCreatingPartial(modelBuilder);
