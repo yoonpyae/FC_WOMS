@@ -1,6 +1,6 @@
 ﻿namespace WOMS.Server.Interfaces.Repositories
 {
-    public interface ISaleRepo:IRepositoryBase<Sale>
+    public interface ISaleRepo : IRepositoryBase<Sale>
     {
     }
 }
