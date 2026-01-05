@@ -23,6 +23,7 @@ namespace WOMS.Server.Interfaces.Repositories
         IPurchaseDetailRepo PurchaseDetails { get; }
         ISaleRepo Sales { get; }
         ISaleDetailRepo SaleDetails { get; }
+        IPatientRepo Patients { get; }
 
         #endregion
 
@@ -31,6 +32,8 @@ namespace WOMS.Server.Interfaces.Repositories
         IViMainStockRepo ViMainStocks { get; }
         IViPurchaseRepo ViPurchases { get; }
         IViPurchaseDetailRepo ViPurchaseDetails { get; }
+        IViSaleRepo ViSales { get; }
+        IViSaleDetailRepo ViSaleDetails { get; }
 
         #endregion
 
