@@ -33,6 +33,7 @@ namespace WOMS.Server.Services.Repository
         private IPurchaseDetailRepo? _purchaseDetail;
         private ISaleRepo? _sale;
         private ISaleDetailRepo? _saleDetail;
+        private IPatientRepo? _patient;
 
         #endregion
 
@@ -40,6 +41,8 @@ namespace WOMS.Server.Services.Repository
         private IViMainStockRepo? _viMainStock;
         private IViPurchaseRepo? _viPurchase;
         private IViPurchaseDetailRepo? _viPurchaseDetail;
+        private IViSaleRepo? _viSale;
+        private IViSaleDetailRepo? _viSaleDetail;
 
         #endregion
 
@@ -191,6 +194,15 @@ namespace WOMS.Server.Services.Repository
                 return _saleDetail;
             }
         }
+
+        public IPatientRepo Patients
+        {
+            get
+            {
+                _patient ??= new PatientRepo(Context);
+                return _patient;
+            }
+        }
         #endregion
 
         #region View Properties
@@ -219,6 +231,24 @@ namespace WOMS.Server.Services.Repository
             {
                 _viPurchaseDetail ??= new ViPurchaseDetailRepo(Context);
                 return _viPurchaseDetail;
+            }
+        }
+
+        public IViSaleRepo ViSales
+        {
+            get
+            {
+                _viSale ??= new ViSaleRepo(Context);
+                return _viSale;
+            }
+        }
+
+        public IViSaleDetailRepo ViSaleDetails
+        {
+            get
+            {
+                _viSaleDetail ??= new ViSaleDetailRepo(Context);
+                return _viSaleDetail;
             }
         }
         #endregion
