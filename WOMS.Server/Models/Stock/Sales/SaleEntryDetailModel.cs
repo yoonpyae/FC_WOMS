@@ -1,6 +1,6 @@
 ﻿namespace WOMS.Server.Models.Stock.Sales
 {
-    public class SaleEntryDetailModel:SaleDetail
+    public class SaleEntryDetailModel : SaleDetail
     {
     }
 }
