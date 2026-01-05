@@ -1,7 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using WOMS.Server.Entities;
-using WOMS.Server.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -31,11 +29,17 @@ namespace WOMS.Server.Services.Repository
         private IMainStockRepo? _mainStock;
         private IStockItemRepo? _stockItem;
         private IDoctorRepo? _doctor;
+        private IPurchaseRepo? _purchase;
+        private IPurchaseDetailRepo? _purchaseDetail;
+        private ISaleRepo? _sale;
+        private ISaleDetailRepo? _saleDetail;
 
         #endregion
 
         #region View Variables
         private IViMainStockRepo? _viMainStock;
+        private IViPurchaseRepo? _viPurchase;
+        private IViPurchaseDetailRepo? _viPurchaseDetail;
 
         #endregion
 
@@ -60,7 +64,7 @@ namespace WOMS.Server.Services.Repository
             }
         }
 
-      
+
         public ITokenClaimRepo TokenClaims
         {
             get
@@ -150,6 +154,43 @@ namespace WOMS.Server.Services.Repository
                 return _doctor;
             }
         }
+
+
+        public IPurchaseRepo Purchases
+        {
+            get
+            {
+                _purchase ??= new PurchaseRepo(Context);
+                return _purchase;
+            }
+        }
+
+        public IPurchaseDetailRepo PurchaseDetails
+        {
+            get
+            {
+                _purchaseDetail ??= new PurchaseDetailRepo(Context);
+                return _purchaseDetail;
+            }
+        }
+
+        public ISaleRepo Sales
+        {
+            get
+            {
+                _sale ??= new SaleRepo(Context);
+                return _sale;
+            }
+        }
+
+        public ISaleDetailRepo SaleDetails
+        {
+            get
+            {
+                _saleDetail ??= new SaleDetailRepo(Context);
+                return _saleDetail;
+            }
+        }
         #endregion
 
         #region View Properties
@@ -163,6 +204,23 @@ namespace WOMS.Server.Services.Repository
             }
         }
 
+        public IViPurchaseRepo ViPurchases
+        {
+            get
+            {
+                _viPurchase ??= new ViPurchaseRepo(Context);
+                return _viPurchase;
+            }
+        }
+
+        public IViPurchaseDetailRepo ViPurchaseDetails
+        {
+            get
+            {
+                _viPurchaseDetail ??= new ViPurchaseDetailRepo(Context);
+                return _viPurchaseDetail;
+            }
+        }
         #endregion
 
         #region General Methods
