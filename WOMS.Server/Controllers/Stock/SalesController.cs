@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using WOMS.Server.Models.Stock.Sales;
-using WOMS.Server.Models.Stock.Sales;
+﻿using WOMS.Server.Models.Stock.Sales;
 
 namespace WOMS.Server.Controllers.Stock;
 
 [Route("api/stock/[controller]")]
 [ApiController]
-public class SalesController( IRepositoryWrapper repo, IIdGenerateService idGenerateService) : ControllerBase
+public class SalesController(IRepositoryWrapper repo, IIdGenerateService idGenerateService) : ControllerBase
 {
 
     #region CRUD Operations
