@@ -1,0 +1,215 @@
+<!-- #region sale Table Component -->
+<div class="card shadow-lg rounded-lg p-4 bg-white dark:bg-gray-900">
+    <p-table #dt1 [value]="sales" [paginator]="true" [rows]="20" [loading]="loading"
+        styleClass="p-datatable-striped p-datatable-gridlines" sortField="createdOn" [sortOrder]="-1"
+        [showCurrentPageReport]="true"
+        [globalFilterFields]="['saleVno','manualVno','patientCompanyName', 'totalAmount','discountAmount','netAmount','paymentType']"
+        [tableStyle]="{ 'min-width': '60rem', 'font-size': '0.95rem' }"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [rowsPerPageOptions]="[20, 50, 100]" selectionMode="single" [(selection)]="selectedSale"
+        dataKey="saleVno" [expandedRowKeys]="expandedRows">
+
+        <!-- Caption -->
+        <ng-template #caption>
+            <div class="flex flex-col md:flex-row md:justify-between gap-4 mb-4">
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <p-splitButton label="Create" icon="pi pi-plus" [model]="items" (onClick)="modalVisible = true"
+                        styleClass="p-button-primary w-full sm:w-auto">
+                    </p-splitButton>
+
+                    <div class="flex gap-2">
+                        <p-datepicker [(ngModel)]="startDate" [showIcon]="true" placeholder="Start Date"
+                            dateFormat="dd/MM/yy" [readonlyInput]="true" styleClass="w-full">
+                        </p-datepicker>
+                        <p-datepicker [(ngModel)]="endDate" (ngModelChange)="onEndDateChange($event)" [showIcon]="true"
+                            placeholder="End Date" dateFormat="dd/MM/yy" [readonlyInput]="true" styleClass="w-full">
+                        </p-datepicker>
+                    </div>
+
+                    <p-button label="View" icon="pi pi-eye" (onClick)="loadData()" styleClass="w-full sm:w-auto">
+                    </p-button>
+                </div>
+
+                <p-iconField iconPosition="left">
+                    <p-inputIcon class="pi pi-search"></p-inputIcon>
+                    <input #search pInputText type="text" (input)="dt1.filterGlobal(search.value, 'contains')"
+                        placeholder="Search keyword"
+                        class="w-full md:w-auto rounded-md border border-gray-300 px-2 py-1" />
+                </p-iconField>
+            </div>
+        </ng-template>
+
+        <ng-template #header>
+            <tr style="white-space: nowrap; background: #f8fafc;">
+                <th style="width: 3rem"></th>
+                <th style="width: 2rem">#</th>
+                <th pSortableColumn="saleVno">Voucher<p-sortIcon field="saleVno"></p-sortIcon></th>
+                <th pSortableColumn="manualVno">Manual No<p-sortIcon field="manualVno"></p-sortIcon></th>
+                <th pSortableColumn="patientCompanyName">Company<p-sortIcon field="patientCompanyName"></p-sortIcon>
+                </th>
+                <th pSortableColumn="patientName">Patient<p-sortIcon field="patientName"></p-sortIcon></th>
+                <th pSortableColumn="saleDate">Sale Date<p-sortIcon field="saleDate"></p-sortIcon></th>
+                <th pSortableColumn="totalAmount">Total<p-sortIcon field="totalAmount"></p-sortIcon></th>
+                <th pSortableColumn="discountAmount">Discount<p-sortIcon field="discountAmount"></p-sortIcon></th>
+                <th pSortableColumn="netAmount">Net<p-sortIcon field="netAmount"></p-sortIcon></th>
+                <th pSortableColumn="paymentType">Payment<p-sortIcon field="paymentType"></p-sortIcon></th>
+                <th pSortableColumn="paidDate">Paid Date<p-sortIcon field="paidDate"></p-sortIcon></th>
+                <th pSortableColumn="status">Status<p-sortIcon field="status"></p-sortIcon></th>
+                <th pSortableColumn="createdOn">Created On<p-sortIcon field="createdOn"></p-sortIcon></th>
+                <th pSortableColumn="createdBy">Created By<p-sortIcon field="createdBy"></p-sortIcon></th>
+                <th pSortableColumn="updatedOn">Updated On<p-sortIcon field="updatedOn"></p-sortIcon></th>
+                <th pSortableColumn="updatedBy">Updated By<p-sortIcon field="updatedBy"></p-sortIcon></th>
+            </tr>
+        </ng-template>
+
+        <!-- Body -->
+        <ng-template #body let-sale let-expanded="expanded" let-rowIndex="rowIndex">
+            <tr style="white-space: nowrap" class="hover:bg-blue-50 dark:hover:bg-slate-700 transition"
+                [pSelectableRow]="sale">
+                <!-- Selection Icon -->
+                <td>
+                    <span class="pi pi-circle" [class.pi-check-circle]="selectedSale === sale"></span>
+                </td>
+
+                <!-- Toggle Button -->
+                <td>
+                    <p-button type="button" pRipple [pRowToggler]="sale" [text]="true" [rounded]="true"
+                        [plain]="true" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></p-button>
+                </td>
+
+                <!-- Voucher Info Group -->
+                <td class="font-semibold">{{ sale.saleVno }}</td>
+                <td>{{ sale.manualVno }}</td>
+                <td>{{ sale.patientName }}</td>
+                <td>{{ sale.saleDate | date: 'dd/MM/yyyy' }}</td>
+                <td class="text-right">{{sale.totalAmount| number: '1.0-0' }}</td>
+                <td class="text-right">{{ sale.discountAmount | number: '1.0-0' }}</td>
+                <td class="text-right">{{ sale.netAmount | number: '1.0-0' }}</td>
+
+                <!-- Payment Type -->
+                <td>
+                    <p-tag [value]="sale.paymentType"
+                        [severity]="sale.paymentType === 'Cash' ? 'success' : 'info'"
+                        [icon]="sale.paymentType === 'Cash' ? 'pi pi-money-bill' : 'pi pi-credit-card'"
+                        [rounded]="true">
+                    </p-tag>
+                </td>
+
+                <td>{{ sale.paidDate ? (sale.paidDate | date: 'dd/MM/yyyy') : 'N/A' }}</td>
+
+                <!-- Status -->
+                <td>
+                    <p-tag [value]="sale.status ? 'Active' : 'Inactive'"
+                        [severity]="sale.status ? 'success' : 'danger'"
+                        [icon]="sale.status ? 'pi pi-check' : 'pi pi-minus-circle'" [rounded]="true">
+                    </p-tag>
+                </td>
+
+                <td>{{ sale.createdOn | date: "dd/MMM/yyyy hh:mm:ss a" }}</td>
+                <td>{{ sale.createdBy }}</td>
+                <td>{{ sale.updatedOn | date: "dd/MMM/yyyy hh:mm:ss a" }}</td>
+                <td>{{ sale.updatedBy }}</td>
+            </tr>
+        </ng-template>
+
+        <!-- Expanded Row Content -->
+        <ng-template #expandedrow let-sale>
+            <td colspan="15 p-0">
+                <div class="overflow-x-auto p-2 bg-gray-50 dark:bg-gray-800 rounded-md">
+                    <p-table [value]="getSortedDetails(sale.details)" dataKey="itemCode" class="p-datatable-sm">
+                        <ng-template #header>
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Type Code</th>
+                                <th>Type Name</th>
+                                <th>Expire Date</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template #body let-detail>
+                            <tr>
+                                <td>
+                                    <i *ngIf="isExpiringSoon(detail.expireDate) || isExpired(detail.expireDate)"
+                                        class="pi pi-exclamation-triangle ml-2 text-red-600"></i>
+                                    {{ detail.itemCode }}
+                                </td>
+                                <td>{{ detail.itemName }}</td>
+                                <td>{{ detail.typeCode }}</td>
+                                <td>{{ detail.typeName }}</td>
+                                <td [class.font-bold]="isExpiringSoon(detail.expireDate) || isExpired(detail.expireDate)"
+                                    [class.text-red-600]="isExpiringSoon(detail.expireDate) || isExpired(detail.expireDate)">
+                                    <p-tag *ngIf="isExpired(detail.expireDate)" value="Expired" severity="danger"
+                                        icon="pi pi-times-circle">
+                                    </p-tag>
+                                    <p-tag *ngIf="isExpiringSoon(detail.expireDate) && !isExpired(detail.expireDate)"
+                                        value="Expiring Soon" severity="warn" icon="pi pi-exclamation-triangle">
+                                    </p-tag>
+                                    <span class="ml-2 text-sm">{{ detail.expireDate | date: 'dd/MM/yyyy' }}</span>
+                                </td>
+                                <td class="text-right">{{ detail.qty }}</td>
+                                <td class="text-right">{{ detail.price }}</td>
+                            </tr>
+                        </ng-template>
+                        <ng-template #emptymessage>
+                            <tr>
+                                <td colspan="8">No details available for this sale.</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </td>
+        </ng-template>
+
+    </p-table>
+</div>
+<!-- #endregion -->
+
+<p-dialog header="Create sale" [(visible)]="modalVisible" (onHide)="clearSelection()" [breakpoints]="{
+     '1920px': '60vw',
+      '1440px': '30vw',
+      '1024px': '30vw',
+      '768px': '80vw',
+      '425px': '100vw',
+      '375px': '100vw',
+      '320px': '100vw'}" [modal]="true"
+    [style]="{width: '50vw', height: '50vh', minWidth: '100vw', minHeight: '100vh'}" [draggable]="false"
+    [resizable]="false">
+    <!-- <app-sale-entry (onSubmitted)="handleSaleSubmitted($event)"></app-sale-entry> -->
+</p-dialog>
+
+<p-dialog header="Delete sale" [(visible)]="showDeleteDialog" [modal]="true" [closable]="false" [responsive]="true"
+    [style]="{ width: '100%', maxWidth: '500px' }" class="p-fluid rounded-lg" [contentStyle]="{ padding: '1.5rem' }"
+    (onHide)="remark = ''">
+    <div class="flex flex-col gap-6">
+        <!-- Warning Section -->
+        <div class="flex items-start gap-4">
+            <i class="pi pi-exclamation-triangle text-orange-500" style="font-size: 1.75rem;"></i>
+            <div>
+                <p class="text-lg font-semibold ">
+                    Confirm Deletion
+                </p>
+                <p class="text-md ">
+                    Are you sure you want to delete this sale? Please provide a remark.
+                </p>
+            </div>
+        </div>
+
+        <!-- Remark Section -->
+        <div>
+            <label for="remark" class="block text-lg font-medium  mb-2">Remark</label>
+            <textarea id="remark" pInputTextarea [(ngModel)]="remark" rows="4"
+                placeholder="Enter your reason for deletion..."
+                class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-4">
+            <p-button type="button" label="Cancel" class="p-button-outlined p-button-md"
+                (click)="showDeleteDialog = false"></p-button>
+            <p-button type="button" label="Delete" class="p-button-md" severity="danger"
+                (click)="confirmDelete()"></p-button>
+        </div>
+    </div>
+</p-dialog>
