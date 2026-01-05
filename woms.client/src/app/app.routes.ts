@@ -27,7 +27,7 @@ import { SettingComponent } from './pages/setting/setting.component';
 // import { LabMainGroupComponent } from './pages/master/lab-main-group/lab-main-group.component';
 // import { LabSubGroupComponent } from './pages/master/lab-sub-group/lab-sub-group.component';
 import { DetailComponent as DoctorDetailComponent } from './pages/master/doctor/detail/detail.component';
-// import { PurchaseComponent } from './pages/stock/purchase/purchase.component';
+import { PurchaseComponent } from './pages/stock/purchase/purchase.component';
 import { PacketTypeComponent } from "./pages/stock/packet-type/packet-type.component";
 import { MainStockComponent } from './pages/stock/main-stock/main-stock.component';
 // import { PharmacyStockComponent } from "./pages/stock/pharmacy-stock/pharmacy-stock.component";
@@ -135,7 +135,7 @@ export const routes: Routes = [
 					{
 						path: 'purchases',
 						children: [
-							// { path: '', component: PurchaseComponent, data: { title: '' } },
+							{ path: '', component: PurchaseComponent, data: { title: '' } },
 							{ path: '', redirectTo: 'purchases', pathMatch: 'full' }
 						], data: { title: 'Purchases' }
 					},
