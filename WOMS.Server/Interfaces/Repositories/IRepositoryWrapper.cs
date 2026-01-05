@@ -19,12 +19,18 @@ namespace WOMS.Server.Interfaces.Repositories
         IMainStockRepo MainStocks { get; }
         IStockItemRepo StockItems { get; }
         IDoctorRepo Doctors { get; }
+        IPurchaseRepo Purchases { get; }
+        IPurchaseDetailRepo PurchaseDetails { get; }
+        ISaleRepo Sales { get; }
+        ISaleDetailRepo SaleDetails { get; }
 
         #endregion
 
         #region Views Variables
 
         IViMainStockRepo ViMainStocks { get; }
+        IViPurchaseRepo ViPurchases { get; }
+        IViPurchaseDetailRepo ViPurchaseDetails { get; }
 
         #endregion
 
