@@ -1,6 +1,6 @@
 ﻿namespace WOMS.Server.Interfaces.Repositories
 {
-    public interface IPatientRepo:IRepositoryBase<Patient>
+    public interface IPatientRepo : IRepositoryBase<Patient>
     {
     }
 }
