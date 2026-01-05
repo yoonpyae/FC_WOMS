@@ -1,0 +1,247 @@
+<p-confirmDialog></p-confirmDialog>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<form [formGroup]="purchaseForm" (submit)="submit()" class="flex flex-col gap-4">
+  <!-- Purchase Detail Entry Form -->
+  <div class="space-y-4">
+
+    <!-- Section -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4">
+      <!-- Stock Item Dropdown -->
+      <div class="lg:col-span-2 sm:col-span-1 flex flex-col gap-2">
+        <label>Stock Item <span class="text-red-500">*</span></label>
+        <app-item-code-dropdown [(ngModel)]="selectedStockItem" [ngModelOptions]="{ standalone: true }"
+          (onValueChange)="onStockItemChange(selectedStockItem)" ngDefaultControl [style]="{ width: '100%' }" required>
+        </app-item-code-dropdown>
+      </div>
+
+      <div class="lg:col-span-2 sm:col-span-1 flex flex-col sm:flex-row gap-4">
+        <!-- Packet Type Dropdown -->
+        <div class="flex flex-col gap-2 flex-1 sm:w-2/3">
+          <label>Packet Type <span class="text-red-500">*</span></label>
+          <app-packet-type-dropdown [(ngModel)]="selectedPacketType" [ngModelOptions]="{standalone: true}"
+            (onValueChange)="onPacketTypeChange(selectedPacketType)" [disabled]="isDisabled"
+            ngDefaultControl></app-packet-type-dropdown>
+        </div>
+        <!-- Capacity Display -->
+        <div class="flex flex-col gap-2 flex-1 sm:w-1/3">
+          <label>Capacity</label>
+          <input pInputText [value]="capacity" [disabled]="true" class="bg-gray-100 w-full" />
+        </div>
+      </div>
+
+      <!-- Price Input -->
+      <div class="lg:col-span-1 sm:col-span-1 flex flex-col gap-2">
+        <label>Price</label>
+        <input formControlName="price" pInputText type="number" min="0"
+          (input)="calculateSalePrice(); calcuateTotalAmount()" (keypress)="preventNegativeInput($event)"
+          class="w-full" />
+      </div>
+
+      <!-- Sale Percentage and Price  -->
+      <div class="lg:col-span-2 sm:col-span-1 flex flex-col gap-2">
+        <label>Sale</label>
+        <div class="flex items-center gap-2">
+          <input formControlName="salePercentage" pInputText type="number" min="0" class="w-1/3"
+            (input)="calculateSalePrice()" (keypress)="preventNegativeInput($event)" />%
+          <input [value]="purchaseForm.get('salePrice')?.value | number:'1.0-0'" pInputText class="w-2/3" readonly />
+        </div>
+      </div>
+
+      <!-- Quantity Input -->
+      <div class="lg:col-span-1 sm:col-span-1 flex flex-col gap-2">
+        <label>Quantity</label>
+        <input formControlName="qty" pInputText type="number" min="0" (input)="calcuateTotalAmount()"
+          (keypress)="preventNegativeInput($event)" class="w-full" />
+      </div>
+
+      <!-- Total Display  -->
+      <div class="lg:col-span-1 sm:col-span-1 flex flex-col gap-2">
+        <label>Total</label>
+        <input [value]="purchaseForm.get('totalQty')?.value | number:'1.0-0'" pInputText type="text" min="0" readonly
+          class="w-full" />
+      </div>
+
+      <!-- Expire Date Picker -->
+      <div class="lg:col-span-2 sm:col-span-1 flex flex-col gap-2">
+        <label>Expire Date</label>
+        <p-date-picker formControlName="expireDate" [showIcon]="true" [minDate]="minExpireDate"
+          [style]="{ width: '100%' }">
+          <ng-template pTemplate="footer">
+            <div class="flex justify-end gap-2">
+              <p-button label="Clear" icon="pi pi-times" (click)="purchaseForm.get('expireDate')?.reset()"
+                severity="danger">
+              </p-button>
+            </div>
+          </ng-template>
+        </p-date-picker>
+        <small *ngIf="purchaseForm.controls['expireDate'].invalid && purchaseForm.get('expireDate')?.dirty"
+          class="text-red-500 text-xs">
+          Expire Date is required.
+        </small>
+      </div>
+
+      <!-- Action Buttons  -->
+      <div class="lg:col-span-1 sm:col-span-1">
+        <div class="mt-7">
+          <p-button icon="pi pi-plus" label="Add" type="button" severity="info" (click)="addItemToCookie()"
+            [style]="{width:'100%'}">
+          </p-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
+    <!-- Items Table -->
+    <div class="col-span-1 lg:col-span-8 xl:col-span-9">
+
+      <p-table #dt1 [value]="purchaseDetails" [(selection)]="selectedRow" selectionMode="single" dataKey="itemCode"
+        [rows]="10" [paginator]="true" [showGridlines]="false" [loading]="loading"
+        [tableStyle]="{ 'min-width': '100%' }" class="p-datatable-sm rounded-lg">
+        <ng-template pTemplate="header">
+          <tr class="bg-gray-100 text-gray-700 text-sm" style="white-space: nowrap">
+            <th pSortableColumn="purchaseVno">Code <p-sortIcon field="itemCode"></p-sortIcon></th>
+            <th pSortableColumn="itemName">Item Name <p-sortIcon field="itemName"></p-sortIcon></th>
+            <th pSortableColumn="typeName">Packet <p-sortIcon field="typeName"></p-sortIcon></th>
+            <th pSortableColumn="capacity">Capacity <p-sortIcon field="capacity"></p-sortIcon></th>
+            <th pSortableColumn="price">Price <p-sortIcon field="price"></p-sortIcon></th>
+            <th pSortableColumn="salePrice">Sale <p-sortIcon field="salePrice"></p-sortIcon></th>
+            <th pSortableColumn="qty">Qty <p-sortIcon field="qty"></p-sortIcon></th>
+            <th pSortableColumn="expireDate">Expire Date <p-sortIcon field="expireDate"></p-sortIcon></th>
+            <th class="delete-cell">
+              <p-button icon="pi pi-trash" class="rounded" severity="danger" (click)="confirm($event)"
+                [disabled]="!hasAnyItems()">
+              </p-button>
+            </th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-item>
+          <tr class="text-sm hover:bg-gray-50 transition" [pSelectableRow]="item">
+            <td>{{ item.itemCode }}</td>
+            <td>{{ item.itemName }}</td>
+            <td>{{ item.typeName }}</td>
+            <td>{{ item.capacity }}</td>
+            <td>{{ item.price | number }}</td>
+            <td>{{ item.salePrice | number }}</td>
+            <td>{{ item.qty }}</td>
+            <td>{{ item.expireDate | date: 'dd/MM/yyyy' }}</td>
+            <td class="text-center">
+              <p-button icon="pi pi-trash" class="rounded" severity="danger" (click)="removeItem(item)">
+              </p-button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-- Summary Sidebar -->
+    <div class="col-span-1 lg:col-span-4 xl:col-span-3">
+      <div class="border rounded-lg flex flex-col gap-4 p-4">
+        <!-- Voucher Info -->
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-2">
+            <label>Manual Voucher No</label>
+            <input formControlName="manualVno" pInputText placeholder="Enter Manual Voucher No" required
+              [ngClass]="{ 'ng-invalid ng-dirty': purchaseForm.controls['manualVno'].invalid && (purchaseForm.controls['manualVno'].touched || purchaseForm.controls['manualVno'].dirty) }" />
+            <small
+              *ngIf="purchaseForm.controls['manualVno'].invalid && (purchaseForm.get('manualVno')?.touched || purchaseForm.get('manualVno')?.dirty)"
+              class="text-red-500 text-xs">
+              <i class="pi pi-exclamation-circle mr-1"></i>
+              Manual Voucher No is required.
+            </small>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label>Purchase Date</label>
+            <p-date-picker formControlName="purchaseDate" [showIcon]="true" [style]="{ width: '100%' }"
+              dateFormat="dd/M/yy" inputId="purchaseDate">
+            </p-date-picker>
+          </div>
+
+          <!-- Supplier -->
+          <div class="flex flex-col gap-2">
+            <label>Supplier</label>
+            <p-select [options]="suppliers" [(ngModel)]="selectedSupplier" (onChange)="onSupplierChange()"
+              optionLabel="companyName" dataKey="supplierId" placeholder="Select Supplier" [filter]="true"
+              [showClear]="true" [ngModelOptions]="{ standalone: true }"
+              [ngClass]="{ 'ng-dirty ng-invalid': purchaseForm.controls['supplierId'].invalid && purchaseForm.get('supplierId')?.touched }">
+            </p-select>
+            <small
+              *ngIf="purchaseForm.controls['supplierId'].invalid && (purchaseForm.get('supplierId')?.touched || purchaseForm.get('supplierId')?.dirty)"
+              class="text-red-500 text-xs">
+              <i class="pi pi-exclamation-circle mr-1"></i>
+              Supplier is required.
+            </small>
+          </div>
+        </div>
+
+        <!-- Payment Type -->
+        <div class="flex flex-col gap-2">
+          <label>Payment Type</label>
+          <p-select [options]="paymentTypes" [(ngModel)]="selectedPayMentType"
+            (ngModelChange)="onPaymentTypeChange(); purchaseForm.controls['paymentType'].setValue($event?.label || '')"
+            [ngModelOptions]="{ standalone: true }" [showClear]="true" optionLabel="label"
+            placeholder="Select Payment Type"
+            [ngClass]="{ 'ng-invalid ng-dirty': purchaseForm.controls['paymentType'].invalid && purchaseForm.controls['paymentType'].touched }">
+          </p-select>
+          <small
+            *ngIf="purchaseForm.controls['paymentType'].invalid && (purchaseForm.controls['paymentType'].touched || purchaseForm.controls['paymentType'].dirty)"
+            class="text-red-500 text-xs">
+            <i class="pi pi-exclamation-circle mr-1"></i>
+            Payment Type is required.
+          </small>
+        </div>
+
+        <!-- Amount Summary -->
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-2">
+            <label>Total Amount</label>
+            <input [value]="purchaseForm.get('totalAmount')?.value | number:'1.0-0'" pInputText type="text" readonly
+              class="text-right" />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label>Discount</label>
+            <input formControlName="discountAmount" pInputText type="number" min="0" (input)="updateAmounts()"
+              (keypress)="preventNegativeInput($event)" (keydown.enter)="$event.preventDefault()" class="text-right" />
+            <small *ngIf="discountExceedsTotal" class="text-red-500 text-xs mt-1">
+              Discount cannot exceed total amount.
+            </small>
+          </div>
+          <div class="flex flex-col gap-2">
+            <label>Net Amount</label>
+            <input [value]="purchaseForm.get('netAmount')?.value | number:'1.0-0'" pInputText type="text" readonly
+              class="text-right" />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label>Pay Amount</label>
+            <input formControlName="payAmount" pInputText type="number" (input)="updateAmounts()"
+              (keypress)="preventNegativeInput($event)" (keydown.enter)="$event.preventDefault()" class="text-right" />
+            <small *ngIf="purchaseForm.controls['payAmount'].value > purchaseForm.controls['netAmount'].value"
+              class="text-red-500 text-xs mt-1">
+              Pay amount cannot exceed net amount.
+            </small>
+          </div>
+          <div class="flex flex-col gap-2 col-span-2">
+            <label>Left Amount</label>
+            <input [value]="purchaseForm.get('leftAmount')?.value | number:'1.0-0'" pInputText type="text" readonly
+              class="text-right" />
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="flex flex-wrap gap-2 pt-2 mt-2 w-full">
+          <p-button icon="pi pi-check" label="Save" severity="success" [loading]="isSubmitting" [style]="{width:'100%'}"
+            (click)="submit()"></p-button>
+          <p-button icon="pi pi-trash" label="Clear" severity="secondary" [style]="{width:'100%'}"
+            (click)="clearAll()"></p-button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</form>
+
+<p-toast></p-toast>
