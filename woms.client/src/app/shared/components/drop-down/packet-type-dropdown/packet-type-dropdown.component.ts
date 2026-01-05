@@ -72,9 +72,9 @@ export class PacketTypeDropdownComponent implements OnInit, OnDestroy {
   }
 
   public loadData(): void {
-    let hospitalId: number = Number.parseInt((this.sharedService.getDefaultHospitalId() ?? "0"));
+    let clinicId: number = Number.parseInt((this.sharedService.getDefaultClinicId() ?? "0"));
     this.loading = true;
-    this.packetTypeService.get(hospitalId).subscribe({
+    this.packetTypeService.get(clinicId).subscribe({
       next: (res) => {
         this.packetTypes = res.data as PacketTypeModel[];
       },
