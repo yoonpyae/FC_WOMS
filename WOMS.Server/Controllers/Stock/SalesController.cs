@@ -117,5 +117,61 @@ public class SalesController(IRepositoryWrapper repo, IIdGenerateService idGener
         }
     }
 
+    [HttpDelete("{id}")]
+    [EndpointSummary("Delete")]
+    [EndpointDescription("Deletes Sale along with its details and updates MainStock GroundBalance.")]
+    public async Task<IActionResult> Delete(string id, string remark)
+    {
+        Sale? Sale = await repo.Sales.GetFirstAsync(x => x.SaleVno == id);
+
+        if (Sale == null)
+        {
+            return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Sale not found.", ""));
+        }
+
+        if (Sale.DeletedOn != null)
+        {
+            return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Sale is already deleted.", ""));
+        }
+
+        IReadOnlyList<SaleDetail> SaleDetails = await repo.SaleDetails.GetAsync(x => x.SaleVno == id) ?? [];
+
+        foreach (SaleDetail detail in SaleDetails)
+        {
+            MainStock? mainStock = await repo.MainStocks.GetFirstAsync(
+                x => x.ItemCode == detail.ItemCode && x.TypeCode == detail.TypeCode);
+
+            if (mainStock == null)
+            {
+                return ResponseHelper.Bad_Request(null,
+                    new DefaultResponseMessageModel($"MainStock not found for ItemCode {detail.ItemCode} and TypeCode {detail.TypeCode}.", ""));
+            }
+        }
+
+        foreach (SaleDetail detail in SaleDetails)
+        {
+            // Update MainStock GroundBalance  
+            MainStock? mainStock = await repo.MainStocks.GetFirstAsync(x => x.ItemCode == detail.ItemCode && x.TypeCode == detail.TypeCode);
+            if (mainStock != null)
+            {
+                mainStock.GroundBalance += detail.Qty;
+                mainStock.UpdatedBy = User.Identity?.Name ?? string.Empty;
+                mainStock.UpdatedOn = DateTime.Now;
+                repo.MainStocks.Update(mainStock);
+            }
+
+            repo.SaleDetails.Delete(detail);
+        }
+
+        Sale.DeletedOn = DateTime.Now;
+        Sale.DeletedBy = User.Identity?.Name ?? string.Empty;
+        Sale.Remark = remark;
+
+        repo.Sales.Update(Sale);
+
+        return await repo.SaveAsync()
+            ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully deleted Sale and its details, and updated MainStock.", ""))
+            : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to delete Sale.", ""));
+    }
     #endregion
 }
