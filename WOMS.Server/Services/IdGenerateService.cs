@@ -40,31 +40,24 @@ public class IdGenerateService(
         return $"{prefix}{(lastNumber + 1):D4}"; // Ensures 4-digit format
     }
     
-    public string GetPurchaseVno(long ClinicId)
+    public string GetPurchaseVno(long BranchId)
     {
         StringBuilder stringBuilder = new();
-        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"P{ClinicId}-", "ddMMyy"));
+        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"P{BranchId}-", "ddMMyy"));
         return stringBuilder.ToString();
     }
 
-    public string GetStockIssueVno(long ClinicId)
+    public string GetSaleVno(long BranchId)
     {
         StringBuilder stringBuilder = new();
-        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"I{ClinicId}-", "ddMMyy"));
+        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"S{BranchId}-", "ddMMyy"));
         return stringBuilder.ToString();
     }
 
-    public string GetDamageVno(long ClinicId)
+    public string GetPatientId(long BranchId)
     {
         StringBuilder stringBuilder = new();
-        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"D{ClinicId}-", "ddMMyy"));
-        return stringBuilder.ToString();
-    }
-
-    public string GetOPDRegId(long ClinicId)
-    {
-        StringBuilder stringBuilder = new();
-        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"P{ClinicId}-", "ddMMyy"));
+        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"P{BranchId}-", "ddMMyy"));
         return stringBuilder.ToString();
     }
 
@@ -75,38 +68,10 @@ public class IdGenerateService(
         return stringBuilder.ToString();
     }
 
-    public string GetAdmissionNo(long ClinicId)
-    {
-        StringBuilder stringBuilder = new();
-        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"ADM{ClinicId}-", "ddMMyy"));
-        return stringBuilder.ToString();
-    }
-
     public string GetLabVoucherVno(long ClinicId)
     {
         StringBuilder stringBuilder = new();
         _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"L{ClinicId}-", "ddMMyy"));
-        return stringBuilder.ToString();
-    }
-
-    public string GetRoomBill(long ClinicId)
-    {
-        StringBuilder stringBuilder = new();
-        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"RVN{ClinicId}-", "ddMMyy"));
-        return stringBuilder.ToString();
-    }
-
-    public string GetPharmacyVoucherVno(long ClinicId)
-    {
-        StringBuilder stringBuilder = new();
-        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"PVN{ClinicId}-", "ddMMyy"));
-         return stringBuilder.ToString();
-    }
-    
-    public string GetAdmissionVNo(long ClinicId)
-    {
-        StringBuilder stringBuilder = new();
-        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"AVN{ClinicId}-", "ddMMyy"));
         return stringBuilder.ToString();
     }
 }
