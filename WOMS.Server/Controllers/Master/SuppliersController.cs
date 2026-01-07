@@ -59,7 +59,7 @@ public class SuppliersController(
     [EndpointDescription("Update Existing Supplier")]
     public async Task<IActionResult> Edit(Supplier model)
     {
-        Supplier? supplier = await repo.Suppliers.GetFirstAsync(x => x.SupplierId == model.SupplierId && x.BranchId== model.BranchId);
+        Supplier? supplier = await repo.Suppliers.GetFirstAsync(x => x.SupplierId == model.SupplierId && x.BranchId == model.BranchId);
 
         if (supplier == null)
             return ResponseHelper.NotFound_Request(
