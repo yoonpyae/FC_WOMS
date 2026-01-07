@@ -91,7 +91,7 @@ public class PatientsController(IRepositoryWrapper repo) : ControllerBase
         null,
         new DefaultResponseMessageModel("Patient not found.", ""));
 
-        bool isUSedInSale = await repo.Sales.AnyAsync(s => s.PatientId == id && s.BranchId == branchId && s.DeletedOn==null);
+        bool isUSedInSale = await repo.Sales.AnyAsync(s => s.PatientId == id && s.BranchId == branchId && s.DeletedOn == null);
         if (isUSedInSale)
         {
             return ResponseHelper.Bad_Request(
