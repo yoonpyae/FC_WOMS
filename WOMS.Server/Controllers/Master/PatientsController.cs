@@ -3,7 +3,9 @@
 [Authorize]
 [Route("api/master/[controller]")]
 [ApiController]
-public class PatientsController(IRepositoryWrapper repo) : ControllerBase
+public class PatientsController(
+    IRepositoryWrapper repo,
+    IIdGenerateService idGenerateService) : ControllerBase
 {
     #region CRUD Operation
     [HttpGet]
@@ -11,28 +13,17 @@ public class PatientsController(IRepositoryWrapper repo) : ControllerBase
     [EndpointDescription("List all Patient without deleted data")]
     public async Task<IActionResult> Get(long branchId)
             => ResponseHelper.OK_Result(
-               await repo.Patients.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId),
+               await repo.ViPatients.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId),
                null);
 
-    [HttpGet("{id:long}")]
+    [HttpGet("{id}")]
     [EndpointSummary("Get By Id")]
     [EndpointDescription("Get Patient by Id")]
-    public async Task<IActionResult> Get(long id, long branchId)
+    public async Task<IActionResult> Get(string id, long branchId)
             => ResponseHelper.OK_Result(
-        await repo.Patients.GetFirstAsync(x => x.PatientId == id && x.BranchId == branchId) ,
+        await repo.ViPatients.GetFirstAsync(x => x.PatientId == id && x.BranchId == branchId) ,
         null);
 
-    [HttpGet("auto-id")]
-    [EndpointSummary("Get Auto Id")]
-    [EndpointDescription("Gets an Patient max id.")]
-    public async Task<IActionResult> GetAutoId(long branchId)
-    {
-        Patient? lastRecord =
-            await repo.Patients.GetFirstAsync(x => x.BranchId == branchId, q => q.OrderByDescending(x => x.PatientId));
-        long maxId = lastRecord?.PatientId ?? 0;
-        maxId++;
-        return ResponseHelper.OK_Result(maxId, null);
-    }
 
     [HttpPost]
     [ValidateModel]
@@ -40,6 +31,7 @@ public class PatientsController(IRepositoryWrapper repo) : ControllerBase
     [EndpointDescription("Create New Patient")]
     public async Task<IActionResult> Create(Patient model)
     {
+        model.PatientId= idGenerateService.GetPatientId(model.BranchId);
         model.CreatedOn = DateTime.Now;
         model.CreatedBy = User.Identity?.Name ?? string.Empty;
         repo.Patients.Create(model);
@@ -53,7 +45,7 @@ public class PatientsController(IRepositoryWrapper repo) : ControllerBase
     [ValidateModel]
     [EndpointSummary("Update")]
     [EndpointDescription("Update Existing Patient")]
-    public async Task<IActionResult> Edit(Patient model)
+    public async Task<IActionResult> Update(Patient model)
     {
         Patient? patient = await repo.Patients.GetFirstAsync(x => x.PatientId == model.PatientId && x.BranchId == model.BranchId);
         if (patient == null)
@@ -70,9 +62,11 @@ public class PatientsController(IRepositoryWrapper repo) : ControllerBase
         patient.TownshipId = model.TownshipId;
         patient.AddressDetail = model.AddressDetail;
         patient.Phone = model.Phone;
+        patient.DoctorId = model.DoctorId;
         patient.UpdatedOn = DateTime.Now;
         patient.UpdatedBy = User.Identity?.Name ?? string.Empty;
         patient.Status = model.Status;
+        patient.Remark = model.Remark;
 
         repo.Patients.Update(patient);
         return await repo.SaveAsync()
@@ -80,10 +74,10 @@ public class PatientsController(IRepositoryWrapper repo) : ControllerBase
         : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to update Patient.", ""));
     }
 
-    [HttpDelete("{id:long}")]
+    [HttpDelete("{id}")]
     [EndpointSummary("Delete")]
     [EndpointDescription("Delete Patient by Id")]
-    public async Task<IActionResult> Delete(long id, long branchId)
+    public async Task<IActionResult> Delete(string id, long branchId)
     {
         Patient? patient = await repo.Patients.GetFirstAsync(x => x.PatientId == id && x.BranchId == branchId);
         if (patient == null)
@@ -91,7 +85,7 @@ public class PatientsController(IRepositoryWrapper repo) : ControllerBase
         null,
         new DefaultResponseMessageModel("Patient not found.", ""));
 
-        bool isUSedInSale = await repo.Sales.AnyAsync(s => s.PatientId == id && s.BranchId == branchId && s.DeletedOn == null);
+        bool isUSedInSale = await repo.Sales.AnyAsync(s => s.PatientId == id && s.BranchId == branchId && !s.DeletedOn.HasValue);
         if (isUSedInSale)
         {
             return ResponseHelper.Bad_Request(
