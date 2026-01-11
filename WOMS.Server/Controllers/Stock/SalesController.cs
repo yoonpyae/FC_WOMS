@@ -2,6 +2,7 @@
 
 namespace WOMS.Server.Controllers.Stock;
 
+[Authorize]
 [Route("api/stock/[controller]")]
 [ApiController]
 public class SalesController(IRepositoryWrapper repo, IIdGenerateService idGenerateService) : ControllerBase
