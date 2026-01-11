@@ -43,6 +43,7 @@ namespace WOMS.Server.Services.Repository
         private IViPurchaseDetailRepo? _viPurchaseDetail;
         private IViSaleRepo? _viSale;
         private IViSaleDetailRepo? _viSaleDetail;
+        private IViPatientRepo? _viPatient;
 
         #endregion
 
@@ -249,6 +250,15 @@ namespace WOMS.Server.Services.Repository
             {
                 _viSaleDetail ??= new ViSaleDetailRepo(Context);
                 return _viSaleDetail;
+            }
+        }
+
+        public IViPatientRepo ViPatients
+        {
+            get
+            {
+                _viPatient ??= new ViPatientRepo(Context);
+                return _viPatient;
             }
         }
         #endregion
