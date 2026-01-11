@@ -63,9 +63,9 @@ export class DoctorDropDownComponent implements OnInit, OnDestroy {
   }
 
   public loadData(): void {
-    let hospitalId: number = Number.parseInt((this.sharedService.getDefaultHospitalId() ?? "0"));
+    let branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
     this.loading = true;
-    this.doctorService.getByActive(hospitalId).subscribe({
+    this.doctorService.getByActive(branchId).subscribe({
       next: (res) => {
         this.doctor = res.data as DoctorModel[];
         this.loading = false;
