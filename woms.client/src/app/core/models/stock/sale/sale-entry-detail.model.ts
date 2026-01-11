@@ -5,7 +5,6 @@ export interface SaleEntryDetailModel {
     qty: number;
     price: number;
     totalQty: number; //should be totalPrice
-    expireDate: string | null;
 }
 
 export interface SaleEntryDisplayModel extends SaleEntryDetailModel {
