@@ -25,10 +25,10 @@ public partial class Patient
     public string? Nrc { get; set; }
 
     [Column("DOB")]
-    public DateOnly Dob { get; set; }
+    public DateOnly? Dob { get; set; }
 
     [StringLength(50)]
-    public string Age { get; set; } = null!;
+    public string? Age { get; set; }
 
     public int? StateId { get; set; }
 
@@ -39,8 +39,6 @@ public partial class Patient
 
     [StringLength(50)]
     public string Phone { get; set; } = null!;
-
-    public long DoctorId { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedOn { get; set; }
@@ -63,4 +61,6 @@ public partial class Patient
     public bool Status { get; set; }
 
     public string? Remark { get; set; }
+
+    public long? DoctorId { get; set; }
 }
