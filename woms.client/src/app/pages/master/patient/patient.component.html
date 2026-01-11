@@ -1,0 +1,103 @@
+<!-- #region Patient Table Component -->
+<div class="card">
+    <p-table #dt1 [value]="patients" [paginator]="true" [rows]="20" sortField="createdOn" [sortOrder]="-1"
+        [loading]="loading" styleClass="p-datatable-striped" [showCurrentPageReport]="true"
+        [globalFilterFields]="['patientId','patientName', 'age','nrc']" [tableStyle]="{ 'min-width': '50rem' }"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [rowsPerPageOptions]="[20, 50, 100]" selectionMode="single" [(selection)]="selectedPatient"
+        dataKey="patientId">
+        <ng-template #caption>
+            <div class="grid grid-cols-12 mb-4">
+                <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
+                    <p-toast></p-toast>
+                    <p-splitButton label="Create" icon="pi pi-plus" [model]="items" (onClick)="create()">
+                    </p-splitButton>
+                </div>
+                <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
+                    <p-iconfield iconPosition="left" class="ml-auto">
+                        <p-inputicon>
+                            <i class="pi pi-search"></i>
+                        </p-inputicon>
+                        <input #search pInputText type="text" (input)="dt1.filterGlobal(search.value, 'contains')"
+                            placeholder="Search keyword" [style]="{ width: '100%' }" />
+                    </p-iconfield>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template #header>
+            <tr style="white-space: nowrap">
+                <th pFrozenColumn [style]="{ width: '10px' }">#</th>
+                <th pSortableColumn="patientId">Id <p-sortIcon field="patientId"></p-sortIcon></th>
+                <th pSortableColumn="patientName">Name <p-sortIcon field="patientName"></p-sortIcon></th>
+                <th pSortableColumn="dob">Date of Birth <p-sortIcon field="dob"></p-sortIcon></th>
+                <th pSortableColumn="age">Age <p-sortIcon field="age"></p-sortIcon></th>
+                <th pSortableColumn="nrc">NRC <p-sortIcon field="nrc"></p-sortIcon></th>
+                <th pSortableColumn="phone">Phone <p-sortIcon field="phone"></p-sortIcon></th>
+                <th pSortableColumn="addressDetail">Address <p-sortIcon field="addressDetail"></p-sortIcon></th>
+                <th pSortableColumn="stateName">State <p-sortIcon field="stateName"></p-sortIcon></th>
+                <th pSortableColumn="townshipName">Township <p-sortIcon field="townshipName"></p-sortIcon></th>
+                <th pSortableColumn="doctorId">Doctor <p-sortIcon field="doctorId"></p-sortIcon></th>
+                <th pSortableColumn="status">Status <p-sortIcon field="status"></p-sortIcon></th>
+                <th pSortableColumn="createdOn">Created On <p-sortIcon field="createdOn"></p-sortIcon></th>
+                <th pSortableColumn="createdBy">Created By <p-sortIcon field="createdBy"></p-sortIcon></th>
+                <th pSortableColumn="updatedOn">Updated On <p-sortIcon field="updatedOn"></p-sortIcon></th>
+                <th pSortableColumn="updatedBy">Updated By <p-sortIcon field="updatedBy"></p-sortIcon></th>
+            </tr>
+        </ng-template>
+
+        <ng-template #body let-patient let-rowData>
+            <tr style="white-space: nowrap" [pSelectableRow]="patient">
+                <td>
+                    <span class="pi pi-circle"
+                        [class.pi-check-circle]="selectedPatient === patient"></span>
+                </td>
+                <td>{{ patient.patientId }}</td>
+                <td>{{ patient.patientName }}</td>
+                <td>{{ patient.dob | date: "dd/MMM/yyyy" }}</td>
+                <td>{{ patient.age }}</td>
+                <td>{{ patient.nrc }}</td>
+                <td>{{ patient.phone }}</td>
+                <td>{{ patient.addressDetail }}</td>
+                <td>{{ patient.stateName }}</td>
+                <td>{{ patient.townshipName }}</td>
+                <td>{{ patient.doctorName }}</td>
+                <td>
+                    <p-tag value="{{ patient.status ? 'Active' : 'Inactive' }}"
+                        [severity]="patient.status ? 'success' : 'info'"
+                        icon="{{ patient.status ? 'pi pi-check' : 'pi pi-minus-circle' }}" [rounded]="true">
+                    </p-tag>
+                </td>
+                <td>{{ patient.createdOn | date: "dd/MMM/yyyy hh:mm:ss a" }}</td>
+                <td>{{ patient.createdBy || '-' }}</td>
+                <td>{{ patient.updatedOn | date: "dd/MMM/yyyy hh:mm:ss a" }}</td>
+                <td>{{ patient.updatedBy }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+<!-- #endregion -->
+
+<p-dialog header="{{ isEdit ? 'Edit Patient' : 'Create Patient' }}" [(visible)]="modalVisible"
+    (onHide)="clearSelection()" [breakpoints]="{
+    '1920px': '30vw',
+    '1440px': '40vw',
+    '1024px': '50vw',
+    '768px': '80vw',
+    '425px': '100vw',
+    '375px': '100vw',
+    '320px': '100vw',
+  }" [modal]="true" [style]="{ 'min-width': '30vw' }" [draggable]="false" [resizable]="false">
+    <app-patient-entry [isEdit]="isEdit" (onSubmitted)="handlePatientSubmitted($event)">
+    </app-patient-entry>
+</p-dialog>
+
+<p-confirmDialog [breakpoints]="{
+    '1920px': '30vw',
+    '1440px': '40vw',
+    '1024px': '50vw',
+    '768px': '60vw',
+    '425px': '100vw',
+    '375px': '100vw',
+    '320px': '100vw',
+  }" [style]="{ 'min-width': '30vw' }" key="patientDeleteDialog" position="bottom"
+    rejectButtonStyleClass="p-button-outlined"></p-confirmDialog>
