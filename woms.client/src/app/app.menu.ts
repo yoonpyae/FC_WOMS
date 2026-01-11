@@ -56,6 +56,7 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
           { label: 'Cash Title', routerLink: ['/master/cash-title'] },
           { label: 'Supplier', routerLink: ['/master/supplier'] },
           { label: 'Doctor', routerLink: ['/master/doctor'] },
+          { label: 'Patient', routerLink: ['/master/patient'] },
           { label: 'Room', routerLink: ['/master/room'] },
           { label: 'Admission Package', routerLink: ['/master/admission-package'] },
         ]
