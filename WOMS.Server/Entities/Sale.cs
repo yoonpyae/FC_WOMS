@@ -22,7 +22,8 @@ public partial class Sale
     [StringLength(50)]
     public string? ManualVno { get; set; }
 
-    public long? PatientId { get; set; }
+    [StringLength(20)]
+    public string? PatientId { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? SaleDate { get; set; }
