@@ -52,6 +52,7 @@ import { Title } from '@angular/platform-browser';
 import { StockItemComponent } from './pages/stock/stock-item/stock-item.component';
 import path from 'path';
 import { SaleComponent } from './pages/stock/sale/sale.component';
+import { PatientComponent } from './pages/master/patient/patient.component';
 // import { AdmLabVoucherComponent } from './pages/admission/lab-voucher/lab-voucher.component';
 // import { AdmissionDetailComponent } from './pages/admission/admission/detail/detail.component';
 
@@ -111,6 +112,7 @@ export const routes: Routes = [
 							{ path: '', redirectTo: 'doctor', pathMatch: 'full' },
 						],
 					},
+					{ path: 'patient', component: PatientComponent, data: { title: 'Patient' } },
 					// { path: 'lab-main-groups', component: LabMainGroupComponent, data: { title: 'Lab Main Group' } },
 					// { path: 'lab-sub-groups', component: LabSubGroupComponent, data: { title: 'Lab Sub Group' } },
 
