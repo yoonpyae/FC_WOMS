@@ -176,7 +176,7 @@
       '320px': '100vw'}" [modal]="true"
     [style]="{width: '50vw', height: '50vh', minWidth: '100vw', minHeight: '100vh'}" [draggable]="false"
     [resizable]="false">
-    <!-- <app-sale-entry (onSubmitted)="handleSaleSubmitted($event)"></app-sale-entry> -->
+    <app-sale-entry (onSubmitted)="handleSaleSubmitted($event)"></app-sale-entry>
 </p-dialog>
 
 <p-dialog header="Delete sale" [(visible)]="showDeleteDialog" [modal]="true" [closable]="false" [responsive]="true"
