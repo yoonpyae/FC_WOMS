@@ -4,13 +4,11 @@ export interface SaleEntryModel {
     saleVno: string;
     branchId: number;
     manualVno: string;
-    patientId: number;
+    patientId: string;
     saleDate: string | Date | null;
     totalAmount: number;
     discountAmount: number;
     netAmount: number;
-    payAmount: number;
-    leftAmount: number;
     paymentType: string;
     paidDate: string | null;
     createdOn: string | null;
