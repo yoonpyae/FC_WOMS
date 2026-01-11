@@ -2,7 +2,7 @@ export interface SaleModel {
     saleVno: string;
     branchId: number;
     manualVno: string;
-    patientId: number;
+    patientId: string;
     saleDate: string | null;
     totalAmount: number;
     discountAmount: number;
@@ -24,9 +24,9 @@ export interface ViSaleModel {
     saleVno: string;
     branchId: number;
     manualVno: string;
-    patientId: number;
+    patientId: string;
     patientName: string;
-    slaeDate: string | null;
+    saleDate: string | null;
     totalAmount: number;
     discountAmount: number;
     netAmount: number;
@@ -46,7 +46,7 @@ export interface Detail {
     saleVno: string;
     branchId: number;
     manualVno: string;
-    patientId: number;
+    patientId: string;
     patientName: string;
     saleDate: null;
     itemCode: string;
