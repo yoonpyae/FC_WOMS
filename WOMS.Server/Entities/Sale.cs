@@ -28,17 +28,24 @@ public partial class Sale
     [Column(TypeName = "datetime")]
     public DateTime? SaleDate { get; set; }
 
-    public double? TotalAmount { get; set; }
+    public double TotalAmount { get; set; }
 
-    public double? DiscountAmount { get; set; }
+    public double DiscountAmount { get; set; }
 
-    public double? NetAmount { get; set; }
+    public double NetAmount { get; set; }
+
+    public double PaidAmount { get; set; }
+
+    public double LeftAmount { get; set; }
 
     [StringLength(50)]
     public string? PaymentType { get; set; }
 
+    [StringLength(256)]
+    public string? IssuePerson { get; set; }
+
     [Column(TypeName = "datetime")]
-    public DateTime? PaidDate { get; set; }
+    public DateTime? IssueDate { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedOn { get; set; }
@@ -61,4 +68,7 @@ public partial class Sale
     public bool? Status { get; set; }
 
     public string? Remark { get; set; }
+
+    [Column("ReferDoctorID")]
+    public long? ReferDoctorId { get; set; }
 }
