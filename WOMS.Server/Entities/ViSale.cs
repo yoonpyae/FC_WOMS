@@ -19,8 +19,8 @@ public partial class ViSale
     [StringLength(50)]
     public string? ManualVno { get; set; }
 
-    [Column("PatientID")]
-    public long? PatientId { get; set; }
+    [StringLength(20)]
+    public string? PatientId { get; set; }
 
     [StringLength(200)]
     public string PatientName { get; set; } = null!;
@@ -28,17 +28,14 @@ public partial class ViSale
     [Column(TypeName = "datetime")]
     public DateTime? SaleDate { get; set; }
 
-    public double? TotalAmount { get; set; }
+    public double TotalAmount { get; set; }
 
-    public double? DiscountAmount { get; set; }
+    public double DiscountAmount { get; set; }
 
-    public double? NetAmount { get; set; }
+    public double NetAmount { get; set; }
 
     [StringLength(50)]
     public string? PaymentType { get; set; }
-
-    [Column(TypeName = "datetime")]
-    public DateTime? PaidDate { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedOn { get; set; }
@@ -61,4 +58,23 @@ public partial class ViSale
     public bool? Status { get; set; }
 
     public string? Remark { get; set; }
+
+    [StringLength(7)]
+    public string? Sex { get; set; }
+
+    [StringLength(50)]
+    public string? Age { get; set; }
+
+    public double PaidAmount { get; set; }
+
+    public double LeftAmount { get; set; }
+
+    [StringLength(256)]
+    public string? IssuePerson { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? IssueDate { get; set; }
+
+    [Column("ReferDoctorID")]
+    public long? ReferDoctorId { get; set; }
 }
