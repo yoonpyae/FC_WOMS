@@ -13,20 +13,6 @@ public partial class ViSaleDetail
     [StringLength(50)]
     public string SaleVno { get; set; } = null!;
 
-    public long BranchId { get; set; }
-
-    [Column("ManualVNO")]
-    [StringLength(50)]
-    public string? ManualVno { get; set; }
-
-    public long? PatientId { get; set; }
-
-    [StringLength(200)]
-    public string PatientName { get; set; } = null!;
-
-    [Column(TypeName = "datetime")]
-    public DateTime? SaleDate { get; set; }
-
     [StringLength(5)]
     public string ItemCode { get; set; } = null!;
 
@@ -42,5 +28,10 @@ public partial class ViSaleDetail
 
     public double Price { get; set; }
 
-    public DateOnly ExpireDate { get; set; }
+    public double Amount { get; set; }
+
+    [StringLength(500)]
+    public string? ChemicalName { get; set; }
+
+    public int? Capacity { get; set; }
 }
