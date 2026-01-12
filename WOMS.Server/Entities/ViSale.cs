@@ -59,12 +59,6 @@ public partial class ViSale
 
     public string? Remark { get; set; }
 
-    [StringLength(7)]
-    public string? Sex { get; set; }
-
-    [StringLength(50)]
-    public string? Age { get; set; }
-
     public double PaidAmount { get; set; }
 
     public double LeftAmount { get; set; }
@@ -77,4 +71,7 @@ public partial class ViSale
 
     [Column("ReferDoctorID")]
     public long? ReferDoctorId { get; set; }
+
+    [StringLength(200)]
+    public string? ReferDoctorName { get; set; }
 }
