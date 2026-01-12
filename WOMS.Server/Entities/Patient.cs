@@ -17,6 +17,8 @@ public partial class Patient
     [Key]
     public long BranchId { get; set; }
 
+    public long? DoctorId { get; set; }
+
     [StringLength(200)]
     public string Name { get; set; } = null!;
 
@@ -26,6 +28,9 @@ public partial class Patient
 
     [Column("DOB")]
     public DateOnly? Dob { get; set; }
+
+    [StringLength(7)]
+    public string? Sex { get; set; }
 
     [StringLength(50)]
     public string? Age { get; set; }
@@ -61,6 +66,4 @@ public partial class Patient
     public bool Status { get; set; }
 
     public string? Remark { get; set; }
-
-    public long? DoctorId { get; set; }
 }
