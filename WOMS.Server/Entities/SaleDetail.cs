@@ -26,5 +26,5 @@ public partial class SaleDetail
 
     public double Price { get; set; }
 
-    public DateOnly ExpireDate { get; set; }
+    public double Amount { get; set; }
 }
