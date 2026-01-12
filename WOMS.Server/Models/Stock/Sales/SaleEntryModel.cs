@@ -2,6 +2,6 @@
 {
     public class SaleEntryModel:Sale
     {
-        public List<SaleEntryDetailModel> Detail { get; set; } = new List<SaleEntryDetailModel>();
+        public List<SaleDetail> Details { get; set; } = [];
     }
 }
