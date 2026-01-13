@@ -74,4 +74,7 @@ public partial class ViPharmacyVoucher
 
     [StringLength(200)]
     public string? ReferDoctorName { get; set; }
+
+    [StringLength(50)]
+    public string ProcessStatus { get; set; } = null!;
 }
