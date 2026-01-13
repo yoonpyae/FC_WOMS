@@ -51,7 +51,6 @@ import { Title } from '@angular/platform-browser';
 // import { PharmacyVoHistoryComponent } from './pages/pharmacy-voucher/history/history.component';
 import { StockItemComponent } from './pages/stock/stock-item/stock-item.component';
 import path from 'path';
-import { SaleComponent } from './pages/stock/sale/sale.component';
 import { PatientComponent } from './pages/master/patient/patient.component';
 // import { AdmLabVoucherComponent } from './pages/admission/lab-voucher/lab-voucher.component';
 // import { AdmissionDetailComponent } from './pages/admission/admission/detail/detail.component';
@@ -142,13 +141,6 @@ export const routes: Routes = [
 							{ path: '', component: PurchaseComponent, data: { title: '' } },
 							{ path: '', redirectTo: 'purchases', pathMatch: 'full' }
 						], data: { title: 'Purchases' }
-					},
-					{
-						path: 'sales',
-						children: [
-							{ path: '', component: SaleComponent, data: { title: '' } },
-							{ path: '', redirectTo: 'sales', pathMatch: 'full' }
-						], data: { title: 'Sales' }
 					},
 					{
 						path: 'damage-vouchers',
