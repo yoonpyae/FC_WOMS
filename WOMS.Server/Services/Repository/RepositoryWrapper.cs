@@ -31,8 +31,8 @@ namespace WOMS.Server.Services.Repository
         private IDoctorRepo? _doctor;
         private IPurchaseRepo? _purchase;
         private IPurchaseDetailRepo? _purchaseDetail;
-        private ISaleRepo? _sale;
-        private ISaleDetailRepo? _saleDetail;
+        private IPharmacyVoucherRepo? _pharmacyVoucher;
+        private IPharmacyVoucherDetailRepo? _pharmacyVoucherDetail;
         private IPatientRepo? _patient;
 
         #endregion
@@ -41,8 +41,8 @@ namespace WOMS.Server.Services.Repository
         private IViMainStockRepo? _viMainStock;
         private IViPurchaseRepo? _viPurchase;
         private IViPurchaseDetailRepo? _viPurchaseDetail;
-        private IViSaleRepo? _viSale;
-        private IViSaleDetailRepo? _viSaleDetail;
+        private IViPharmacyVoucherRepo? _viPharmacyVoucher;
+        private IViPharmacyVoucherDetailRepo? _viPharmacyVoucherDetail;
         private IViPatientRepo? _viPatient;
 
         #endregion
@@ -178,21 +178,21 @@ namespace WOMS.Server.Services.Repository
             }
         }
 
-        public ISaleRepo Sales
+        public IPharmacyVoucherRepo PharmacyVouchers
         {
             get
             {
-                _sale ??= new SaleRepo(Context);
-                return _sale;
+                _pharmacyVoucher ??= new PharmacyVoucherRepo(Context);
+                return _pharmacyVoucher;
             }
         }
 
-        public ISaleDetailRepo SaleDetails
+        public IPharmacyVoucherDetailRepo PharmacyVoucherDetails
         {
             get
             {
-                _saleDetail ??= new SaleDetailRepo(Context);
-                return _saleDetail;
+                _pharmacyVoucherDetail ??= new PharmacyVoucherDetailRepo(Context);
+                return _pharmacyVoucherDetail;
             }
         }
 
@@ -235,21 +235,21 @@ namespace WOMS.Server.Services.Repository
             }
         }
 
-        public IViSaleRepo ViSales
+        public IViPharmacyVoucherRepo ViPharmacyVouchers
         {
             get
             {
-                _viSale ??= new ViSaleRepo(Context);
-                return _viSale;
+                _viPharmacyVoucher ??= new ViPharmacyVoucherRepo(Context);
+                return _viPharmacyVoucher;
             }
         }
 
-        public IViSaleDetailRepo ViSaleDetails
+        public IViPharmacyVoucherDetailRepo ViPharmacyVoucherDetails
         {
             get
             {
-                _viSaleDetail ??= new ViSaleDetailRepo(Context);
-                return _viSaleDetail;
+                _viPharmacyVoucherDetail ??= new ViPharmacyVoucherDetailRepo(Context);
+                return _viPharmacyVoucherDetail;
             }
         }
 
