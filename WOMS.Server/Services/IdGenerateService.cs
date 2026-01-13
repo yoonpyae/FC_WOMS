@@ -47,10 +47,10 @@ public class IdGenerateService(
         return stringBuilder.ToString();
     }
 
-    public string GetSaleVno(long BranchId)
+    public string GetPharmacyVoucherVno(long BranchId)
     {
         StringBuilder stringBuilder = new();
-        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"S{BranchId}-", "ddMMyy"));
+        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"PV{BranchId}-", "ddMMyy"));
         return stringBuilder.ToString();
     }
 
