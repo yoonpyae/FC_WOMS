@@ -68,7 +68,6 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
           { label: 'Packet Type', routerLink: ['/stock/packet-types'] },
           { label: 'Stock Item', routerLink: ['/stock/stock-items'] },
           { label: 'Purchase', routerLink: ['/stock/purchases'] },
-          { label: 'Sale', routerLink: ['/stock/sales'] },
           { label: 'Main Stock', routerLink: ['/stock/main-stocks'] },
           { label: 'Pharmacy Stock', routerLink: ['/stock/pharmacy-stocks'] },
           { label: 'Stock Issue', routerLink: ['/stock/stock-issue'] },
