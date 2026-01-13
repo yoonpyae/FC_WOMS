@@ -42,13 +42,13 @@ public partial class WOMSDbContext : DbContext
 
     public virtual DbSet<Patient> Patients { get; set; }
 
+    public virtual DbSet<PharmacyVoucher> PharmacyVouchers { get; set; }
+
+    public virtual DbSet<PharmacyVoucherDetail> PharmacyVoucherDetails { get; set; }
+
     public virtual DbSet<Purchase> Purchases { get; set; }
 
     public virtual DbSet<PurchaseDetail> PurchaseDetails { get; set; }
-
-    public virtual DbSet<Sale> Sales { get; set; }
-
-    public virtual DbSet<SaleDetail> SaleDetails { get; set; }
 
     public virtual DbSet<State> States { get; set; }
 
@@ -66,13 +66,13 @@ public partial class WOMSDbContext : DbContext
 
     public virtual DbSet<ViPatient> ViPatients { get; set; }
 
+    public virtual DbSet<ViPharmacyVoucher> ViPharmacyVouchers { get; set; }
+
+    public virtual DbSet<ViPharmacyVoucherDetail> ViPharmacyVoucherDetails { get; set; }
+
     public virtual DbSet<ViPurchase> ViPurchases { get; set; }
 
     public virtual DbSet<ViPurchaseDetail> ViPurchaseDetails { get; set; }
-
-    public virtual DbSet<ViSale> ViSales { get; set; }
-
-    public virtual DbSet<ViSaleDetail> ViSaleDetails { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -147,6 +147,16 @@ public partial class WOMSDbContext : DbContext
             entity.HasKey(e => new { e.PatientId, e.BranchId }).HasName("PK_Patient_1");
         });
 
+        modelBuilder.Entity<PharmacyVoucher>(entity =>
+        {
+            entity.HasKey(e => new { e.Vno, e.BranchId }).HasName("PK_Sale");
+        });
+
+        modelBuilder.Entity<PharmacyVoucherDetail>(entity =>
+        {
+            entity.HasKey(e => new { e.Vno, e.ItemCode, e.TypeCode }).HasName("PK_SaleDetail");
+        });
+
         modelBuilder.Entity<State>(entity =>
         {
             entity.Property(e => e.StateId).ValueGeneratedNever();
@@ -172,6 +182,16 @@ public partial class WOMSDbContext : DbContext
             entity.ToView("VI_Patient");
         });
 
+        modelBuilder.Entity<ViPharmacyVoucher>(entity =>
+        {
+            entity.ToView("VI_PharmacyVoucher");
+        });
+
+        modelBuilder.Entity<ViPharmacyVoucherDetail>(entity =>
+        {
+            entity.ToView("VI_PharmacyVoucherDetail");
+        });
+
         modelBuilder.Entity<ViPurchase>(entity =>
         {
             entity.ToView("VI_Purchase");
@@ -180,16 +200,6 @@ public partial class WOMSDbContext : DbContext
         modelBuilder.Entity<ViPurchaseDetail>(entity =>
         {
             entity.ToView("VI_PurchaseDetail");
-        });
-
-        modelBuilder.Entity<ViSale>(entity =>
-        {
-            entity.ToView("VI_Sale");
-        });
-
-        modelBuilder.Entity<ViSaleDetail>(entity =>
-        {
-            entity.ToView("VI_SaleDetail");
         });
 
         OnModelCreatingPartial(modelBuilder);
