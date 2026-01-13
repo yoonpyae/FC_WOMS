@@ -15,28 +15,28 @@ import { PatientService } from '@core_services/master/patient.service';
 import { EntryComponent } from 'src/app/pages/master/patient/entry/entry.component';
 
 @Component({
-    selector: 'app-patient-down',
+    selector: 'app-patient-drop-down',
     imports: [CommonModule, SelectModule, FormsModule, ButtonModule, EntryComponent, DialogModule],
     template: `
-    <p-select [options]="opd" [style]="{'width': '100%'}" [(ngModel)]="selectedValue" optionLabel="patientId"
+    <p-select [options]="patient" [style]="{'width': '100%'}" [(ngModel)]="selectedValue" optionLabel="patientId"
               dataKey="patientId"
-              placeholder="Select OPD" [ngModelOptions]="{ standalone: true }" [loading]="loading" [filter]="true" filterBy="name"
+              placeholder="Select Patient" [ngModelOptions]="{ standalone: true }" [loading]="loading" [filter]="true" filterBy="patientName"
                (onChange)="onChanges($event)" [disabled]="!isEnabled" appendTo="body">
         <ng-template #selectedItem let-selectedOption>
             <div class="flex items-center gap-2" *ngIf="selectedOption">
               
               <i class="pi pi-user"></i>
-                <div>{{ selectedOption.name }}</div>
+                <div>{{ selectedOption.patientName }}</div>
             </div>
         </ng-template>
-        <ng-template let-opd #item>
+        <ng-template let-patient #item>
             <div class="flex gap-4">
               <div class="w-20 h-20 border rounded-xl flex justify-center items-center">
                  <i class="pi pi-user scale-150"></i>
               </div>
               <div class="flex flex-col gap-2">
-                <div class="font-semibold">{{ opd.name }}</div>
-                <div>AGE: {{ opd.age }}</div>
+                <div class="font-semibold">{{ patient.patientName }}</div>
+                <div>AGE: {{ patient.age }}</div>
               </div>
             </div>
         </ng-template>
@@ -44,16 +44,16 @@ import { EntryComponent } from 'src/app/pages/master/patient/entry/entry.compone
             <i class="pi pi-users"></i>
         </ng-template>
         <ng-template #header>
-            <div class="font-medium p-3">Current OPD</div>
+            <div class="font-medium p-3">Current Patient</div>
         </ng-template>
         <ng-template #footer>
             <div class="p-3">
-                <p-button label="Add New OPD" fluid severity="secondary" text size="small" icon="pi pi-plus" (onClick)="creatOpdModeelvisible=true" />
+                <p-button label="Add New Patient" fluid severity="secondary" text size="small" icon="pi pi-plus" (onClick)="creatPatientModelvisible=true" />
             </div>
         </ng-template>
     </p-select>
     
-    <p-dialog header="Create OPD Registration" [(visible)]="creatOpdModeelvisible" (onHide)="clearSelection()"
+    <p-dialog header="Create Patient Registration" [(visible)]="creatPatientModelvisible" (onHide)="clearSelection()"
         [breakpoints]="{
     '1920px': '60vw',
     '1440px': '30vw',
@@ -63,7 +63,7 @@ import { EntryComponent } from 'src/app/pages/master/patient/entry/entry.compone
     '375px': '100vw',
     '320px': '100vw'}" [modal]="true" [style]="{width: '60vw', minWidth: '50vw', minHeight: '50vh'}"
         [draggable]="false" [resizable]="false">
-        <app-patient-entry (onSubmitted)="handleOpdEntrySubmitted($event)"></app-patient-entry>
+        <app-patient-entry (onSubmitted)="handlePatientEntrySubmitted($event)"></app-patient-entry>
     </p-dialog>`,
 
     providers: [
@@ -80,14 +80,14 @@ export class PatientDropDownComponent implements OnInit, OnDestroy {
 
     subscription!: Subscription;
     loading: boolean = false;
-    creatOpdModeelvisible: boolean = false;
+    creatPatientModelvisible: boolean = false;
 
-    dropdownId: string = 'opd-dropdown';
+    dropdownId: string = 'patient-dropdown';
 
-    opd: ViPatientModel[] = [];
+    patient: ViPatientModel[] = [];
     selectedValue!: ViPatientModel;
     patientId = '';
-    name = '';
+    patientName = '';
     age = '';
 
     constructor(
@@ -105,7 +105,7 @@ export class PatientDropDownComponent implements OnInit, OnDestroy {
             if (this.dropdownId) {
                 this.isEnabled = states.enabled[this.dropdownId] ?? true;
                 if (states.selected[this.dropdownId] !== undefined) {
-                    this.selectedValue = this.opd.filter((v, i) => v.patientId == states.selected[this.dropdownId])[0];
+                    this.selectedValue = this.patient.filter((v, i) => v.patientId == states.selected[this.dropdownId])[0];
                 }
             }
         });
@@ -120,7 +120,7 @@ export class PatientDropDownComponent implements OnInit, OnDestroy {
         this.loading = true;
         this.patientService.get(branchId).subscribe({
             next: (res) => {
-                this.opd = res.data as ViPatientModel[];
+                this.patient = res.data as ViPatientModel[];
                 this.loading = false;
             },
             error: (err) => {
@@ -132,30 +132,30 @@ export class PatientDropDownComponent implements OnInit, OnDestroy {
     }
 
     clearSelection() {
-        this.opd = null as any;
+        this.patient = null as any;
     }
 
-    handleOpdEntrySubmitted(newPatientId: string) {
-        this.creatOpdModeelvisible = false;
+    handlePatientEntrySubmitted(newPatientId: string) {
+        this.creatPatientModelvisible = false;
         this.patientId = newPatientId;
 
         let branchId = Number.parseInt(this.sharedService.getDefaultBranchId() ?? '0');
         this.patientService.get(branchId).subscribe({
             next: (res) => {
-                this.opd = res.data as ViPatientModel[];
+                this.patient = res.data as ViPatientModel[];
                 // Set the selected value to the new one
-                this.selectedValue = this.opd.find(x => x.patientId === newPatientId)!;
+                this.selectedValue = this.patient.find(x => x.patientId === newPatientId)!;
                 this.onChange(this.selectedValue);
                 this.onValueChange.emit(this.selectedValue);
 
                 this.messageService.add({
                     severity: 'success',
-                    summary: 'OPD Registered',
+                    summary: 'Patient Registered',
                     detail: `Patient ID: ${newPatientId}`
                 });
             },
             error: () => {
-                this.name = '';
+                this.patientName = '';
                 this.age = '';
             }
         });
