@@ -85,12 +85,12 @@ public class PatientsController(
         null,
         new DefaultResponseMessageModel("Patient not found.", ""));
 
-        bool isUSedInSale = await repo.Sales.AnyAsync(s => s.PatientId == id && s.BranchId == branchId && !s.DeletedOn.HasValue);
-        if (isUSedInSale)
+        bool isUSedInPharmacyVoucher = await repo.PharmacyVouchers.AnyAsync(s => s.PatientId == id && s.BranchId == branchId && !s.DeletedOn.HasValue);
+        if (isUSedInPharmacyVoucher)
         {
             return ResponseHelper.Bad_Request(
                 null,
-                new DefaultResponseMessageModel("Cannot delete Patient as it is referenced in existing Sales.", ""));
+                new DefaultResponseMessageModel("Cannot delete Patient as it is referenced in existing PharmacyVouchers.", ""));
         }
 
         // Soft delete
