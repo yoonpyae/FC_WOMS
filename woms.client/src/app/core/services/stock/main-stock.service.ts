@@ -22,6 +22,10 @@ export class MainStockService {
     return this.httpClient.get<RootModel>(`${environment.main_url}/stock/mainstocks/code?code=${code}&clinicId=${clinicId}`);
   }
 
+    getByActive(branchId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/stock/pharmacystocks/active?branchId=${branchId}`);
+  }
+
   create(model: MainStockModel): Observable<RootModel> {
     return this.httpClient.post<RootModel>(`${environment.main_url}/stock/mainstocks`, model);
   }
