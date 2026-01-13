@@ -47,8 +47,8 @@ import { Title } from '@angular/platform-browser';
 // import { OPDVoucherComponent } from './pages/opd/opd-voucher/opd-voucher.component';
 // import { AdmissionVoucherComponent } from './pages/admission/admission-voucher/admission-voucher.component';
 // import { OpdDoctorAttachComponent } from './pages/opd/opd-doctor-attach/opd-doctor-attach.component';
-// import { PharmacyCreateVoucherComponent } from './pages/pharmacy-voucher/create-voucher/create-voucher.component';
-// import { PharmacyVoHistoryComponent } from './pages/pharmacy-voucher/history/history.component';
+import { PharmacyCreateVoucherComponent } from './pages/pharmacy-voucher/create-voucher/create-voucher.component';
+import { PharmacyVoHistoryComponent } from './pages/pharmacy-voucher/history/history.component';
 import { StockItemComponent } from './pages/stock/stock-item/stock-item.component';
 import path from 'path';
 import { PatientComponent } from './pages/master/patient/patient.component';
@@ -169,8 +169,8 @@ export const routes: Routes = [
 			{
 				path: 'pharmacy-voucher',
 				children: [
-					// { path: 'create-vouchers', component: PharmacyCreateVoucherComponent, data: { title: 'Create Voucher' } },
-					// { path: 'histories', component: PharmacyVoHistoryComponent, data: { title: 'History' } },
+					{ path: 'create-vouchers', component: PharmacyCreateVoucherComponent, data: { title: 'Create Voucher' } },
+					{ path: 'histories', component: PharmacyVoHistoryComponent, data: { title: 'History' } },
 
 				],
 
