@@ -82,7 +82,7 @@ export class PharmacyCreateVoucherComponent implements OnInit {
   labmodalVisible: boolean = false;
   submodalVisible: boolean = false;
   PharmacymodalVisible: boolean = false;
-  OpdModelvisible: boolean = false;
+  PatientModelvisible: boolean = false;
   creatOpdModeelvisible: boolean = false;
   checkedValue: boolean = false;
   formSubmitted: boolean = false;
@@ -518,14 +518,14 @@ export class PharmacyCreateVoucherComponent implements OnInit {
     }
   }
 
-  //#region OPD
+  //#region Patient
 
-  onOPDSelected(opd: ViPatientModel): void {
-    this.selectedPatient = opd;
+  onPatientSelected(patient: ViPatientModel): void {
+    this.selectedPatient = patient;
 
-    if (opd) {
-      this.name = opd.patientName;
-      this.patientId = opd.patientId;
+    if (patient) {
+      this.name = patient.patientName;
+      this.patientId = patient.patientId;
     } else {
       this.name = '';
       this.patientId = '';
