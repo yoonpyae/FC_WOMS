@@ -26,7 +26,7 @@ export interface ViMainStockModel {
     clinicId: number;
     branchId: number;
     purchasePrice?: number;
-    salePrice?: number;
+    salePrice: number;
     avgPrice?: number;
     groundBalance?: number;
     createdOn?: Date;
