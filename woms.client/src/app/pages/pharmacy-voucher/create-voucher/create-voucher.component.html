@@ -10,44 +10,13 @@
                     <div class="col-span-12 sm:col-span-6 md:col-span-3 lg:col-span-4">
                         <div class="flex flex-col gap-2">
                             <label for="name">Patient Name</label>
-                            <app-patient-drop-down *ngIf="mode == 'OutPatient'" (onValueChange)="onPatientSelected($event)">
+                            <app-patient-drop-down (onValueChange)="onPatientSelected($event)">
                             </app-patient-drop-down>
                         </div>
                     </div>
-                    <!-- Action Buttons (Mode Switch) -->
-                    <div class="col-span-12 sm:col-span-6 md:col-span-3 lg:col-span-2 flex gap-2 items-end">
-                        <div class="flex flex-col w-full">
-                            <label class="mb-1">Patient Type</label>
-                            <div class="flex justify-center">
-                                <p-selectbutton [options]="choiceOptions" [(ngModel)]="mode" optionLabel="label"
-                                    [allowEmpty]="false" optionValue="value"
-                                    [style]="{ width: '100%', minWidth: '180px' }" class="w-full"
-                                    [ngModelOptions]="{standalone: true}" (onChange)="onModeChange()"></p-selectbutton>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Age -->
-                    <div class="col-span-6 sm:col-span-3 md:col-span-2">
-                        <div class="flex flex-col gap-2">
-                            <label for="age">Age</label>
-                            <input pInputText [value]="age" placeholder="Age" class="bg-gray-100 w-full" readonly />
-                        </div>
-                    </div>
-                    <!-- Gender -->
-                    <div class="col-span-6 sm:col-span-3 md:col-span-2">
-                        <div class="flex flex-col gap-2">
-                            <label>Gender</label>
-                            <p-select [options]="genders" formControlName="sex" optionLabel="label"
-                                placeholder="Select Gender"
-                                [ngClass]="{ 'ng-invalid ng-dirty': pharmacyVoucherForm.controls['sex'].invalid && pharmacyVoucherForm.controls['sex'].touched }"
-                                class="w-full"></p-select>
-                            <small
-                                *ngIf="pharmacyVoucherForm.controls['sex'].invalid && pharmacyVoucherForm.get('sex')?.dirty"
-                                class="text-xs text-red-500">Gender is required.</small>
-                        </div>
-                    </div>
+
                     <!-- Refer Doctor -->
-                    <div class="col-span-12 sm:col-span-6 md:col-span-2 md:col-start-11">
+                    <div class="col-span-12 sm:col-span-6 md:col-span-3 lg:col-span-4">
                         <div class="flex flex-col gap-2">
                             <label>Refer Doctor</label>
                             <app-doctor-drop-down [(ngModel)]="selectedDoctor" [ngModelOptions]="{ standalone: true }"
@@ -63,8 +32,8 @@
                     <div class="col-span-12 sm:col-span-6 md:col-span-2">
                         <div class="flex flex-col gap-2">
                             <label>Item Code</label>
-                            <p-select [options]="pharmacyStocks" [(ngModel)]="selectedStockItem"
-                                (onChange)="onStockItemChange(selectedStockItem)" optionLabel="itemName"
+                            <p-select [options]="mainStocks" [(ngModel)]="selectedMainStock"
+                                (onChange)="onStockItemChange(selectedMainStock)" optionLabel="itemName"
                                 dataKey="itemCode" placeholder="Select Item Code" [filter]="true" [showClear]="true"
                                 [ngModelOptions]="{ standalone: true }"
                                 [ngClass]="{ 'ng-dirty ng-invalid': pharmacyVoucherForm.controls['itemCode'].invalid && pharmacyVoucherForm.get('itemCode')?.touched }">
