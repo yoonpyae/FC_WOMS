@@ -21,8 +21,8 @@ namespace WOMS.Server.Interfaces.Repositories
         IDoctorRepo Doctors { get; }
         IPurchaseRepo Purchases { get; }
         IPurchaseDetailRepo PurchaseDetails { get; }
-        ISaleRepo Sales { get; }
-        ISaleDetailRepo SaleDetails { get; }
+        IPharmacyVoucherRepo PharmacyVouchers { get; }
+        IPharmacyVoucherDetailRepo PharmacyVoucherDetails { get; }
         IPatientRepo Patients { get; }
 
         #endregion
@@ -32,8 +32,8 @@ namespace WOMS.Server.Interfaces.Repositories
         IViMainStockRepo ViMainStocks { get; }
         IViPurchaseRepo ViPurchases { get; }
         IViPurchaseDetailRepo ViPurchaseDetails { get; }
-        IViSaleRepo ViSales { get; }
-        IViSaleDetailRepo ViSaleDetails { get; }
+        IViPharmacyVoucherRepo ViPharmacyVouchers { get; }
+        IViPharmacyVoucherDetailRepo ViPharmacyVoucherDetails { get; }
         IViPatientRepo ViPatients { get; }
 
         #endregion
