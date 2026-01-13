@@ -18,11 +18,11 @@ public interface IIdGenerateService
     string GetPurchaseVno(long BranchId);
 
     /// <summary>
-    /// Sale VNO => [S1-010125-RXYDQC]
+    /// PharmacyVoucher VNO => [PV-010125-RXYDQC]
     /// </summary>
     /// <param name="BranchId"></param>
     /// <returns></returns>
-    string GetSaleVno(long BranchId);
+    string GetPharmacyVoucherVno(long BranchId);
 
     /// <summary>
     /// Patient ID => [P-010125-RXYDQC]
