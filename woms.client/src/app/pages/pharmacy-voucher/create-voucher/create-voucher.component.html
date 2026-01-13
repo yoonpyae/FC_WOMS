@@ -1,0 +1,229 @@
+<!-- #region Pharmacy Voucher Form -->
+<form [formGroup]="pharmacyVoucherForm" class="flex flex-col gap-4">
+    <!-- Card Container -->
+    <div class="card mb-0">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 w-full">
+            <div class="col-span-12 w-full">
+                <!-- Form Header Section -->
+                <div class="grid grid-cols-12 gap-4 mb-4 items-end">
+                    <!-- Patient Name -->
+                    <div class="col-span-12 sm:col-span-6 md:col-span-3 lg:col-span-4">
+                        <div class="flex flex-col gap-2">
+                            <label for="name">Patient Name</label>
+                            <app-patient-drop-down *ngIf="mode == 'OutPatient'" (onValueChange)="onPatientSelected($event)">
+                            </app-patient-drop-down>
+                        </div>
+                    </div>
+                    <!-- Action Buttons (Mode Switch) -->
+                    <div class="col-span-12 sm:col-span-6 md:col-span-3 lg:col-span-2 flex gap-2 items-end">
+                        <div class="flex flex-col w-full">
+                            <label class="mb-1">Patient Type</label>
+                            <div class="flex justify-center">
+                                <p-selectbutton [options]="choiceOptions" [(ngModel)]="mode" optionLabel="label"
+                                    [allowEmpty]="false" optionValue="value"
+                                    [style]="{ width: '100%', minWidth: '180px' }" class="w-full"
+                                    [ngModelOptions]="{standalone: true}" (onChange)="onModeChange()"></p-selectbutton>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Age -->
+                    <div class="col-span-6 sm:col-span-3 md:col-span-2">
+                        <div class="flex flex-col gap-2">
+                            <label for="age">Age</label>
+                            <input pInputText [value]="age" placeholder="Age" class="bg-gray-100 w-full" readonly />
+                        </div>
+                    </div>
+                    <!-- Gender -->
+                    <div class="col-span-6 sm:col-span-3 md:col-span-2">
+                        <div class="flex flex-col gap-2">
+                            <label>Gender</label>
+                            <p-select [options]="genders" formControlName="sex" optionLabel="label"
+                                placeholder="Select Gender"
+                                [ngClass]="{ 'ng-invalid ng-dirty': pharmacyVoucherForm.controls['sex'].invalid && pharmacyVoucherForm.controls['sex'].touched }"
+                                class="w-full"></p-select>
+                            <small
+                                *ngIf="pharmacyVoucherForm.controls['sex'].invalid && pharmacyVoucherForm.get('sex')?.dirty"
+                                class="text-xs text-red-500">Gender is required.</small>
+                        </div>
+                    </div>
+                    <!-- Refer Doctor -->
+                    <div class="col-span-12 sm:col-span-6 md:col-span-2 md:col-start-11">
+                        <div class="flex flex-col gap-2">
+                            <label>Refer Doctor</label>
+                            <app-doctor-drop-down [(ngModel)]="selectedDoctor" [ngModelOptions]="{ standalone: true }"
+                                optionLabel="name"
+                                (onValueChange)="onDoctorChange(selectedDoctor)"></app-doctor-drop-down>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item Entry Section -->
+                <div class="grid grid-cols-12 gap-4 mb-4">
+                    <!-- Item Code -->
+                    <div class="col-span-12 sm:col-span-6 md:col-span-2">
+                        <div class="flex flex-col gap-2">
+                            <label>Item Code</label>
+                            <p-select [options]="pharmacyStocks" [(ngModel)]="selectedStockItem"
+                                (onChange)="onStockItemChange(selectedStockItem)" optionLabel="itemName"
+                                dataKey="itemCode" placeholder="Select Item Code" [filter]="true" [showClear]="true"
+                                [ngModelOptions]="{ standalone: true }"
+                                [ngClass]="{ 'ng-dirty ng-invalid': pharmacyVoucherForm.controls['itemCode'].invalid && pharmacyVoucherForm.get('itemCode')?.touched }">
+                            </p-select>
+                            <small
+                                *ngIf="pharmacyVoucherForm.controls['itemCode'].invalid && (pharmacyVoucherForm.get('itemCode')?.touched || pharmacyVoucherForm.get('itemCode')?.dirty)"
+                                class="text-red-500 text-xs">
+                                <i class="pi pi-exclamation-circle mr-1"></i>
+                                Item Code is required.
+                            </small>
+                        </div>
+                    </div>
+                    <!-- Type Code -->
+                    <div class="col-span-12 sm:col-span-6 md:col-span-2">
+                        <div class="flex flex-col gap-2">
+                            <label>Packet Type</label>
+                            <input pInputText [value]="typeName" [disabled]="true" readonly
+                                class="w-full Pharmacyed-md bg-gray-100 px-3 py-2 text-gray-700 cursor-not-allowed" />
+
+                        </div>
+                    </div>
+                    <!-- Quantity -->
+                    <div class="col-span-6 sm:col-span-3 md:col-span-2">
+                        <div class="flex flex-col gap-2">
+                            <label>Quantity</label>
+                            <input min="0" type="number" formControlName="quantity" pInputText
+                                (keydown)="preventNegativeInput($event)" class="w-full" />
+                        </div>
+                    </div>
+                    <!-- Price -->
+                    <div class="col-span-6 sm:col-span-3 md:col-span-2">
+                        <div class="flex flex-col gap-2">
+                            <label>Price</label>
+                            <input min="0" type="text" pInputText [value]="salePrice | number:'1.0-0'" [disabled]="true"
+                                class="bg-gray-100 w-full" />
+                        </div>
+                    </div>
+                    <!-- Ground Balance -->
+                    <div class="col-span-6 sm:col-span-3 md:col-span-2">
+                        <div class="flex flex-col gap-2">
+                            <label>Ground Balance</label>
+                            <input min="0" type="text" pInputText [value]="groundBalance | number:'1.0-0'"
+                                [disabled]="true" class="bg-gray-100 w-full" />
+                        </div>
+                    </div>
+                    <!-- Add Button -->
+                    <div class="col-span-12 sm:col-span-2 md:col-span-2 flex items-end">
+                        <p-button icon="pi pi-plus" label="Add" styleClass="w-full" (onClick)="addItemToCookie()">
+                        </p-button>
+
+                    </div>
+                </div>
+
+                <!-- Table & Payment Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                    <!-- Items Table -->
+                    <div class="lg:col-span-8 xl:col-span-9 overflow-x-auto">
+                        <div class="border rounded-lg" style="max-height: 590px; overflow-y: auto;">
+                            <p-table [value]="cookieData" selectionMode="single" dataKey="id" [scrollable]="true"
+                                scrollHeight="flex" [loading]="loading" [tableStyle]="{ 'min-width': '600px' }">
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th>Item Code</th>
+                                        <th>Item Name</th>
+                                        <th>Type Name</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Amount</th>
+                                        <th class="text-center">
+                                            <button pButton icon="pi pi-trash"
+                                                class="p-button-rounded p-button-text p-button-danger"
+                                                (click)="confirmClearAllItems()" title="Clear All"></button>
+                                        </th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-entry let-i="rowIndex">
+                                    <tr>
+                                        <td>{{ entry.itemCode }}</td>
+                                        <td>{{ entry.itemName }}</td>
+                                        <td>{{ entry.typeName }}</td>
+                                        <td>{{ entry.price | number:'1.0-0' }}</td>
+                                        <td>{{ entry.quantity | number:'1.0-0' }}</td>
+                                        <td>{{ entry.amount | number:'1.0-0' }}</td>
+                                        <td class="text-center">
+                                            <button pButton icon="pi pi-trash"
+                                                class="p-button-rounded p-button-text p-button-danger"
+                                                (click)="removeItemFromCookie(i)" title="Delete Item"></button>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                    </div>
+
+                    <!-- Amount Form Section -->
+                    <div class="lg:col-span-4 xl:col-span-3 mt-2">
+                        <div class="border rounded-lg flex flex-col p-4 gap-3">
+                            <div class="flex flex-col gap-2">
+                                <label>Issue Date</label>
+                                <p-date-picker formControlName="issueDate" [showIcon]="true" [style]="{ width: '100%' }"
+                                    dateFormat="dd/M/yy" inputId="issueDate"></p-date-picker>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label>Issue Person</label>
+                                <input type="text" formControlName="issuePerson" pInputText [ngClass]="{
+                                            'p-invalid':
+                                                pharmacyVoucherForm.get('issuePerson')?.invalid &&
+                                                pharmacyVoucherForm.get('issuePerson')?.touched
+                                        }" [placeholder]="
+                                            pharmacyVoucherForm.get('issuePerson')?.invalid &&
+                                            pharmacyVoucherForm.get('issuePerson')?.touched
+                                                ? 'Issue Person Is Required'
+                                                : 'Enter Issue Person'
+                                        " />
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label>Total Amount</label>
+                                <input pInputText type="text" class="w-full text-right"
+                                    [value]="pharmacyVoucherForm.get('totalAmount')?.value | number:'1.0-0'" readonly />
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label>Discount</label>
+                                <input formControlName="discountAmount" pInputText type="number" min="0"
+                                    (input)="onAmountChange()" (keypress)="preventNegativeInput($event)"
+                                    (keydown.enter)="$event.preventDefault()" class="w-full text-right" />
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label>Net Amount</label>
+                                <input pInputText type="text" class="w-full text-right"
+                                    [value]="pharmacyVoucherForm.get('netAmount')?.value | number:'1.0-0'" readonly />
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label>Pay Amount</label>
+                                <input formControlName="paidAmount" pInputText type="number" (input)="onAmountChange()"
+                                    (keypress)="preventNegativeInput($event)" (keydown.enter)="$event.preventDefault()"
+                                    class="w-full text-right" />
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label>Left Amount</label>
+                                <input pInputText type="text" class="w-full text-right"
+                                    [value]="pharmacyVoucherForm.get('leftAmount')?.value | number:'1.0-0'" readonly />
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label>Remark</label>
+                                <textarea pTextarea formControlName="remark" rows="2" class="w-full"></textarea>
+                            </div>
+                            <div class="flex flex-wrap gap-2 pt-2 mt-2">
+                                <p-button icon="pi pi-check" label="Save" severity="success"
+                                    (click)="submit()"></p-button>
+                                <p-button icon="pi pi-trash" label="Clear" severity="warn" (click)="clear()"></p-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<!-- #endregion Pharmacy Voucher Form -->
+
+<p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>
