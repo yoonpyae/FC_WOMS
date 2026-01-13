@@ -1,6 +1,4 @@
-﻿using WOMS.Server.Entities;
-
-namespace WOMS.Server.Controllers.Stock
+﻿namespace WOMS.Server.Controllers.Stock
 {
     [Authorize]
     [Route("api/stock/[controller]")]
@@ -11,7 +9,7 @@ namespace WOMS.Server.Controllers.Stock
         [HttpGet]
         [EndpointSummary("List")]
         [EndpointDescription("List all Main Stocks by Clinic and Branch")]
-        public async Task<IActionResult> Get(long clinicId, long branchId) 
+        public async Task<IActionResult> Get(long clinicId, long branchId)
         {
             return ResponseHelper.OK_Result(
                 await repo.ViMainStocks.GetAsync(x =>
@@ -28,6 +26,19 @@ namespace WOMS.Server.Controllers.Stock
         {
             return ResponseHelper.OK_Result(
                     await repo.MainStocks.GetFirstAsync(x => x.ItemCode == code && x.ClinicId == clinicId), null);
+        }
+
+        [HttpGet("active")]
+        [EndpointSummary("List Active")]
+        [EndpointDescription("List all Main Stock with Status true")]
+        public async Task<IActionResult> GetActive(long branchId)
+        {
+            return ResponseHelper.OK_Result(
+                await repo.ViMainStocks.GetAsync(
+                    x => x.BranchId == branchId && !x.DeletedOn.HasValue && x.Status == true
+                ),
+                null
+            );
         }
 
         [HttpPost]
