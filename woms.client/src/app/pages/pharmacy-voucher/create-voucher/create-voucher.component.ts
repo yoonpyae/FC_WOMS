@@ -95,14 +95,6 @@ export class PharmacyCreateVoucherComponent implements OnInit {
   typeCode: number | null = 0;
   typeName: string | null = '';
   groundBalance: number | null = 0;
-  mode: string = 'OutPatient';
-
-  genders = [{ label: 'Male' }, { label: 'Female' }];
-
-  choiceOptions = [
-    { label: 'Out-Patient', value: 'OutPatient' },
-    { label: 'In-Patient', value: 'InPatient' }
-  ];
 
   private readonly Issue_COOKIE_NAME = 'pharmacy-voucher-details';
 
@@ -310,8 +302,7 @@ export class PharmacyCreateVoucherComponent implements OnInit {
 
     this.mainStockService.getByActive(branchId).subscribe({
       next: (res) => {
-        this.mainStocks = (res.data as ViMainStockModel[])
-          .filter(item => item.itemCode.startsWith('Z'));
+        this.mainStocks = (res.data as ViMainStockModel[]);
       },
       error: () => { },
       complete: () => {
@@ -343,12 +334,6 @@ export class PharmacyCreateVoucherComponent implements OnInit {
     this.pharmacyVoucherForm.controls['itemCode'].setValue(null);
   }
 
-  onModeChange() {
-    if (!this.mode) {
-      this.mode = 'OutPatient';
-    }
-    this.name = '';
-  }
   //#endregion
 
   //#region Submit Method
@@ -504,11 +489,6 @@ export class PharmacyCreateVoucherComponent implements OnInit {
     this.cookieData = [];
     this.formSubmitted = false;
     this.selectedPatient = null as any;
-    if (this.mode = 'OutPatient') {
-      this.mode = 'InPatient';
-    } else {
-      this.mode = 'OutPatient';
-    }
   }
   //#endregion
 
