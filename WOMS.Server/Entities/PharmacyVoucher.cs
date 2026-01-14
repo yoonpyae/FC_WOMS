@@ -42,7 +42,7 @@ public partial class PharmacyVoucher
     public string? PaymentType { get; set; }
 
     [StringLength(50)]
-    public string ProcessStatus { get; set; } = null!;
+    public string? ProcessStatus { get; set; }
 
     [StringLength(256)]
     public string? IssuePerson { get; set; }
