@@ -69,8 +69,6 @@ export class PharmacyVoHistoryComponent implements OnInit {
     patientId: [''],
     vdate: [new Date()],
     patientName: [''],
-    age: [''],
-    sex: [''],
     referDoctorId: [0],
     referDoctorName: [''],
     totalAmount: [0],
