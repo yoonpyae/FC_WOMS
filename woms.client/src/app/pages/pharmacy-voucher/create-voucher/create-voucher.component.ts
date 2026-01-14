@@ -377,16 +377,6 @@ export class PharmacyCreateVoucherComponent implements OnInit {
       return;
     }
 
-
-    if (this.patientId && this.pharmacyVoucherForm.get('leftAmount')?.value > 0) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Payment Error',
-        detail: 'Out-patients must pay the full amount at once. No credit allowed.'
-      });
-      return;
-    }
-
     let payAmount = this.pharmacyVoucherForm.get('paidAmount')?.value;
     let netAmount = this.pharmacyVoucherForm.get('netAmount')?.value;
     let discountAmount = this.pharmacyVoucherForm.get('discountAmount')?.value;
