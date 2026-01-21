@@ -97,7 +97,6 @@ export const routes: Routes = [
 					// { path: 'ot-service', component: OtServiceComponent, data: { title: 'OT Serivce' } },
 					// { path: 'ward-service', component: WardServiceComponent, data: { title: 'Ward Service' } },
 					// { path: 'lab-test', component: LabtestComponent, data: { title: 'Lab Test' } },
-					{ path: 'supplier', component: SupplierComponent, data: { title: 'Supplier' } },
 					// { path: 'laboratory', component: LaboratoryComponent, data: { title: 'laboratory' } },
 					// { path: 'checkup-company', component: CheckupCompanyComponent, data: { title: 'Checkup Company' } },
 					// { path: 'checkup-types', component: CheckuptypesComponent, data: { title: 'Checkup Types' } },
@@ -128,6 +127,7 @@ export const routes: Routes = [
 			{
 				path: 'stock',
 				children: [
+					{ path: 'supplier', component: SupplierComponent, data: { title: 'Supplier' } },
 					{ path: 'stock-items', component: StockItemComponent, data: { title: 'Stock Item' } },
 					{ path: 'packet-types', component: PacketTypeComponent, data: { title: 'Packet Type' } },
 					{ path: 'main-stocks', component: MainStockComponent, data: { title: 'Main Stock' } },
