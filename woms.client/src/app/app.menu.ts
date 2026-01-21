@@ -36,14 +36,18 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
             ]
           },
           { label: 'Supplier', routerLink: ['/master/supplier'] },
-          { label: 'Doctor', routerLink: ['/master/doctor'] },
           { label: 'Patient', routerLink: ['/master/patient'] },
         ]
       },
       {
         label: 'Doctor',
-        icon: 'pi pi-fw pi-user-md',
+        icon: 'pi pi-fw pi-users',
         routerLink: ['/doctor']
+      },
+      {
+        label: 'Patient',
+        icon: 'pi pi-fw pi-user',
+        routerLink: ['/patient']
       },
       {
         label: 'Stock',
