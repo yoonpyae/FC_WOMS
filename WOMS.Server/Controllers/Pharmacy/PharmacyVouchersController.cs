@@ -54,7 +54,7 @@ public class PharmacyVouchersController(
             x.BranchId == branchId &&
             x.LeftAmount > 0) ?? [];
 
-        List<PharmacyVoucherListModel> records = new();
+        List<PharmacyVoucherListModel> records = [];
 
         foreach (ViPharmacyVoucher voucher in Pharmacyvouchers)
         {
@@ -80,80 +80,88 @@ public class PharmacyVouchersController(
     [HttpPost]
     [ValidateModel]
     [EndpointSummary("Create")]
-    [EndpointDescription("Creates a new Pharmacy Voucher.")]
+    [EndpointDescription("Creates a new Pharmacy Voucher and deducts stock.")]
     public async Task<IActionResult> CreatePharmacyVoucher(PharmacyVoucherEntryModel model)
     {
-        model.Vno = idGenerateService.GetPharmacyVoucherVno(model.BranchId);
-        model.CreatedOn = DateTime.Now;
-        model.CreatedBy = User.Identity?.Name ?? string.Empty;
-
-
-        var mainStock = await repo.MainStocks.GetAsync(x => x.BranchId == model.BranchId) ?? [];
-
-        // Check stock for each detail
-        foreach (PharmacyVoucherDetail detail in model.Details)
+        try
         {
-            var mainStockDetail = mainStock?
-                .FirstOrDefault(x => x.ItemCode == detail.ItemCode && x.BranchId == model.BranchId);
+            string vno = idGenerateService.GetPharmacyVoucherVno(model.BranchId);
 
-            double groundBalance = mainStockDetail?.GroundBalance ?? 0;
+            bool isFullyPaid = model.LeftAmount == 0 && model.PaidAmount == model.TotalAmount;
 
-            if (groundBalance < detail.Qty)
+            PharmacyVoucher voucher = new()
             {
-                return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel(
-                    $"Insufficient stock for item {detail.ItemCode}. Available: {groundBalance}, Requested: {detail.Qty}", ""));
-            }
-        }
+                Vno = vno,
+                BranchId = model.BranchId,
+                PatientId = model.PatientId,
+                Vdate = model.Vdate,
+                ReferDoctorId = model.ReferDoctorId,
+                TotalAmount = model.TotalAmount,
+                DiscountAmount = model.DiscountAmount,
+                PaidAmount = model.PaidAmount,
+                LeftAmount = model.LeftAmount,
+                PaymentType = model.PaymentType,
+                IssuePerson = model.IssuePerson,
+                IssueDate = model.IssueDate,
+                CreatedOn = DateTime.Now,
+                CreatedBy = User.Identity?.Name ?? string.Empty,
+                Remark = model.Remark,
+            };
 
-        // Deduct stock
-        foreach (PharmacyVoucherDetail detail in model.Details)
-        {
-            var stock = mainStock?.FirstOrDefault(x => x.ItemCode == detail.ItemCode && x.BranchId == model.BranchId);
-            if (stock != null)
+            repo.PharmacyVouchers.Create(voucher);
+
+            IReadOnlyList<MainStock> mainStockList =
+                await repo.MainStocks.GetAsync(x => x.BranchId == model.BranchId) ?? [];
+
+            foreach (PharmacyVoucherDetail item in model.Details)
             {
-                stock.GroundBalance -= detail.Qty;
-                stock.UpdatedBy = User.Identity?.Name ?? string.Empty;
-                stock.UpdatedOn = DateTime.Now;
-                repo.MainStocks.Update(stock);
+                item.Vno = vno;
+
+                MainStock? mainStock = mainStockList.FirstOrDefault(x => x.ItemCode == item.ItemCode &&
+                                                                         x.TypeCode == item.TypeCode);
+
+                if (mainStock == null)
+                {
+                    return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel($"Item with ItemCode {item.ItemCode} and TypeCode {item.TypeCode} is not available in MainStock.", ""));
+                }
+
+                if (mainStock.GroundBalance < item.Qty)
+                {
+                    return ResponseHelper.Bad_Request(null,
+                        new DefaultResponseMessageModel(
+                            $"Insufficient stock for item {mainStock.ItemCode}. Available: {mainStock.GroundBalance}, Requested: {item.Qty}", ""));
+                }
+
+                mainStock.GroundBalance -= item.Qty;
+                mainStock.UpdatedBy = User.Identity?.Name ?? string.Empty;
+                mainStock.UpdatedOn = DateTime.Now;
+                repo.MainStocks.Update(mainStock);
+
+                PharmacyVoucherDetail itemDetail = new()
+                {
+                    Vno = voucher.Vno,
+                    ItemCode = item.ItemCode,
+                    TypeCode = item.TypeCode,
+                    Qty = item.Qty,
+                    Price = item.Price,
+                    Amount = item.Amount
+                };
+                repo.PharmacyVoucherDetails.Create(itemDetail);
             }
-            else
-            {
-                return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel(
-                    $"Item {detail.ItemCode} not found in stock.", ""));
-            }
+
+            return await repo.SaveAsync()
+                ? ResponseHelper.Created_Result("api/pharmacy/pharmacyvouchers/create", null,
+                    new DefaultResponseMessageModel("Successfully created Pharmacy Voucher.", ""))
+                : ResponseHelper.Bad_Request(null,
+                    new DefaultResponseMessageModel("Failed to create Pharmacy Voucher.", ""));
         }
-
-        PharmacyVoucher voucher = new()
+        catch (Exception ex)
         {
-            Vno = model.Vno,
-            BranchId = model.BranchId,
-            PatientId = model.PatientId,
-            Vdate = model.Vdate,
-            ReferDoctorId = model.ReferDoctorId,
-            TotalAmount = model.TotalAmount,
-            DiscountAmount = model.DiscountAmount,
-            PaidAmount = model.PaidAmount,
-            LeftAmount = model.LeftAmount,
-            PaymentType = model.PaymentType,
-            IssuePerson = model.IssuePerson,
-            IssueDate = model.IssueDate,
-            CreatedOn = model.CreatedOn,
-            CreatedBy = model.CreatedBy,
-            Remark = model.Remark,
-        };
-        repo.PharmacyVouchers.Create(voucher);
-
-        if (model.Details != null && model.Details.Count > 0)
-        {
-            model.Details.ForEach(detail => detail.Vno = model.Vno);
-            repo.PharmacyVoucherDetails.CreateRange(model.Details);
-
+            return ResponseHelper.InternalServerError_Request(null,
+                new DefaultResponseMessageModel("An error occurred while creating the Pharmacy Voucher.", ex.Message));
         }
-
-        return await repo.SaveAsync()
-            ? ResponseHelper.Created_Result("api/pharmacyvo/pharmacyvouchers/create", null, new DefaultResponseMessageModel("Sucessfully created Pharmacy Voucher.", ""))
-            : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Failed to create Pharmacy Voucher.", ""));
     }
+
 
     [HttpPut]
     [ValidateModel]
@@ -182,7 +190,7 @@ public class PharmacyVouchersController(
 
             PharmacyVo.LeftAmount -= model.PaidAmount.Value;
 
-            PharmacyVo.PaidAmount = (PharmacyVo.PaidAmount) + model.PaidAmount.Value;
+            PharmacyVo.PaidAmount += model.PaidAmount.Value;
         }
 
         PharmacyVo.UpdatedOn = DateTime.Now;
