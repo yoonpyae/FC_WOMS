@@ -101,16 +101,6 @@ export const routes: Routes = [
 					// { path: 'laboratory', component: LaboratoryComponent, data: { title: 'laboratory' } },
 					// { path: 'checkup-company', component: CheckupCompanyComponent, data: { title: 'Checkup Company' } },
 					// { path: 'checkup-types', component: CheckuptypesComponent, data: { title: 'Checkup Types' } },
-					{
-						path: 'doctor',
-						children: [
-							{ path: '', component: DoctorComponent },
-							{ path: 'detail/:id', component: DoctorDetailComponent },
-							{ path: 'detail', component: DoctorDetailComponent },
-							{ path: 'doctor/detail', component: DoctorDetailComponent },
-							{ path: '', redirectTo: 'doctor', pathMatch: 'full' },
-						],
-					},
 					{ path: 'patient', component: PatientComponent, data: { title: 'Patient' } },
 					// { path: 'lab-main-groups', component: LabMainGroupComponent, data: { title: 'Lab Main Group' } },
 					// { path: 'lab-sub-groups', component: LabSubGroupComponent, data: { title: 'Lab Sub Group' } },
@@ -121,12 +111,21 @@ export const routes: Routes = [
 				data: { title: 'Master' },
 			},
 			{
+				path: 'doctor',
+				canActivate: [AuthGuardService],
+				data: { title: 'Doctor' },
+				children: [
+					{ path: '', component: DoctorComponent },
+					{ path: 'detail', component: DoctorDetailComponent },
+					{ path: 'detail/:id', component: DoctorDetailComponent },
+				]
+			},
+			{
 				path: 'stock',
 				children: [
 					{ path: 'stock-items', component: StockItemComponent, data: { title: 'Stock Item' } },
 					{ path: 'packet-types', component: PacketTypeComponent, data: { title: 'Packet Type' } },
 					{ path: 'main-stocks', component: MainStockComponent, data: { title: 'Main Stock' } },
-					// { path: 'pharmacy-stocks', component: PharmacyStockComponent, data: { title: 'Pharmacy Stock' } },
 					{
 						path: 'stock-issue',
 						children: [
@@ -194,15 +193,6 @@ export const routes: Routes = [
 				],
 				canActivate: [AuthGuardService],
 				data: { title: 'OPD' }
-			},
-			{
-				path: 'ot',
-				children: [
-					// { path: 'ot-stock', component: OtStockComponent, data: { title: '' } },
-					// { path: 'ot-case-voucher', component: OtCaseVoucherComponent, data: { title: '' } }
-				],
-				canActivate: [AuthGuardService],
-				data: { title: 'OT' }
 			}
 		],
 	}
