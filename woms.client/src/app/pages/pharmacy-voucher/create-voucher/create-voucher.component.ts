@@ -415,7 +415,7 @@ export class PharmacyCreateVoucherComponent implements OnInit {
       paidAmount: model.paidAmount,
       leftAmount: model.leftAmount,
       paymentType: '',
-      processStatus: '',
+      processStatus: 'True',
       issuePerson: model.issuePerson || null,
       issueDate: new Date(),
       createdOn: null,
