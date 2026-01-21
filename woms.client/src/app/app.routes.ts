@@ -101,7 +101,6 @@ export const routes: Routes = [
 					// { path: 'laboratory', component: LaboratoryComponent, data: { title: 'laboratory' } },
 					// { path: 'checkup-company', component: CheckupCompanyComponent, data: { title: 'Checkup Company' } },
 					// { path: 'checkup-types', component: CheckuptypesComponent, data: { title: 'Checkup Types' } },
-					{ path: 'patient', component: PatientComponent, data: { title: 'Patient' } },
 					// { path: 'lab-main-groups', component: LabMainGroupComponent, data: { title: 'Lab Main Group' } },
 					// { path: 'lab-sub-groups', component: LabSubGroupComponent, data: { title: 'Lab Sub Group' } },
 
@@ -119,6 +118,12 @@ export const routes: Routes = [
 					{ path: 'detail', component: DoctorDetailComponent },
 					{ path: 'detail/:id', component: DoctorDetailComponent },
 				]
+			},
+			{
+				path: 'patient',
+				canActivate: [AuthGuardService],
+				data: { title: 'Patient' },
+				component: PatientComponent,
 			},
 			{
 				path: 'stock',
