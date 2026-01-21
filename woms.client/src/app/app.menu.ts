@@ -35,31 +35,15 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
 
             ]
           },
-          {
-            label: 'Laboratory & Test',
-            items: [
-              { label: 'Laboratory', routerLink: ['/master/laboratory'] },
-              { label: 'Lab Accessory', routerLink: ['/master/accessories'] },
-              { label: 'Lab Main Group', routerLink: ['/master/lab-main-groups'] },
-              { label: 'Lab Sub Group', routerLink: ['/master/lab-sub-groups'] },
-              { label: 'Lab Test', routerLink: ['/master/lab-test'] },
-            ]
-          },
-          {
-            label: 'OPD / OT / Ward',
-            items: [
-              { label: 'OPD Service', routerLink: ['/master/opd-services'] },
-              { label: 'OT Service', routerLink: ['/master/ot-service'] },
-              { label: 'Ward Service', routerLink: ['/master/ward-service'] },
-            ]
-          },
-          { label: 'Cash Title', routerLink: ['/master/cash-title'] },
           { label: 'Supplier', routerLink: ['/master/supplier'] },
           { label: 'Doctor', routerLink: ['/master/doctor'] },
           { label: 'Patient', routerLink: ['/master/patient'] },
-          { label: 'Room', routerLink: ['/master/room'] },
-          { label: 'Admission Package', routerLink: ['/master/admission-package'] },
         ]
+      },
+      {
+        label: 'Doctor',
+        icon: 'pi pi-fw pi-user-md',
+        routerLink: ['/doctor']
       },
       {
         label: 'Stock',
@@ -69,7 +53,6 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
           { label: 'Stock Item', routerLink: ['/stock/stock-items'] },
           { label: 'Purchase', routerLink: ['/stock/purchases'] },
           { label: 'Main Stock', routerLink: ['/stock/main-stocks'] },
-          { label: 'Pharmacy Stock', routerLink: ['/stock/pharmacy-stocks'] },
           { label: 'Stock Issue', routerLink: ['/stock/stock-issue'] },
           { label: 'Damage Voucher', routerLink: ['/stock/damage-vouchers'] }
         ]
