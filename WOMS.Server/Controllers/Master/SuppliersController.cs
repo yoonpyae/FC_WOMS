@@ -90,14 +90,14 @@ public class SuppliersController(
     [EndpointDescription("Delete Existing Supplier")]
     public async Task<IActionResult> Delete(long? id, long branchId)
     {
-        Supplier? supplier = await repo.Suppliers.GetFirstAsync(x => x.SupplierId == id && x.BranchId == branchId);
+        Supplier? supplier = await repo.Suppliers.GetFirstAsync(x => x.SupplierId == id);
 
         if (supplier == null)
         {
             return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Supplier not found.", ""));
         }
 
-        bool isUsedInPurchase = await repo.Purchases.AnyAsync(p => p.SupplierId == id && p.BranchId == branchId && p.DeletedOn == null);
+        bool isUsedInPurchase = await repo.Purchases.AnyAsync(p => p.SupplierId == id && p.DeletedOn == null);
         if (isUsedInPurchase)
         {
             return ResponseHelper.Bad_Request(
