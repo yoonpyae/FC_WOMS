@@ -34,6 +34,7 @@ namespace WOMS.Server.Services.Repository
         private IPharmacyVoucherRepo? _pharmacyVoucher;
         private IPharmacyVoucherDetailRepo? _pharmacyVoucherDetail;
         private IPatientRepo? _patient;
+        private IAppointmentRepo? _appointment;
 
         #endregion
 
@@ -44,6 +45,7 @@ namespace WOMS.Server.Services.Repository
         private IViPharmacyVoucherRepo? _viPharmacyVoucher;
         private IViPharmacyVoucherDetailRepo? _viPharmacyVoucherDetail;
         private IViPatientRepo? _viPatient;
+        private IViAppointmentRepo? _viAppointment;
 
         #endregion
 
@@ -204,6 +206,15 @@ namespace WOMS.Server.Services.Repository
                 return _patient;
             }
         }
+
+        public IAppointmentRepo Appointments
+        {
+            get
+            {
+                _appointment ??= new AppointmentRepo(Context);
+                return _appointment;
+            }
+        }
         #endregion
 
         #region View Properties
@@ -259,6 +270,15 @@ namespace WOMS.Server.Services.Repository
             {
                 _viPatient ??= new ViPatientRepo(Context);
                 return _viPatient;
+            }
+        }
+
+        public IViAppointmentRepo ViAppointments
+        {
+            get
+            {
+                _viAppointment ??= new ViAppointmentRepo(Context);
+                return _viAppointment;
             }
         }
         #endregion
