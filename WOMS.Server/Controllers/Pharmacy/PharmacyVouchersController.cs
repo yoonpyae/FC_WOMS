@@ -101,6 +101,7 @@ public class PharmacyVouchersController(
                 PaidAmount = model.PaidAmount,
                 LeftAmount = model.LeftAmount,
                 PaymentType = model.PaymentType,
+                ProcessStatus= model.ProcessStatus,
                 IssuePerson = model.IssuePerson,
                 IssueDate = model.IssueDate,
                 CreatedOn = DateTime.Now,
