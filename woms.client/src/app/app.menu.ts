@@ -18,13 +18,13 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
         icon: 'pi pi-fw pi-database',
         items: [
 
-          {
-            label: 'Medical Checkup',
-            items: [
-              { label: 'Checkup-Company', routerLink: ['/master/checkup-company'] },
-              { label: 'Checkup Types', routerLink: ['/master/checkup-types'] },
-            ]
-          },
+          // {
+          //   label: 'Medical Checkup',
+          //   items: [
+          //     { label: 'Checkup-Company', routerLink: ['/master/checkup-company'] },
+          //     { label: 'Checkup Types', routerLink: ['/master/checkup-types'] },
+          //   ]
+          // },
           {
             label: 'Diagnostic Tests',
             items: [
@@ -46,6 +46,11 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
         label: 'Patient',
         icon: 'pi pi-fw pi-user',
         routerLink: ['/patient']
+      },
+      {
+        label: 'Appointment',
+        icon: 'pi pi-fw pi-calendar',
+        routerLink: ['/appointment']
       },
       {
         label: 'Stock',
