@@ -52,6 +52,7 @@ import { PharmacyVoHistoryComponent } from './pages/pharmacy-voucher/history/his
 import { StockItemComponent } from './pages/stock/stock-item/stock-item.component';
 import path from 'path';
 import { PatientComponent } from './pages/master/patient/patient.component';
+import { AppointmentComponent } from './pages/master/appointment/appointment.component';
 // import { AdmLabVoucherComponent } from './pages/admission/lab-voucher/lab-voucher.component';
 // import { AdmissionDetailComponent } from './pages/admission/admission/detail/detail.component';
 
@@ -123,6 +124,12 @@ export const routes: Routes = [
 				canActivate: [AuthGuardService],
 				data: { title: 'Patient' },
 				component: PatientComponent,
+			},
+			{
+				path: 'appointment',
+				canActivate: [AuthGuardService],
+				data: { title: 'Appointment' },
+				component: AppointmentComponent
 			},
 			{
 				path: 'stock',
