@@ -19,7 +19,7 @@ public partial class Appointment
     public long DoctorId { get; set; }
 
     [StringLength(20)]
-    public string PatientId { get; set; } = null!;
+    public string? PatientId { get; set; }
 
     [Key]
     public DateOnly AppointmentDate { get; set; }
