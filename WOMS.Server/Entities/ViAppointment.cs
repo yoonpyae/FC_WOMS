@@ -29,13 +29,7 @@ public partial class ViAppointment
     public string PhoneNo { get; set; } = null!;
 
     [StringLength(20)]
-    public string PatientId { get; set; } = null!;
-
-    [StringLength(200)]
-    public string PatientName { get; set; } = null!;
-
-    [StringLength(50)]
-    public string PatientPhoneNo { get; set; } = null!;
+    public string? PatientId { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedOn { get; set; }
