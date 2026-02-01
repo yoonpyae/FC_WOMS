@@ -1,0 +1,46 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { AppointmentModel } from '@core_models/master/appointment.model';
+import { RootModel } from '@core_models/root.model';
+import { environment } from '@env/environment';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AppointmentService {
+
+  constructor(private httpClient: HttpClient) { }
+
+  get(branchId: number):Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/appointments?branchId=${branchId}`);
+  }
+
+  getDoctorsOnDuty(branchId: number, dayOfWeek: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/appointments/doctors-on-duty?branchId=${branchId}&dayOfWeek=${dayOfWeek}`);
+  }
+
+  getDoctorAppointments(branchId: number, doctorId: number, date: string): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/appointments/doctor-bookings?branchId=${branchId}&doctorId=${doctorId}&bookingDate=${date}`);
+  }
+
+  getById(id: string, branchId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/appointments/${id}?BranchId=${branchId}`);
+  }
+
+  getAutoId(branchId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/appointments/auto-id?branchId=${branchId}`);
+  }
+
+  create(model: AppointmentModel): Observable<RootModel> {
+    return this.httpClient.post<RootModel>(`${environment.main_url}/master/appointments`, model);
+  }
+
+  update(model: AppointmentModel): Observable<RootModel> {
+    return this.httpClient.put<RootModel>(`${environment.main_url}/master/appointments`, model);
+  }
+
+  delete(id: number): Observable<RootModel> {
+    return this.httpClient.delete<RootModel>(`${environment.main_url}/master/appointments/${id}`);
+  }
+}
