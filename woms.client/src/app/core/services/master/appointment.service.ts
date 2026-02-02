@@ -21,7 +21,7 @@ export class AppointmentService {
   }
 
   getDoctorAppointments(branchId: number, doctorId: number, date: string): Observable<RootModel> {
-    return this.httpClient.get<RootModel>(`${environment.main_url}/master/appointments/doctor-bookings?branchId=${branchId}&doctorId=${doctorId}&bookingDate=${date}`);
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/appointments/doctor-appointments?branchId=${branchId}&doctorId=${doctorId}&appointmentDate=${date}`);
   }
 
   getById(id: string, branchId: number): Observable<RootModel> {
