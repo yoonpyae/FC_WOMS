@@ -1,0 +1,14 @@
+/* PrimeNG Theme Overrides - Loaded last */
+:root {
+  --p-primary-50: #ecfeff !important;
+  --p-primary-100: #cffafe !important;
+  --p-primary-200: #a5f3fc !important;
+  --p-primary-300: #67e8f9 !important;
+  --p-primary-400: #22d3ee !important;
+  --p-primary-500: #00B6C7 !important; 
+  --p-primary-600: #0891b2 !important;
+  --p-primary-700: #0e7490 !important;
+  --p-primary-800: #155e75 !important;
+  --p-primary-900: #164e63 !important;
+  --p-primary-950: #0c4a6e !important;
+}
