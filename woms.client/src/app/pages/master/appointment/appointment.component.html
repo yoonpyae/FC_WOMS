@@ -3,8 +3,7 @@
         styleClass="p-datatable-striped" sortField="createdOn" [sortOrder]="-1" [showCurrentPageReport]="true"
         [globalFilterFields]="['name', 'phoneNo']" [tableStyle]="{ 'min-width': '50rem' }"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        [rowsPerPageOptions]="[20, 50, 100]" selectionMode="single" [(selection)]="selectedAppointment"
-        dataKey="ano">
+        [rowsPerPageOptions]="[20, 50, 100]" selectionMode="single" [(selection)]="selectedAppointment" dataKey="ano">
         <ng-template #caption>
             <div class="flex flex-col gap-4 mb-4 lg:flex-row lg:flex-wrap lg:justify-between lg:items-end">
 
@@ -181,10 +180,18 @@
                 </div>
             </div>
 
+            <!-- Patient Selection -->
+            <div class="flex flex-col gap-1">
+                <label class="font-semibold">Patient (Optional)</label>
+                <app-patient-drop-down [(ngModel)]="selectedPatient" (onValueChange)="onPatientChange()"
+                    [ngModelOptions]="{ standalone: true }"></app-patient-drop-down>
+            </div>
+
             <!-- Name -->
             <div class="flex flex-col gap-1">
                 <label class="font-semibold">Name <span class="text-red-500">*</span></label>
-                <input #nameInput formControlName="name" pInputText placeholder="Enter Name..." required autofocus />
+                <input #nameInput formControlName="name" pInputText placeholder="Enter Name..." required autofocus
+                    [readonly]="selectedPatient !== null" />
                 <small *ngIf="appointmentForm.controls['name'].invalid && appointmentForm.get('name')?.dirty"
                     class="text-xs text-red-500">Name is required.</small>
             </div>
@@ -192,8 +199,8 @@
             <!-- Phone Number -->
             <div class="flex flex-col gap-1">
                 <label class="font-semibold">Phone Number <span class="text-red-500">*</span></label>
-                <input formControlName="phoneNo" pInputText placeholder="Enter Phone Number..." required
-                    inputmode="tel" />
+                <input formControlName="phoneNo" pInputText placeholder="Enter Phone Number..." required inputmode="tel"
+                    [readonly]="selectedPatient !== null" />
                 <small *ngIf="appointmentForm.controls['phoneNo'].invalid && appointmentForm.get('phoneNo')?.dirty"
                     class="text-xs text-red-500">Phone number is required.</small>
                 <small
