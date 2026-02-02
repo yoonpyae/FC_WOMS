@@ -3,8 +3,10 @@ import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core'
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { AppointmentModel } from '@core_models/master/appointment.model';
 import { DoctorModel } from '@core_models/master/doctor.model';
+import { PatientModel, ViPatientModel } from '@core_models/master/patient.model';
 import { AppointmentService } from '@core_services/master/appointment.service';
 import { DoctorService } from '@core_services/master/doctor.service';
+import { PatientDropDownComponent } from '../../../shared/components/drop-down/patient-drop-down/patient-drop-down.component';
 import { ExportService } from '@shared_services/export.service';
 import { LoggerService } from '@shared_services/logger.service';
 import { SharedService } from '@shared_services/shared.service';
@@ -22,6 +24,7 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { log } from 'console';
 
 @Component({
   selector: 'app-appointment',
@@ -41,7 +44,8 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
     DialogModule,
     ConfirmDialogModule,
     DatePickerModule,
-    SelectModule
+    SelectModule,
+    PatientDropDownComponent
   ],
   templateUrl: './appointment.component.html',
   providers: [ConfirmationService, ExportService, DatePipe],
@@ -53,6 +57,8 @@ export class AppointmentComponent implements OnInit {
   doctors: DoctorModel[] = [];
   selectedDoctor: DoctorModel | null = null;
   selectedAppointmentDate: Date | null = null;
+
+  selectedPatient: ViPatientModel | null = null;
 
   items!: MenuItem[] | undefined;
 
@@ -131,6 +137,7 @@ export class AppointmentComponent implements OnInit {
     ).subscribe({
       next: (res) => {
         this.appointments = res.data as AppointmentModel[];
+        console.log('Loaded appointments:', this.appointments);
       },
       error: () => {
         this.loading = false;
@@ -178,6 +185,7 @@ export class AppointmentComponent implements OnInit {
     }
 
     this.appointmentForm.reset();
+    this.selectedPatient = null;
     this.appointmentForm.controls['doctorId'].setValue(this.selectedDoctor?.doctorId ?? 0);
     this.appointmentForm.controls['appointmentDate'].setValue(this.datePipe.transform(this.selectedAppointmentDate, 'yyyy-MM-dd'));
 
@@ -344,6 +352,18 @@ export class AppointmentComponent implements OnInit {
     if (this.selectedDoctor && this.selectedAppointmentDate) {
     } else {
       this.appointments = [];
+    }
+  }
+
+  onPatientChange(): void {
+    if (this.selectedPatient) {
+      this.appointmentForm.get('patientId')?.setValue(this.selectedPatient.patientId);
+      this.appointmentForm.get('name')?.setValue(this.selectedPatient.patientName);
+      this.appointmentForm.get('phoneNo')?.setValue(this.selectedPatient.phone);
+    } else {
+      this.appointmentForm.get('patientId')?.setValue('');
+      this.appointmentForm.get('name')?.setValue('');
+      this.appointmentForm.get('phoneNo')?.setValue('');
     }
   }
 
