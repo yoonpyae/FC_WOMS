@@ -145,7 +145,7 @@ export class PatientComponent implements OnInit {
       });
 
       this.patientEntryComponent.selectedDoctor = this.selectedPatient.doctorId
-        ? { doctorId: this.selectedPatient.doctorId, name: this.selectedPatient.patientName } as DoctorModel
+        ? { doctorId: this.selectedPatient.doctorId, name: this.selectedPatient.name } as DoctorModel
         : null;
 
       this.patientEntryComponent.getStates();
