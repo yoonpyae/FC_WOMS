@@ -15,20 +15,19 @@ public partial class ViPatient
     public long BranchId { get; set; }
 
     [StringLength(200)]
-    public string PatientName { get; set; } = null!;
+    public string Name { get; set; } = null!;
 
     [Column("NRC")]
     [StringLength(50)]
     public string? Nrc { get; set; }
 
     [Column("DOB")]
-    public DateOnly Dob { get; set; }
+    public DateOnly? Dob { get; set; }
 
     [StringLength(50)]
-    public string Age { get; set; } = null!;
+    public string? Age { get; set; }
 
-    [Column("DoctorID")]
-    public long DoctorId { get; set; }
+    public long? DoctorId { get; set; }
 
     [StringLength(200)]
     public string? DoctorName { get; set; }
