@@ -29,10 +29,12 @@ public partial class Supplier
     [StringLength(50)]
     public string? Phone { get; set; }
 
+    public int? StateId { get; set; }
+
+    public int? TownshipId { get; set; }
+
     [StringLength(50)]
     public string? Email { get; set; }
-
-    public double? Balance { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedOn { get; set; }
