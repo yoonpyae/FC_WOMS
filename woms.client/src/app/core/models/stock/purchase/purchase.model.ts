@@ -61,6 +61,7 @@ export interface Detail {
     typeName: string;
     qty: number;
     price: number;
+    Amount: number;
     expireDate: string | null;
 }
 
