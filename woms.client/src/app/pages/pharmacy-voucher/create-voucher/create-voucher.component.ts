@@ -494,7 +494,7 @@ export class PharmacyCreateVoucherComponent implements OnInit {
     this.selectedPatient = patient;
 
     if (patient) {
-      this.name = patient.patientName;
+      this.name = patient.name;
       this.patientId = patient.patientId;
     } else {
       this.name = '';
