@@ -358,7 +358,7 @@ export class AppointmentComponent implements OnInit {
   onPatientChange(): void {
     if (this.selectedPatient) {
       this.appointmentForm.get('patientId')?.setValue(this.selectedPatient.patientId);
-      this.appointmentForm.get('name')?.setValue(this.selectedPatient.patientName);
+      this.appointmentForm.get('name')?.setValue(this.selectedPatient.name);
       this.appointmentForm.get('phoneNo')?.setValue(this.selectedPatient.phone);
     } else {
       this.appointmentForm.get('patientId')?.setValue('');
