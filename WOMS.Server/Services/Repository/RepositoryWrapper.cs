@@ -46,6 +46,7 @@ namespace WOMS.Server.Services.Repository
         private IViPharmacyVoucherDetailRepo? _viPharmacyVoucherDetail;
         private IViPatientRepo? _viPatient;
         private IViAppointmentRepo? _viAppointment;
+        private IVISupplierRepo? _viSupplier;
 
         #endregion
 
@@ -279,6 +280,15 @@ namespace WOMS.Server.Services.Repository
             {
                 _viAppointment ??= new ViAppointmentRepo(Context);
                 return _viAppointment;
+            }
+        }
+
+        public IVISupplierRepo ViSuppliers
+        {
+            get
+            {
+                _viSupplier ??= new ViSupplierRepo(Context);
+                return _viSupplier;
             }
         }
         #endregion
