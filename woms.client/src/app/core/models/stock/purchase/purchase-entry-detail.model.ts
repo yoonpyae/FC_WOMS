@@ -4,7 +4,7 @@ export interface PurchaseEntryDetailModel {
     typeCode: number;
     qty: number;
     price: number;
-    totalQty: number; //should be totalPrice
+    Amount: number; //should be totalPrice
     expireDate: string | null;
     saleQty: null;
     salePrice: number;
