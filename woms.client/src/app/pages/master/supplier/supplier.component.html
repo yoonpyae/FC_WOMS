@@ -107,7 +107,7 @@
       '320px': '100vw'}" [modal]="true" [style]="{ 'min-width': '40vw' }" [draggable]="false" [resizable]="false"
     (onHide)="clearSection()">
 
-    <form [formGroup]="supplierform" (submit)="submit()">
+    <form [formGroup]="supplierForm" (submit)="submit()">
         <div class="grid grid-cols-12 gap-4">
 
             <!-- Company Name -->
@@ -116,7 +116,7 @@
                     <label>Company Name</label>
                     <input formControlName="companyName" pInputText placeholder="Enter Company Name..." required />
                     <small
-                        *ngIf="supplierform.controls['companyName'].invalid && supplierform.get('companyName')?.dirty"
+                        *ngIf="supplierForm.controls['companyName'].invalid && supplierForm.get('companyName')?.dirty"
                         class="p-text text-sm text-red-500">
                         Company Name is required.
                     </small>
@@ -130,11 +130,32 @@
                 <input formControlName="contactPerson" pInputText placeholder="Enter Contact Person..." required />
             </div>
 
+            <!-- State -->
+            <div class="col-span-6 flex flex-col gap-2">
+                <label class="font-semibold">State</label>
+                <p-select [options]="states" [(ngModel)]="SelectedState" (onChange)="onStateChange()"
+                    optionLabel="stateName" dataKey="stateId" placeholder="Select State"
+                    [ngModelOptions]="{ standalone: true }" [filter]="true" filterBy="stateName" [showClear]="true"
+                    appendTo="body">
+                </p-select>
+
+            </div>
+
+            <!-- Township -->
+            <div class="col-span-6 flex flex-col gap-2">
+                <label class="font-semibold">Township</label>
+                <p-select [options]="townships" [(ngModel)]="SelectedTownship" (onChange)="onTownshipChange()"
+                    optionLabel="townshipName" dataKey="townshipId" placeholder="Select Township"
+                    [ngModelOptions]="{ standalone: true }" [filter]="true" filterBy="townshipName" [showClear]="true"
+                    appendTo="body">
+                </p-select>
+            </div>
+
             <!-- address -->
             <div class="col-span-6 flex flex-col gap-2">
                 <label>Address</label>
                 <input formControlName="address" pInputText placeholder="Enter address..." required />
-                <small *ngIf="supplierform.controls['address'].invalid && supplierform.get('address')?.dirty"
+                <small *ngIf="supplierForm.controls['address'].invalid && supplierForm.get('address')?.dirty"
                     class="p-text text-sm text-red-500">
                     Address is Required
                 </small>
@@ -145,12 +166,12 @@
                 <label>Phone</label>
                 <input formControlName="phone" pInputText placeholder="Enter Phone Number..." required />
                 <small
-                    *ngIf="supplierform.controls['phone'].invalid && supplierform.get('phone')?.dirty && supplierform.get('phone')?.untouched"
+                    *ngIf="supplierForm.controls['phone'].invalid && supplierForm.get('phone')?.dirty && supplierForm.get('phone')?.untouched"
                     class="p-text text-sm text-red-500">
                     Phone is required
                 </small>
                 <small
-                    *ngIf="supplierform.controls['phone'].invalid && supplierform.get('phone')?.dirty && supplierform.get('phone')?.touched"
+                    *ngIf="supplierForm.controls['phone'].invalid && supplierForm.get('phone')?.dirty && supplierForm.get('phone')?.touched"
                     class="p-text text-sm text-red-500">
                     Phone Format is invalid
                 </small>
@@ -161,12 +182,12 @@
                 <label>Email</label>
                 <input formControlName="email" pInputText placeholder="Enter Email.." required />
                 <small
-                    *ngIf="supplierform.controls['email'].invalid && supplierform.get('email')?.dirty && supplierform.get('email')?.untouched"
+                    *ngIf="supplierForm.controls['email'].invalid && supplierForm.get('email')?.dirty && supplierForm.get('email')?.untouched"
                     class="p-text text-sm text-red-500">
                     Email is Required
                 </small>
                 <small
-                    *ngIf="supplierform.controls['email'].invalid && supplierform.get('email')?.dirty && supplierform.get('email')?.touched"
+                    *ngIf="supplierForm.controls['email'].invalid && supplierForm.get('email')?.dirty && supplierForm.get('email')?.touched"
                     class="p-text text-sm text-red-500">
                     Email format is invalid.
                 </small>
@@ -178,7 +199,7 @@
                 <input min="0" type="number" pInputText formControlName="balance"
                     (keydown)="preventNegativeInput($event)" />
 
-                <small *ngIf="supplierform.controls['balance'].invalid && supplierform.get('balance')?.dirty"
+                <small *ngIf="supplierForm.controls['balance'].invalid && supplierForm.get('balance')?.dirty"
                     class="p-text text-sm text-red-500">
                     Balance is Required
                 </small>
