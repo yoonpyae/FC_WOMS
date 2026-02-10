@@ -13,7 +13,7 @@ public class SuppliersController(
     [EndpointDescription("List all Supplier without deleted data")]
     public async Task<IActionResult> Get(long branchId)
             => ResponseHelper.OK_Result(
-               await repo.Suppliers.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId),
+               await repo.ViSuppliers.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId),
                null);
 
     [HttpGet("{id:long}")]
@@ -21,7 +21,7 @@ public class SuppliersController(
     [EndpointDescription("Get Supplier by Id")]
     public async Task<IActionResult> Get(long id, long branchId)
             => ResponseHelper.OK_Result(
-        await repo.Suppliers.GetFirstAsync(x => x.SupplierId == id && x.BranchId == branchId) ,
+        await repo.ViSuppliers.GetFirstAsync(x => x.SupplierId == id && x.BranchId == branchId) ,
         null);
 
     [HttpGet("auto-id")]
@@ -71,10 +71,11 @@ public class SuppliersController(
         supplier.BranchId = model.BranchId;
         supplier.CompanyName = model.CompanyName;
         supplier.ContactPerson = model.ContactPerson;
+        supplier.StateId = model.StateId;
+        supplier.TownshipId = model.TownshipId;
         supplier.Address = model.Address;
         supplier.Phone = model.Phone;
         supplier.Email = model.Email;
-        supplier.Balance = model.Balance;
         supplier.UpdatedOn = DateTime.Now;
         supplier.UpdatedBy = User.Identity?.Name ?? string.Empty;
         supplier.Status = model.Status;
