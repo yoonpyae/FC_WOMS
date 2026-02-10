@@ -404,7 +404,7 @@ export class EntryComponent implements OnInit {
       existingItem.qty += this.purchaseForm.value.qty;
       existingItem.price = this.purchaseForm.value.price;
       existingItem.expireDate = this.purchaseForm.value.expireDate || null;
-      existingItem.totalQty = existingItem.qty * existingItem.price;
+      existingItem.Amount = existingItem.qty * existingItem.price;
       existingItem.purchaseVno = purchaseVno;
     } else {
       let newItem = {
@@ -415,7 +415,7 @@ export class EntryComponent implements OnInit {
         capacity: this.capacity || 0,
         price: this.purchaseForm.value.price,
         qty: this.purchaseForm.value.qty,
-        totalQty: Number((this.purchaseForm.value.price * this.purchaseForm.value.qty).toFixed(2)),
+        Amount: Number((this.purchaseForm.value.price * this.purchaseForm.value.qty).toFixed(2)),
         salePrice: this.calculateSalePriceValue(),
         expireDate: this.purchaseForm.value.expireDate ? formatDate(this.purchaseForm.value.expireDate, 'yyyy-MM-dd', 'en-US') : null,
         saleQty: null
@@ -569,7 +569,7 @@ export class EntryComponent implements OnInit {
   }
 
   private calculateTotalAmountFromCookie(): number {
-    return this.getItemsFromCookie().reduce((sum, item) => sum + (item.totalQty ?? 0), 0);
+    return this.getItemsFromCookie().reduce((sum, item) => sum + (item.Amount ?? 0), 0);
   }
 
   private calculateSalePriceValue(): number {
