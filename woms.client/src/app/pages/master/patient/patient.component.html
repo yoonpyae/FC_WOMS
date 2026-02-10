@@ -2,7 +2,7 @@
 <div class="card">
     <p-table #dt1 [value]="patients" [paginator]="true" [rows]="20" sortField="createdOn" [sortOrder]="-1"
         [loading]="loading" styleClass="p-datatable-striped" [showCurrentPageReport]="true"
-        [globalFilterFields]="['patientId','patientName', 'age','nrc']" [tableStyle]="{ 'min-width': '50rem' }"
+        [globalFilterFields]="['patientId','name', 'age','nrc']" [tableStyle]="{ 'min-width': '50rem' }"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         [rowsPerPageOptions]="[20, 50, 100]" selectionMode="single" [(selection)]="selectedPatient"
         dataKey="patientId">
@@ -28,7 +28,7 @@
             <tr style="white-space: nowrap">
                 <th pFrozenColumn [style]="{ width: '10px' }">#</th>
                 <th pSortableColumn="patientId">Id <p-sortIcon field="patientId"></p-sortIcon></th>
-                <th pSortableColumn="patientName">Name <p-sortIcon field="patientName"></p-sortIcon></th>
+                <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
                 <th pSortableColumn="dob">Date of Birth <p-sortIcon field="dob"></p-sortIcon></th>
                 <th pSortableColumn="age">Age <p-sortIcon field="age"></p-sortIcon></th>
                 <th pSortableColumn="nrc">NRC <p-sortIcon field="nrc"></p-sortIcon></th>
@@ -52,7 +52,7 @@
                         [class.pi-check-circle]="selectedPatient === patient"></span>
                 </td>
                 <td>{{ patient.patientId }}</td>
-                <td>{{ patient.patientName }}</td>
+                <td>{{ patient.name }}</td>
                 <td>{{ patient.dob | date: "dd/MMM/yyyy" }}</td>
                 <td>{{ patient.age }}</td>
                 <td>{{ patient.nrc }}</td>
