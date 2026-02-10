@@ -40,6 +40,12 @@
                 <th pSortableColumn="address">Address
                     <p-sortIcon field="address"></p-sortIcon>
                 </th>
+                <th pSortableColumn="townshipName">Township
+                    <p-sortIcon field="townshipName"></p-sortIcon>
+                </th>
+                <th pSortableColumn="stateName">State
+                    <p-sortIcon field="stateName"></p-sortIcon>
+                </th>
                 <th pSortableColumn="phone">Phone
                     <p-sortIcon field="phone"></p-sortIcon>
                 </th>
@@ -76,6 +82,8 @@
                 <td>{{ supplier.companyName }}</td>
                 <td>{{ supplier.contactPerson}}</td>
                 <td>{{ supplier.address}}</td>
+                <td>{{ supplier.townshipName}}</td>
+                <td>{{ supplier.stateName}}</td>
                 <td>{{ supplier.phone}}</td>
                 <td>{{ supplier.email== null ? 'N/A' : supplier.email }}</td>
                 <td style="text-align: right">{{ supplier.balance | number : '1.0-2'}}</td>
@@ -190,18 +198,6 @@
                     *ngIf="supplierForm.controls['email'].invalid && supplierForm.get('email')?.dirty && supplierForm.get('email')?.touched"
                     class="p-text text-sm text-red-500">
                     Email format is invalid.
-                </small>
-            </div>
-
-            <!-- Balance -->
-            <div class="col-span-6 flex flex-col gap-2">
-                <label>Balance</label>
-                <input min="0" type="number" pInputText formControlName="balance"
-                    (keydown)="preventNegativeInput($event)" />
-
-                <small *ngIf="supplierForm.controls['balance'].invalid && supplierForm.get('balance')?.dirty"
-                    class="p-text text-sm text-red-500">
-                    Balance is Required
                 </small>
             </div>
 
