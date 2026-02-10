@@ -74,6 +74,8 @@ public partial class WOMSDbContext : DbContext
 
     public virtual DbSet<ViPurchaseDetail> ViPurchaseDetails { get; set; }
 
+    public virtual DbSet<ViSupplier> ViSuppliers { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AspNetRole>(entity =>
@@ -200,6 +202,11 @@ public partial class WOMSDbContext : DbContext
         modelBuilder.Entity<ViPurchaseDetail>(entity =>
         {
             entity.ToView("VI_PurchaseDetail");
+        });
+
+        modelBuilder.Entity<ViSupplier>(entity =>
+        {
+            entity.ToView("VI_Supplier");
         });
 
         OnModelCreatingPartial(modelBuilder);
