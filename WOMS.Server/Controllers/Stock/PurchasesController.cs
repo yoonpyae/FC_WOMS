@@ -110,6 +110,7 @@ public class PurchasesController(
                     TypeCode = item.TypeCode,
                     Qty = item.Qty,
                     Price = item.Price,
+                    Amount= item.Amount,
                     ExpireDate = item.ExpireDate
                 };
                 repo.PurchaseDetails.Create(itemDetail);
