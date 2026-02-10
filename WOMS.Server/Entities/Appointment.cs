@@ -15,7 +15,6 @@ public partial class Appointment
     public int Ano { get; set; }
 
     [Key]
-    [Column("DoctorID")]
     public long DoctorId { get; set; }
 
     [StringLength(20)]
