@@ -23,7 +23,7 @@ export interface PatientModel {
 export interface ViPatientModel {
   patientId: string;
   branchId: number;
-  patientName: string;
+  name: string;
   nrc: string;
   dob: string;
   age: string;
