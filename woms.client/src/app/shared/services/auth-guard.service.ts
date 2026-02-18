@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { LoggerService } from './logger.service';
 import { SharedService } from './shared.service';
 import {NAVIGATION_MENU} from '../../app.menu';
+import { MessageService } from 'primeng/api';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,7 @@ export class AuthGuardService implements CanActivate {
     private authService: AuthService,
     private sharedService: SharedService,
     private loggerSerivce: LoggerService,
+    private messageService: MessageService,
     private router: Router) { }
   canActivate(next: ActivatedRouteSnapshot,
               state: RouterStateSnapshot):
@@ -25,12 +27,12 @@ export class AuthGuardService implements CanActivate {
       this.router.navigate(['auth/login']);
       return false;
     }
-    // else {
-    //   if (!this.checkAuthorizedRoute(state.url)) {
-    //     this.router.navigate(['auth/access-denied']);
-    //     this.messageService.add({ key: 'globalMessage', severity: 'info', summary: "Access deined.", detail: "You don't have permission." });
-    //   }
-    // }
+    else {
+      if (!this.checkAuthorizedRoute(state.url)) {
+        this.router.navigate(['auth/access-denied']);
+        this.messageService.add({ key: 'globalMessage', severity: 'info', summary: "Access deined.", detail: "You don't have permission." });
+      }
+    }
     return true;
   }
 
