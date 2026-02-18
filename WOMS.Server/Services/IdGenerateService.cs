@@ -7,7 +7,7 @@ public class IdGenerateService(
     WOMSDbContext context,
     IRandomizer randomizer) : IIdGenerateService
 {
-    public async Task<string> GetItemCode(string Name, long ClinicId)
+    public async Task<string> GetItemCode(string Name, long BranchId)
     {
         if (string.IsNullOrWhiteSpace(Name))
             throw new ArgumentException("Item name cannot be null or empty.", nameof(Name));
@@ -16,7 +16,7 @@ public class IdGenerateService(
 
         List<string> items = await context.StockItems
             .AsNoTracking()
-            .Where(x => x.ClinicId == ClinicId)
+            //.Where(x => x.BranchId == BranchId)
             .Select(x=>x.ItemCode)
             .ToListAsync(); // Load filtered data into memory (EF Core limitation)
         
@@ -61,17 +61,17 @@ public class IdGenerateService(
         return stringBuilder.ToString();
     }
 
-    public string GetOPDVNo(long ClinicId)
+    public string GetOPDVNo(long BranchId)
     {
         StringBuilder stringBuilder = new();
-        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"VNo{ClinicId}-", "ddMMyy"));
+        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"VNo{BranchId}-", "ddMMyy"));
         return stringBuilder.ToString();
     }
 
-    public string GetLabVoucherVno(long ClinicId)
+    public string GetLabVoucherVno(long BranchId)
     {
         StringBuilder stringBuilder = new();
-        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"L{ClinicId}-", "ddMMyy"));
+        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"L{BranchId}-", "ddMMyy"));
         return stringBuilder.ToString();
     }
 }
