@@ -27,11 +27,6 @@ public partial class ViPatient
     [StringLength(50)]
     public string? Age { get; set; }
 
-    public long? DoctorId { get; set; }
-
-    [StringLength(200)]
-    public string? DoctorName { get; set; }
-
     public int? StateId { get; set; }
 
     [StringLength(200)]
