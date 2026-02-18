@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-
-namespace WOMS.Server.Controllers.Master
+﻿namespace WOMS.Server.Controllers.Master
 {
     [Authorize]
     [Route("api/[controller]")]
@@ -49,7 +46,7 @@ namespace WOMS.Server.Controllers.Master
             model.CreatedBy = User.Identity?.Name ?? string.Empty;
 
             // Validate doctor exists
-            var doctor = await repo.Doctors.GetAsync(x => x.DoctorId == model.DoctorId);
+            IReadOnlyList<Doctor>? doctor = await repo.Doctors.GetAsync(x => x.DoctorId == model.DoctorId);
             if (!doctor.Any())
                 return BadRequest("Doctor not found.");
 
@@ -66,7 +63,7 @@ namespace WOMS.Server.Controllers.Master
         [EndpointDescription("Update an existing DoctorSchedules")]
         public async Task<IActionResult> UpdateSchedule(long id, DoctorSchedule model)
         {
-            var existingSchedule = await repo.DoctorSchedules.GetFirstAsync(x => x.ScheduleId == id);
+            DoctorSchedule? existingSchedule = await repo.DoctorSchedules.GetFirstAsync(x => x.ScheduleId == id);
             if (existingSchedule == null)
                 return NotFound("Schedule not found.");
             existingSchedule.DoctorId = model.DoctorId;
@@ -86,7 +83,7 @@ namespace WOMS.Server.Controllers.Master
         [EndpointDescription("Soft delete a DoctorSchedules")]
         public async Task<IActionResult> DeleteSchedule(long id)
         {
-            var existingSchedule = await repo.DoctorSchedules.GetFirstAsync(x => x.ScheduleId == id);
+            DoctorSchedule? existingSchedule = await repo.DoctorSchedules.GetFirstAsync(x => x.ScheduleId == id);
             if (existingSchedule == null)
                 return NotFound("Schedule not found.");
             existingSchedule.DeletedOn = DateTime.Now;
