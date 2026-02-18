@@ -1,4 +1,6 @@
-﻿namespace WOMS.Server.Controllers.Master
+﻿using WOMS.Server.Entities;
+
+namespace WOMS.Server.Controllers.Master
 {
     [Authorize]
     [Route("api/[controller]")]
@@ -15,10 +17,10 @@
                 await repo.DoctorSchedules.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId),
                 null);
 
-        [HttpGet("{id:long}")]
+        [HttpGet("by-doctor")]
         [EndpointSummary("Get By doctor Id")]
         [EndpointDescription("Get DoctorSchedules by doctor Id")]
-        public async Task<IActionResult> Get(long branchId, long doctorId)
+        public async Task<IActionResult> GetByDoctor(long branchId, long doctorId)
             => ResponseHelper.OK_Result(
                 await repo.DoctorSchedules.GetAsync(x => x.DoctorId == doctorId && x.BranchId == branchId),
                 null);
@@ -50,20 +52,40 @@
             if (!doctor.Any())
                 return BadRequest("Doctor not found.");
 
+            bool overlap = await repo.DoctorSchedules.AnyAsync(x =>
+            x.DoctorId == model.DoctorId &&
+            x.BranchId == model.BranchId &&
+            x.DayOfWeek == model.DayOfWeek &&
+            x.DeletedOn == null &&
+            model.StartTime < x.EndTime &&
+            model.EndTime > x.StartTime
+            );
+
+            if (overlap)
+                return BadRequest("Schedule overlaps with existing schedule.");
+
+            if (model.StartTime >= model.EndTime)
+                return BadRequest("Start time must be earlier than end time.");
+
+
             repo.DoctorSchedules.Create(model);
 
             return await repo.SaveAsync()
-                ? Ok("Schedule created successfully.")
-                : BadRequest("Failed to create schedule.");
+                ? ResponseHelper.Created_Result("/api/doctorschedules", null,
+                    new DefaultResponseMessageModel("Successfully created new schedule.", ""))
+                : ResponseHelper.Bad_Request(null,
+                    new DefaultResponseMessageModel("Unable to created schedule.", ""));
         }
 
         [HttpPut("{id:long}")]
         [ValidateModel]
         [EndpointSummary("Update")]
         [EndpointDescription("Update an existing DoctorSchedules")]
-        public async Task<IActionResult> UpdateSchedule(long id, DoctorSchedule model)
+        public async Task<IActionResult> UpdateSchedule(long id, DoctorSchedule model, long branchId)
         {
-            DoctorSchedule? existingSchedule = await repo.DoctorSchedules.GetFirstAsync(x => x.ScheduleId == id);
+            DoctorSchedule? existingSchedule = await repo.DoctorSchedules.GetFirstAsync(
+            x => x.ScheduleId == id && x.BranchId == branchId && !x.DeletedOn.HasValue);
+
             if (existingSchedule == null)
                 return NotFound("Schedule not found.");
             existingSchedule.DoctorId = model.DoctorId;
@@ -74,24 +96,28 @@
             existingSchedule.UpdatedBy = User.Identity?.Name ?? string.Empty;
             repo.DoctorSchedules.Update(existingSchedule);
             return await repo.SaveAsync()
-                ? Ok("Schedule updated successfully.")
-                : BadRequest("Failed to update schedule.");
+                ? ResponseHelper.OK_Result(null,
+                    new DefaultResponseMessageModel("Schedule updated successfully.", ""))
+                : ResponseHelper.Bad_Request(null,
+                    new DefaultResponseMessageModel("Failed to update schedule.", ""));
         }
 
         [HttpDelete("{id:long}")]
         [EndpointSummary("Delete")]
         [EndpointDescription("Soft delete a DoctorSchedules")]
-        public async Task<IActionResult> DeleteSchedule(long id)
+        public async Task<IActionResult> DeleteSchedule(long id, long branchId)
         {
-            DoctorSchedule? existingSchedule = await repo.DoctorSchedules.GetFirstAsync(x => x.ScheduleId == id);
+            DoctorSchedule? existingSchedule = await repo.DoctorSchedules.GetFirstAsync(x => x.ScheduleId == id && x.BranchId == branchId);
             if (existingSchedule == null)
                 return NotFound("Schedule not found.");
             existingSchedule.DeletedOn = DateTime.Now;
             existingSchedule.DeletedBy = User.Identity?.Name ?? string.Empty;
             repo.DoctorSchedules.Update(existingSchedule);
             return await repo.SaveAsync()
-                ? Ok("Schedule deleted successfully.")
-                : BadRequest("Failed to delete schedule.");
+                ? ResponseHelper.OK_Result(null,
+                    new DefaultResponseMessageModel("Schedule deleted successfully.", ""))
+                : ResponseHelper.Bad_Request(null,
+                    new DefaultResponseMessageModel("Failed to delete schedule.", ""));
         }
 
         #endregion
