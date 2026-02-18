@@ -6,16 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WOMS.Server.Entities;
 
-[PrimaryKey("ItemCode", "ClinicId")]
 [Table("StockItem")]
 public partial class StockItem
 {
     [Key]
     [StringLength(5)]
     public string ItemCode { get; set; } = null!;
-
-    [Key]
-    public long ClinicId { get; set; }
 
     [StringLength(200)]
     public string? ItemName { get; set; }
