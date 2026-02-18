@@ -6,44 +6,36 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WOMS.Server.Entities;
 
+[PrimaryKey("ConsultationId", "BranchId")]
 [Table("Consultation")]
 public partial class Consultation
 {
     [Key]
-    public long ConsultationId { get; set; }
+    [StringLength(20)]
+    public string ConsultationId { get; set; } = null!;
 
-    public long MedicalRecordId { get; set; }
+    [Key]
+    public long BranchId { get; set; }
 
     public long DoctorId { get; set; }
 
     [Column(TypeName = "datetime")]
-    public DateTime ConsultationDate { get; set; }
+    public DateTime VisitDate { get; set; }
 
     [StringLength(20)]
-    public string? BloodPressure { get; set; }
+    public string? PatientId { get; set; }
 
-    [Column(TypeName = "decimal(4, 1)")]
-    public decimal? Temperature { get; set; }
-
-    [Column(TypeName = "decimal(5, 2)")]
-    public decimal? Weight { get; set; }
-
-    [Column(TypeName = "decimal(5, 2)")]
-    public decimal? Height { get; set; }
-
-    public int? Pulse { get; set; }
+    [Column("ANo")]
+    public long? Ano { get; set; }
 
     public string? Symptoms { get; set; }
 
-    public string? ClinicalFindings { get; set; }
+    public string? Diagnosis { get; set; }
 
-    public string? Assessment { get; set; }
+    public string? Notes { get; set; }
 
-    public string? PlanToDo { get; set; }
-
-    public DateOnly? FollowUpDate { get; set; }
-
-    public byte Status { get; set; }
+    [StringLength(20)]
+    public string Status { get; set; } = null!;
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedOn { get; set; }
@@ -62,7 +54,4 @@ public partial class Consultation
 
     [StringLength(50)]
     public string? DeletedBy { get; set; }
-
-    [StringLength(250)]
-    public string? Remark { get; set; }
 }
