@@ -9,11 +9,10 @@
         [HttpGet]
         [EndpointSummary("List")]
         [EndpointDescription("List all Main Stocks by Clinic and Branch")]
-        public async Task<IActionResult> Get(long clinicId, long branchId)
+        public async Task<IActionResult> Get(long branchId)
         {
             return ResponseHelper.OK_Result(
                 await repo.ViMainStocks.GetAsync(x =>
-                    x.ClinicId == clinicId &&
                     x.BranchId == branchId &&
                     !x.DeletedOn.HasValue
                 ), null);
@@ -22,10 +21,10 @@
         [HttpGet("code")]
         [EndpointSummary("Get By Code")]
         [EndpointDescription("Get a Main Stock with specified code")]
-        public async Task<IActionResult> GetById(string code, long clinicId)
+        public async Task<IActionResult> GetById(string code, long branchId)
         {
             return ResponseHelper.OK_Result(
-                    await repo.MainStocks.GetFirstAsync(x => x.ItemCode == code && x.ClinicId == clinicId), null);
+                    await repo.MainStocks.GetFirstAsync(x => x.ItemCode == code && x.BranchId == branchId), null);
         }
 
         [HttpGet("active")]
