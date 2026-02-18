@@ -10,25 +10,25 @@
         [HttpGet]
         [EndpointSummary("List")]
         [EndpointDescription("List all Packet Types")]
-        public async Task<IActionResult> Get(long clinicId)
+        public async Task<IActionResult> Get()
         {
             return ResponseHelper.OK_Result(
-                await repo.PacketTypes.GetAsync(x => x.ClinicId == clinicId && !x.DeletedOn.HasValue), null);
+                await repo.PacketTypes.GetAsync(x => !x.DeletedOn.HasValue), null);
         }
 
-        [HttpGet("auto-code")]
-        [EndpointSummary("Get Auto Code")]
-        [EndpointDescription("Get Auto Code for Packet Type")]
-        public async Task<IActionResult> GetAutoCode(long clinicId)
-        {
-            PacketType? lastRecord = await repo.PacketTypes.GetFirstAsync(x => x.ClinicId == clinicId,
-                q => q.OrderByDescending(x => x.TypeCode));
+        //[HttpGet("auto-code")]
+        //[EndpointSummary("Get Auto Code")]
+        //[EndpointDescription("Get Auto Code for Packet Type")]
+        //public async Task<IActionResult> GetAutoCode()
+        //{
+        //    PacketType? lastRecord = await repo.PacketTypes.GetFirstAsync(
+        //        q => q.OrderByDescending(x => x.TypeCode));
 
-            long maxCode = lastRecord?.TypeCode ?? 0;
-            maxCode++;
+        //    long maxCode = lastRecord?.TypeCode ?? 0;
+        //    maxCode++;
 
-            return ResponseHelper.OK_Result(maxCode, null);
-        }
+        //    return ResponseHelper.OK_Result(maxCode, null);
+        //}
 
         [HttpPost]
         [ValidateModel]
