@@ -12,8 +12,6 @@ public partial class Branch
     [Key]
     public long BranchId { get; set; }
 
-    public long ClinicId { get; set; }
-
     [StringLength(256)]
     public string? BranchName { get; set; }
 
@@ -62,8 +60,4 @@ public partial class Branch
     public string? DeletedBy { get; set; }
 
     public string? Remark { get; set; }
-
-    [ForeignKey("ClinicId")]
-    [InverseProperty("Branches")]
-    public virtual Clinic Clinic { get; set; } = null!;
 }
