@@ -10,7 +10,6 @@ namespace WOMS.Server.Interfaces.Repositories
         IAspNetRoleRepo AspNetRoles { get; }
 
         ITokenClaimRepo TokenClaims { get; }
-        IClinicRepo Clinics { get; }
         IStateRepo States { get; }
         ITownshipRepo Townships { get; }
         IBranchRepo Branches { get; }
