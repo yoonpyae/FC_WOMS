@@ -20,7 +20,6 @@ namespace WOMS.Server.Services.Repository
         private IAspNetUserRepo? _aspNetUser;
         private IAspNetRoleRepo? _aspNetRole;
         private ITokenClaimRepo? _tokenClaim;
-        private IClinicRepo? _clinic;
         private IStateRepo? _state;
         private ITownshipRepo? _township;
         private IBranchRepo? _branch;
@@ -78,15 +77,6 @@ namespace WOMS.Server.Services.Repository
             {
                 _tokenClaim ??= new TokenClaimRepo(Context);
                 return _tokenClaim;
-            }
-        }
-
-        public IClinicRepo Clinics
-        {
-            get
-            {
-                _clinic ??= new ClinicRepo(Context);
-                return _clinic;
             }
         }
 
