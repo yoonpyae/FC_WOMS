@@ -6,9 +6,9 @@ public interface IIdGenerateService
     /// Item Code => [A0001]
     /// </summary>
     /// <param name="Name"></param>
-    /// <param name="ClinicId"></param>
+    /// <param name="BranchId"></param>
     /// <returns></returns>
-    Task<string> GetItemCode(string Name, long ClinicId);
+    Task<string> GetItemCode(string Name, long BranchId);
     
     /// <summary>
     /// Purchase VNO => [P1-010125-RXYDQC]
@@ -34,15 +34,15 @@ public interface IIdGenerateService
     /// <summary>
     /// OPD Voucher ID => [VNo-010125-RXYDQC]
     /// </summary>
-    /// <param name="ClinicId"></param>
+    /// <param name="BranchId"></param>
     /// <returns></returns>
-    string GetOPDVNo(long ClinicId);
-   
+    string GetOPDVNo(long BranchId);
+
     /// <summary>
     /// Damange VNO => [D1-010125-RXYDQC]
     /// </summary>
-    /// <param name="ClinicId"></param>
+    /// <param name="BranchId"></param>
     /// <returns></returns>
-    string GetLabVoucherVno(long ClinicId);
+    string GetLabVoucherVno(long BranchId);
       
 }
