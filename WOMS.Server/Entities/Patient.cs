@@ -17,8 +17,6 @@ public partial class Patient
     [Key]
     public long BranchId { get; set; }
 
-    public long? DoctorId { get; set; }
-
     [StringLength(200)]
     public string Name { get; set; } = null!;
 
