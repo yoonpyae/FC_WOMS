@@ -6,16 +6,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WOMS.Server.Entities;
 
-[PrimaryKey("Ano", "DoctorId", "AppointmentDate", "BranchId")]
+[PrimaryKey("Ano", "ScheduleId", "AppointmentDate", "BranchId")]
 [Table("Appointment")]
 public partial class Appointment
 {
     [Key]
     [Column("ANo")]
-    public int Ano { get; set; }
+    public long Ano { get; set; }
 
     [Key]
-    public long DoctorId { get; set; }
+    public long ScheduleId { get; set; }
 
     [StringLength(20)]
     public string? PatientId { get; set; }
@@ -25,12 +25,6 @@ public partial class Appointment
 
     [Key]
     public long BranchId { get; set; }
-
-    [StringLength(200)]
-    public string Name { get; set; } = null!;
-
-    [StringLength(50)]
-    public string PhoneNo { get; set; } = null!;
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedOn { get; set; }
@@ -50,7 +44,8 @@ public partial class Appointment
     [StringLength(256)]
     public string? DeletedBy { get; set; }
 
-    public bool Status { get; set; }
+    [StringLength(20)]
+    public string Status { get; set; } = null!;
 
     public string? Remark { get; set; }
 }
