@@ -31,17 +31,6 @@ public class DoctorsController(
         return ResponseHelper.OK_Result(doctors, null);
     }
 
-    [HttpGet("round")]
-    [EndpointSummary("List")]
-    [EndpointDescription("List Status true Round fee greater than 0")]
-    public async Task<IActionResult> GetByActive(long branchId)
-    {
-        return ResponseHelper.OK_Result(
-            await repo.Doctors.GetAsync(x => x.BranchId == branchId && !x.DeletedOn.HasValue &&
-                                           x.Status == true &&
-                                           x.RoundFee.HasValue && x.RoundFee > 0), null);
-    }
-
     [HttpGet("{id:long}")]
     [EndpointSummary("Get By Id")]
     [EndpointDescription("Get Doctor by Id")]
@@ -103,19 +92,10 @@ public class DoctorsController(
         doctor.Spalized = model.Spalized;
         doctor.Photo = model.Photo;
         doctor.Sign = model.Sign;
-        doctor.ReferFee = model.ReferFee;
-        doctor.OpdreferFee = model.OpdreferFee;
         doctor.ConsultantFee = model.ConsultantFee;
         doctor.Ecgfee = model.Ecgfee;
         doctor.XrayFee = model.XrayFee;
         doctor.UltrasoundFee = model.UltrasoundFee;
-        doctor.MonTime = model.MonTime;
-        doctor.TueTime = model.TueTime;
-        doctor.WedTime = model.WedTime;
-        doctor.ThuTime = model.ThuTime;
-        doctor.FriTime = model.FriTime;
-        doctor.SatTime = model.SatTime;
-        doctor.SunTime = model.SunTime;
         doctor.UpdatedOn = DateTime.Now;
         doctor.UpdatedBy = User.Identity?.Name ?? string.Empty;
         doctor.Status = model.Status;
