@@ -28,15 +28,19 @@ public partial class WOMSDbContext : DbContext
 
     public virtual DbSet<Branch> Branches { get; set; }
 
-    public virtual DbSet<Clinic> Clinics { get; set; }
-
     public virtual DbSet<Consultation> Consultations { get; set; }
 
     public virtual DbSet<Doctor> Doctors { get; set; }
 
+    public virtual DbSet<DoctorSchedule> DoctorSchedules { get; set; }
+
+    public virtual DbSet<LabService> LabServices { get; set; }
+
     public virtual DbSet<MainStock> MainStocks { get; set; }
 
-    public virtual DbSet<MedicalRecord> MedicalRecords { get; set; }
+    public virtual DbSet<Opdvoucher> Opdvouchers { get; set; }
+
+    public virtual DbSet<OpdvoucherItem> OpdvoucherItems { get; set; }
 
     public virtual DbSet<PacketType> PacketTypes { get; set; }
 
@@ -45,6 +49,10 @@ public partial class WOMSDbContext : DbContext
     public virtual DbSet<PharmacyVoucher> PharmacyVouchers { get; set; }
 
     public virtual DbSet<PharmacyVoucherDetail> PharmacyVoucherDetails { get; set; }
+
+    public virtual DbSet<Prescription> Prescriptions { get; set; }
+
+    public virtual DbSet<PrescriptionItem> PrescriptionItems { get; set; }
 
     public virtual DbSet<Purchase> Purchases { get; set; }
 
@@ -104,25 +112,13 @@ public partial class WOMSDbContext : DbContext
                     });
         });
 
-        modelBuilder.Entity<Branch>(entity =>
-        {
-            entity.HasOne(d => d.Clinic).WithMany(p => p.Branches)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Branch_Clinic");
-        });
-
-        modelBuilder.Entity<Clinic>(entity =>
-        {
-            entity.Property(e => e.ClinicId).ValueGeneratedNever();
-        });
-
         modelBuilder.Entity<Consultation>(entity =>
         {
-            entity.HasKey(e => e.ConsultationId).HasName("PK__Consulta__5D014A98A4A2F895");
+            entity.HasKey(e => new { e.ConsultationId, e.BranchId }).HasName("PK__Consulta__5D014A98A4A2F895");
 
-            entity.Property(e => e.ConsultationDate).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.CreatedOn).HasDefaultValueSql("(getdate())");
-            entity.Property(e => e.Status).HasDefaultValue((byte)1);
+            entity.Property(e => e.Status).HasDefaultValueSql("((1))");
+            entity.Property(e => e.VisitDate).HasDefaultValueSql("(getdate())");
         });
 
         modelBuilder.Entity<Doctor>(entity =>
@@ -130,18 +126,31 @@ public partial class WOMSDbContext : DbContext
             entity.HasKey(e => new { e.DoctorId, e.BranchId }).HasName("PK_Doctor_1");
         });
 
+        modelBuilder.Entity<DoctorSchedule>(entity =>
+        {
+            entity.Property(e => e.ScheduleId).ValueGeneratedOnAdd();
+        });
+
+        modelBuilder.Entity<LabService>(entity =>
+        {
+            entity.Property(e => e.ServiceId).ValueGeneratedNever();
+        });
+
         modelBuilder.Entity<MainStock>(entity =>
         {
+            entity.HasKey(e => new { e.ItemCode, e.TypeCode }).HasName("PK_MainStock_1");
+
             entity.Property(e => e.BranchId).HasDefaultValue(1L);
         });
 
-        modelBuilder.Entity<MedicalRecord>(entity =>
+        modelBuilder.Entity<Opdvoucher>(entity =>
         {
-            entity.HasKey(e => e.MedicalRecordId).HasName("PK__MedicalR__4411BA220AD136E2");
+            entity.Property(e => e.Status).IsFixedLength();
+        });
 
-            entity.Property(e => e.CreatedOn).HasDefaultValueSql("(getdate())");
-            entity.Property(e => e.RecordDate).HasDefaultValueSql("(getdate())");
-            entity.Property(e => e.Status).HasDefaultValue((byte)1);
+        modelBuilder.Entity<PacketType>(entity =>
+        {
+            entity.Property(e => e.TypeCode).ValueGeneratedNever();
         });
 
         modelBuilder.Entity<Patient>(entity =>
@@ -157,6 +166,16 @@ public partial class WOMSDbContext : DbContext
         modelBuilder.Entity<PharmacyVoucherDetail>(entity =>
         {
             entity.HasKey(e => new { e.Vno, e.ItemCode, e.TypeCode }).HasName("PK_SaleDetail");
+        });
+
+        modelBuilder.Entity<Prescription>(entity =>
+        {
+            entity.Property(e => e.CreatedOn).HasDefaultValueSql("(getdate())");
+        });
+
+        modelBuilder.Entity<PrescriptionItem>(entity =>
+        {
+            entity.Property(e => e.CreatedOn).HasDefaultValueSql("(getdate())");
         });
 
         modelBuilder.Entity<State>(entity =>
