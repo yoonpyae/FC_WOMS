@@ -62,7 +62,6 @@ public class PatientsController(
         patient.TownshipId = model.TownshipId;
         patient.AddressDetail = model.AddressDetail;
         patient.Phone = model.Phone;
-        patient.DoctorId = model.DoctorId;
         patient.UpdatedOn = DateTime.Now;
         patient.UpdatedBy = User.Identity?.Name ?? string.Empty;
         patient.Status = model.Status;
