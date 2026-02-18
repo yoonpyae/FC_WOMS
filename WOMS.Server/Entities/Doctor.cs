@@ -31,11 +31,6 @@ public partial class Doctor
     [StringLength(200)]
     public string? Sign { get; set; }
 
-    public double? ReferFee { get; set; }
-
-    [Column("OPDReferFee")]
-    public double? OpdreferFee { get; set; }
-
     public double? ConsultantFee { get; set; }
 
     [Column("ECGFee")]
@@ -45,29 +40,6 @@ public partial class Doctor
     public double? XrayFee { get; set; }
 
     public double? UltrasoundFee { get; set; }
-
-    public double? RoundFee { get; set; }
-
-    [StringLength(100)]
-    public string? MonTime { get; set; }
-
-    [StringLength(100)]
-    public string? TueTime { get; set; }
-
-    [StringLength(100)]
-    public string? WedTime { get; set; }
-
-    [StringLength(100)]
-    public string? ThuTime { get; set; }
-
-    [StringLength(100)]
-    public string? FriTime { get; set; }
-
-    [StringLength(100)]
-    public string? SatTime { get; set; }
-
-    [StringLength(100)]
-    public string? SunTime { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedOn { get; set; }
