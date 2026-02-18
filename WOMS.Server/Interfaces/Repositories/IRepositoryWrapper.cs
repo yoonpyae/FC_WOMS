@@ -18,6 +18,7 @@ namespace WOMS.Server.Interfaces.Repositories
         IMainStockRepo MainStocks { get; }
         IStockItemRepo StockItems { get; }
         IDoctorRepo Doctors { get; }
+        IDoctorScheduleRepo DoctorSchedules { get; }
         IPurchaseRepo Purchases { get; }
         IPurchaseDetailRepo PurchaseDetails { get; }
         IPharmacyVoucherRepo PharmacyVouchers { get; }

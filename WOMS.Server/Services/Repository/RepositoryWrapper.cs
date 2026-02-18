@@ -28,6 +28,7 @@ namespace WOMS.Server.Services.Repository
         private IMainStockRepo? _mainStock;
         private IStockItemRepo? _stockItem;
         private IDoctorRepo? _doctor;
+        private IDoctorScheduleRepo? _doctorSchedule;
         private IPurchaseRepo? _purchase;
         private IPurchaseDetailRepo? _purchaseDetail;
         private IPharmacyVoucherRepo? _pharmacyVoucher;
@@ -149,6 +150,15 @@ namespace WOMS.Server.Services.Repository
             {
                 _doctor ??= new DoctorRepo(Context);
                 return _doctor;
+            }
+        }
+
+        public IDoctorScheduleRepo DoctorSchedules
+        {
+            get
+            {
+                _doctorSchedule ??= new DoctorScheduleRepo(Context);
+                return _doctorSchedule;
             }
         }
 
