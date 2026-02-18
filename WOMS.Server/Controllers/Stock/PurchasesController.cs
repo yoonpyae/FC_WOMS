@@ -67,7 +67,7 @@ public class PurchasesController(
                 PayAmount = model.PayAmount,
                 LeftAmount = model.LeftAmount,
                 PaymentType = model.PaymentType,
-                Status = model.Status ?? true,
+                Status = model.Status,
                 Remark = model.Remark,
                 PaidDate = isFullyPaid ? DateTime.Now : null
             };
