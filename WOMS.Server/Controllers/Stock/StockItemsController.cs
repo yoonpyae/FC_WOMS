@@ -12,9 +12,9 @@ public class StockItemsController(
     [HttpGet]
     [EndpointSummary("List")]
     [EndpointDescription("Lists all stock item without deleted data.")]
-    public async Task<IActionResult> Get(long clinicId)
+    public async Task<IActionResult> Get()
     {
-        return ResponseHelper.OK_Result(await repo.StockItems.GetAsync(x => x.ClinicId == clinicId && !x.DeletedOn.HasValue), null);
+        return ResponseHelper.OK_Result(await repo.StockItems.GetAsync(x => !x.DeletedOn.HasValue), null);
     }
 
     [HttpGet("itemCode")]
@@ -29,13 +29,13 @@ public class StockItemsController(
             : ResponseHelper.OK_Result(true, new DefaultResponseMessageModel("Item name can be use for item code", ""));
     }
 
-    [HttpGet("auto-id")]
-    [EndpointSummary("Get Item Code")]
-    [EndpointDescription("Gets a stock item code.")]
-    public async Task<IActionResult> GetAutoId(string Name, long ClinicId)
-    {
-        return ResponseHelper.OK_Result(await idGenerateService.GetItemCode(Name, ClinicId), null);
-    }
+    //[HttpGet("auto-id")]
+    //[EndpointSummary("Get Item Code")]
+    //[EndpointDescription("Gets a stock item code.")]
+    //public async Task<IActionResult> GetAutoId(string Name, long ClinicId)
+    //{
+    //    return ResponseHelper.OK_Result(await idGenerateService.GetItemCode(Name, ClinicId), null);
+    //}
 
     [HttpPost]
     [ValidateModel]
@@ -50,7 +50,6 @@ public class StockItemsController(
         MainStock mainStock = new()
         {
             ItemCode = model.ItemCode,
-            ClinicId = model.ClinicId,
             TypeCode=model.TypeCode,
             PurchasePrice = 0,
             SalePrice = 0,
