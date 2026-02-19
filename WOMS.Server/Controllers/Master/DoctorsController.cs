@@ -89,7 +89,7 @@ public class DoctorsController(
         doctor.BranchId = model.BranchId;
         doctor.Name = model.Name;
         doctor.Degree = model.Degree;
-        doctor.Spalized = model.Spalized;
+        doctor.Specialized = model.Specialized;
         doctor.Photo = model.Photo;
         doctor.Sign = model.Sign;
         doctor.ConsultantFee = model.ConsultantFee;
@@ -121,15 +121,6 @@ public class DoctorsController(
                 new DefaultResponseMessageModel("Doctor not Found.", ""));
         }
 
-        //bool isConsultantsInAdmission = await repo.AdmVoucherConsultants.AnyAsync(x => x.DoctorId == id);
-        //bool isRoundInAdmission = await repo.AdmVoucherRounds.AnyAsync(x => x.DoctorId == id);
-        //bool isInOPD = await repo.OPDVoucherConsultants.AnyAsync(x => x.DoctorId == id);
-        //if (isConsultantsInAdmission || isInOPD || isConsultantsInAdmission)
-        //{
-        //    return ResponseHelper.Bad_Request(null,
-        //        new DefaultResponseMessageModel("Doctor is in use and cannot be deleted.", ""));
-        //}
-
         string userName = User.Identity?.Name ?? string.Empty;
 
         doctor.DeletedOn = DateTime.Now;
@@ -153,43 +144,34 @@ public class DoctorsController(
     [EndpointDescription("Upload Image")]
     public async Task<IActionResult> ImportImageAsync(long id, IFormFile photo)
     {
+        if (photo == null || photo.Length == 0)
+            return BadRequest(new DefaultResponseMessageModel("No photo uploaded.", ""));
+
         try
         {
             Doctor? doctor = await repo.Doctors.GetFirstAsync(x => x.DoctorId == id);
-            if (doctor != null)
-            {
-                if (!string.IsNullOrEmpty(doctor.Photo))
-                {
-                    DeleteExistingFile(doctor.Photo); // Delete the existing file if it exists
-                }
+            if (doctor == null)
+                return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Doctor not found.", ""));
 
-                _ = await fileService.WriteImage(
-                    photo,
-                    $"{id}",
-                    "doctor/photo");
-                doctor.Photo = @$"files/doctor/photo/{doctor.DoctorId}{GetExtension(photo)}";
-                repo.Doctors.Update(doctor);
-            }
-            else
-            {
-                return ResponseHelper.NotFound_Request(null,
-                    new DefaultResponseMessageModel("Doctor not found.", ""));
-            }
+            if (!string.IsNullOrEmpty(doctor.Photo))
+                DeleteExistingFile(doctor.Photo);
+
+            string extension = GetExtension(photo);
+            string filePath = $"files/doctor/photo/{doctor.DoctorId}{extension}";
+
+            await fileService.WriteImage(photo, $"{id}", "doctor/photo");
+            doctor.Photo = filePath;
+
+            repo.Doctors.Update(doctor);
 
             return await repo.SaveAsync()
-                ? ResponseHelper.OK_Result(null,
-                    new DefaultResponseMessageModel("Successfully Uploaded Photo Doctor.", ""))
-                : ResponseHelper.Bad_Request(null,
-                    new DefaultResponseMessageModel("Unable to Upload Photo Doctor.", ""));
+                ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully Uploaded Doctor Photo.", ""))
+                : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to Upload Doctor Photo.", ""));
         }
         catch (Exception ex)
         {
             return StatusCode(StatusCodes.Status500InternalServerError,
-                new DefaultResponseMessageModel()
-                {
-                    EN = ex.Message,
-                    MM = ex.Message
-                });
+                new DefaultResponseMessageModel { EN = ex.Message, MM = ex.Message });
         }
     }
 
@@ -199,54 +181,52 @@ public class DoctorsController(
     [EndpointDescription("Upload Sign")]
     public async Task<IActionResult> ImportSignAsync(DoctorUploadModel model)
     {
+        if (string.IsNullOrEmpty(model.File))
+            return BadRequest(new DefaultResponseMessageModel("No sign file uploaded.", ""));
+
         try
         {
             Doctor? doctor = await repo.Doctors.GetFirstAsync(x => x.DoctorId == model.Id);
-            if (doctor != null)
+            if (doctor == null)
+                return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Doctor not found.", ""));
+
+            if (!string.IsNullOrEmpty(doctor.Sign))
+                DeleteExistingFile(doctor.Sign);
+
+            // Get extension and decode Base64
+            string extension = convertion.GetFileExtension(model.File);
+            byte[] imageBytes;
+            try
             {
-                if (!string.IsNullOrEmpty(doctor.Sign))
-                {
-                    DeleteExistingFile(doctor.Sign); // Delete the existing file if it exists
-                }
-
-                string extension = convertion.GetFileExtension(model.File ?? "");
-                string fileName = $"{model.Id}{extension}";
-                doctor.Sign = $"images/doctor/sign/{fileName}";
-                byte[] imageBytes = Convert.FromBase64String(model.File ?? "");
-                using MemoryStream memoryStream = new(imageBytes);
-
-                IFormFile formFile = new FormFile(memoryStream, 0, memoryStream.Length, "fileUpload", fileName);
-
-                _ = await fileService.WriteImage(
-                    formFile,
-                    $"{model.Id}",
-                    "doctor/sign");
-                doctor.Sign = @$"images/doctor/sign/{doctor.DoctorId}{extension}";
-                repo.Doctors.Update(doctor);
+                imageBytes = DecodeBase64(model.File ?? "");
             }
-            else
+            catch (FormatException)
             {
-                return ResponseHelper.NotFound_Request(null,
-                    new DefaultResponseMessageModel("Doctor not found.", ""));
+                return BadRequest(new DefaultResponseMessageModel("Invalid Base64 string.", ""));
             }
+
+            string fileName = $"{model.Id}{extension}";
+            string filePath = $"images/doctor/sign/{fileName}";
+
+            using MemoryStream memoryStream = new(imageBytes);
+            IFormFile formFile = new FormFile(memoryStream, 0, memoryStream.Length, "fileUpload", fileName);
+
+            await fileService.WriteImage(formFile, $"{model.Id}", "doctor/sign");
+            doctor.Sign = filePath;
+
+            repo.Doctors.Update(doctor);
 
             return await repo.SaveAsync()
-                ? ResponseHelper.OK_Result(null,
-                    new DefaultResponseMessageModel("Successfully Uploaded Sign Doctor.", ""))
-                : ResponseHelper.Bad_Request(null,
-                    new DefaultResponseMessageModel("Unable to Upload Sign Doctor.", ""));
+                ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully Uploaded Doctor Sign.", ""))
+                : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to Upload Doctor Sign.", ""));
         }
         catch (Exception ex)
         {
             return StatusCode(StatusCodes.Status500InternalServerError,
-                new DefaultResponseMessageModel()
-                {
-                    EN = ex.Message,
-                    MM = ex.Message
-                });
+                new DefaultResponseMessageModel { EN = ex.Message, MM = ex.Message });
         }
     }
-    //
+
     [NonAction]
     private void DeleteExistingFile(string existingFile)
     {
@@ -257,8 +237,25 @@ public class DoctorsController(
 
     private string GetExtension(IFormFile file)
     {
-        return ("." + file.FileName.Split('.')[^1]).ToLower();
+        string ext = Path.GetExtension(file.FileName);
+        return string.IsNullOrEmpty(ext) ? "" : ext.ToLower();
+    }
+
+    private byte[] DecodeBase64(string base64String)
+    {
+        if (string.IsNullOrWhiteSpace(base64String))
+            throw new ArgumentException("Base64 string is empty");
+
+        // Remove data URI prefix if present
+        var commaIndex = base64String.IndexOf(',');
+        if (commaIndex >= 0)
+            base64String = base64String[(commaIndex + 1)..];
+
+        // Remove whitespace / newlines
+        base64String = base64String.Trim();
+        return Convert.FromBase64String(base64String);
     }
 
     #endregion
+
 }
