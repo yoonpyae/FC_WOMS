@@ -88,7 +88,6 @@ export class StockItemComponent implements OnInit {
   private formBuilder = inject(FormBuilder);
   public stockItemForm: FormGroup = this.formBuilder.group({
     itemCode: [''],
-    clinicId: [0, Validators.required],
     itemName: ['', Validators.required],
     typeCode: [0, Validators.required],
     chemicalName: ['', Validators.required],
@@ -104,8 +103,7 @@ export class StockItemComponent implements OnInit {
 
   loadData(): void {
     this.loading = true;
-    let clinicId: number = Number.parseInt((this.sharedService.getDefaultClinicId() ?? "0"));
-    this.stockItemService.get(clinicId).subscribe({
+    this.stockItemService.get().subscribe({
       next: res => {
         this.stockItems = res.data as StockItemModel[];
         this.loading = false;
@@ -127,7 +125,6 @@ export class StockItemComponent implements OnInit {
   create(): void {
     this.isEdit = false;
     this.stockItemForm.reset();
-    this.stockItemForm.controls['clinicId'].setValue(1);
     this.stockItemForm.controls['status'].setValue(false);
 
     this.selectedPacketType = null as any;
@@ -143,7 +140,6 @@ export class StockItemComponent implements OnInit {
       this.loggerService.info(this.selectedStockItem);
 
       this.stockItemForm.controls['itemCode'].setValue(this.selectedStockItem.itemCode);
-      this.stockItemForm.controls['clinicId'].setValue(this.selectedStockItem.clinicId);
       this.stockItemForm.controls['itemName'].setValue(this.selectedStockItem.itemName);
       this.stockItemForm.controls['chemicalName'].setValue(this.selectedStockItem.chemicalName);
       this.stockItemForm.controls['status'].setValue(this.selectedStockItem.status);
@@ -192,8 +188,7 @@ export class StockItemComponent implements OnInit {
 
   // #region getTypeCodeChange
   getTypeCodeChange(): void {
-    let clinicId: number = Number.parseInt((this.sharedService.getDefaultClinicId() ?? "0"));
-    this.packetTypeService.get(clinicId).subscribe({
+    this.packetTypeService.get().subscribe({
       next: (res) => {
         this.packetTypes = res.data as PacketTypeModel[];
         if (this.isEdit) {
@@ -241,7 +236,6 @@ export class StockItemComponent implements OnInit {
     // Define the columns to be exported
     const columns = [
       { key: 'itemCode', value: 'Item Code' },
-      { key: 'clinicId', value: 'Hospital Id' },
       { key: 'itemName', value: 'Item Name' },
       { key: 'chemicalName', value: 'Chemical' },
       { key: 'status', value: 'Status' },
@@ -261,10 +255,9 @@ export class StockItemComponent implements OnInit {
     if (this.stockItemForm.valid) {
       this.isSubmitting = true;
       if (!this.isEdit) {
-        let clinicId: number = Number.parseInt((this.sharedService.getDefaultClinicId() ?? "0"));
         let itemName = this.stockItemForm.controls['itemName'].value;
 
-        this.stockItemService.getByAutoId(itemName, clinicId).subscribe({
+        this.stockItemService.getByAutoId(itemName).subscribe({
           next: res => {
             const itemCode = res.data as string;
             this.stockItemForm.controls['itemCode'].setValue(itemCode);
