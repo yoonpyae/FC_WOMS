@@ -12,14 +12,14 @@ export class MainStockService {
 
   constructor(private httpClient: HttpClient) { }
 
-  get(clinicId: number, branchId: number): Observable<RootModel> {
+  get(branchId: number): Observable<RootModel> {
     return this.httpClient.get<RootModel>(
-      `${environment.main_url}/stock/mainstocks?clinicId=${clinicId}&branchId=${branchId}`
+      `${environment.main_url}/stock/mainstocks?branchId=${branchId}`
     );
   }
 
-  getByCode(code: string, clinicId: number): Observable<RootModel> {
-    return this.httpClient.get<RootModel>(`${environment.main_url}/stock/mainstocks/code?code=${code}&clinicId=${clinicId}`);
+  getByCode(code: string): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/stock/mainstocks/code?code=${code}`);
   }
 
   getByActive(branchId: number): Observable<RootModel> {
