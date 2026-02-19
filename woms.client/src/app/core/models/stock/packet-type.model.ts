@@ -1,6 +1,5 @@
 export interface PacketTypeModel {
     typeCode: number;
-    clinicId: number;
     typeName: string;
     capacity: number;
     createdOn: string;
