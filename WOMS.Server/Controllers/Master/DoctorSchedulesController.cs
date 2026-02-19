@@ -3,7 +3,7 @@
 namespace WOMS.Server.Controllers.Master
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/master/[controller]")]
     [ApiController]
     public class DoctorSchedulesController(IRepositoryWrapper repo) : ControllerBase
     {
@@ -25,10 +25,10 @@ namespace WOMS.Server.Controllers.Master
                 await repo.DoctorSchedules.GetAsync(x => x.DoctorId == doctorId && x.BranchId == branchId),
                 null);
 
-        [HttpGet("auto-id")]
-        [EndpointSummary("Get Auto Id")]
+        [HttpGet("auto-scheduleId")]
+        [EndpointSummary("Get Auto ScheduleId")]
         [EndpointDescription("Get an DoctorSchedules max Id")]
-        public async Task<IActionResult> GetAutoId(long branchId)
+        public async Task<IActionResult> GetAutoScheduleId(long branchId)
         {
             DoctorSchedule? lastRecord =
                 await repo.DoctorSchedules.GetFirstAsync(x => x.BranchId == branchId,
