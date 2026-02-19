@@ -81,7 +81,6 @@ export class MainStockComponent implements OnInit {
   public mainStockForm: FormGroup = this.formBuilder.group({
     itemCode: [''],
     typeCode: [0, Validators.required],
-    clinicId: [0, Validators.required],
     branchId: [0, Validators.required],
     purchasePrice: [0, [Validators.required, Validators.min(0)]],
     salePrice: [0, [Validators.required, Validators.min(0)]],
@@ -97,9 +96,8 @@ export class MainStockComponent implements OnInit {
 
   loadData(): void {
     this.loading = true;
-    let clinicId: number = Number.parseInt((this.sharedService.getDefaultClinicId() ?? "0"));
     let branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
-    this.mainStockService.get(clinicId, branchId).subscribe({
+    this.mainStockService.get(branchId).subscribe({
       next: res => {
         this.mainstocks = res.data as ViMainStockModel[];
         this.loading = false;
@@ -126,7 +124,6 @@ export class MainStockComponent implements OnInit {
 
       this.mainStockForm.controls['itemCode'].setValue(this.selectedMainStock.itemCode);
       // this.mainStockForm.controls['itemCode'].disable();
-      this.mainStockForm.controls['clinicId'].setValue(this.selectedMainStock.clinicId);
       this.mainStockForm.controls['branchId'].setValue(this.selectedMainStock.branchId);
       this.mainStockForm.controls['typeCode'].setValue(this.selectedMainStock.typeCode);
       this.mainStockForm.controls['purchasePrice'].setValue(this.selectedMainStock.purchasePrice);
@@ -145,8 +142,7 @@ export class MainStockComponent implements OnInit {
 
   //#region getPacketType
   getPackettype(): void {
-    let clinicId: number = Number.parseInt((this.sharedService.getDefaultClinicId() ?? "0"));
-    this.packetTypeService.get(clinicId).subscribe({
+    this.packetTypeService.get().subscribe({
       next: (res) => {
         this.packetTypes = res.data as PacketTypeModel[];
         if (this.isEdit) {
@@ -189,7 +185,6 @@ export class MainStockComponent implements OnInit {
     const columns = [
       { key: 'itemCode', value: 'Item Code' },
       { key: 'typeCode', value: 'Type Code' },
-      { key: 'clinicId', value: 'Hospital Id' },
       { key: 'purchasePrice', value: 'Purchase Price' },
       { key: 'salePrice', value: 'Sale Price' },
       { key: 'groundBalance', value: 'groundBalance' },
