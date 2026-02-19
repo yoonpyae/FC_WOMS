@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { DoctorModel } from '@core_models/master/doctor.model';
+import { DoctorModel, ScheduleModel } from '@core_models/master/doctor.model';
 import { DoctorService } from '@core_services/master/doctor.service';
 import { LoggerService } from '@shared_services/logger.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -49,9 +49,6 @@ import { SharedService } from '@shared_services/shared.service';
     FieldsetModule,
     FileUploadModule,
     ImageModule
-
-
-
   ],
   templateUrl: './detail.component.html',
   providers: [
@@ -63,46 +60,21 @@ import { SharedService } from '@shared_services/shared.service';
 })
 export class DetailComponent implements OnInit {
   @ViewChild('img') img!: ElementRef<HTMLInputElement>;
+  @ViewChild('photoInput') photoInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('signInput') signInput!: ElementRef<HTMLInputElement>;
   imgBase64String: string | undefined;
+  photoBase64String: string | undefined;
+  signBase64String: string | undefined;
   imgSrc: string | undefined = undefined;
   imgName: string = 'None';
   imageChangedEvent: any = '';
   croppedImage: any = '';
-  croppedImgBase64: any[]=[];
+  croppedImgBase64: any[] = [];
 
   paramValue!: string | '';
+  doctor!: DoctorModel;
   doctorId: number = 0;
-  doctor: DoctorModel = {
-    doctorId: 0,
-    branchId: 0,
-    name: "",
-    degree: null,
-    spalized: null,
-    photo: null,
-    sign: null,
-    referFee: null,
-    opdreferFee: null,
-    consultantFee: null,
-    ecgfee: null,
-    xrayFee: null,
-    ultrasoundFee: null,
-    roundFee: null,
-    monTime: "",
-    tueTime: "",
-    wedTime: "",
-    thuTime: "",
-    friTime: "",
-    satTime: "",
-    sunTime: "",
-    createdOn: '',
-    createdBy: '',
-    updatedOn: '',
-    updatedBy: '',
-    deletedOn: null,
-    deletedBy: null,
-    status: null,
-    remark: null
-  };
+
   @Output() submitEvent = new EventEmitter();
   activateStatus: boolean = false;
   loading = false;
@@ -117,6 +89,31 @@ export class DetailComponent implements OnInit {
   uploadVisible: boolean = false;
 
   photoFile: any;
+
+  schedules: ScheduleModel[] = [];
+  scheduleDialogVisible = false;
+
+  newSchedule: ScheduleModel = {
+    scheduleId: 0,
+    doctorId: 0,
+    branchId: 0,
+    dayOfWeek: '',
+    startTime: '',
+    endTime: '',
+    maxPatient: 10,
+    status: true
+  };
+
+  days = [
+    { label: 'Monday', value: 'Monday' },
+    { label: 'Tuesday', value: 'Tuesday' },
+    { label: 'Wednesday', value: 'Wednesday' },
+    { label: 'Thursday', value: 'Thursday' },
+    { label: 'Friday', value: 'Friday' },
+    { label: 'Saturday', value: 'Saturday' },
+    { label: 'Sunday', value: 'Sunday' }
+  ];
+
 
   attachModal: boolean = false;
   constructor(
@@ -137,96 +134,161 @@ export class DetailComponent implements OnInit {
     this.loading = true;
 
     this.doctorId = parseInt(this.route.snapshot.paramMap.get('id') ?? '');
-    this.doctorService.getById(this.doctorId,branchId).subscribe({
+    this.doctorService.getById(this.doctorId, branchId).subscribe({
       next: (res) => {
         this.doctor = res.data;
-        this.loggerService.info(this.doctorId)
-
-
         this.loading = false;
-
       },
       error: err => { },
       complete: () => {
         this.loading = false;
+        // load schedules after doctor is loaded
+        this.loadSchedules();
       }
     });
   }
 
-  onImportImg(): void {
-    this.img.nativeElement.click();
+  triggerPhotoInput(): void {
+    this.photoInput.nativeElement.click();
   }
 
-  onImgChange(event: any): void {
-    if (this.img.nativeElement.value === '') {
-      this.imgName = 'None';
-      return;
-    }
+  triggerSignInput(): void {
+    this.signInput.nativeElement.click();
+  }
 
+  onPhotoSelected(event: any): void {
     const file: File = event.target.files[0];
-    if (file) {
-      this.imgName = file.name; // Update image name
+    if (!file) return;
 
-      const reader = new FileReader();
+    // preview
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => this.imgSrc = reader.result as string;
 
-      // Convert file to base64 and log it
-      this.sharedService.convertBase64(file).subscribe((base64) => {
-        this.imgBase64String = base64;
-        this.loggerService.info(this.imgBase64String); // Log the base64 string
+    this.loading = true;
+    const formData = new FormData();
+    formData.append('photo', file);
+
+    this.doctorService.uploadPhoto(this.doctorId, formData).subscribe({
+      next: (res: any) => {
+        this.loading = false;
+        if (res?.success) {
+          this.messgaeService.add({ key: 'globalMessage', severity: 'info', summary: 'Success', detail: res.message?.toString() });
+          this.loadData();
+        } else {
+          const msg = res?.message ?? 'Unable to upload photo.';
+          this.messgaeService.add({ severity: 'error', summary: 'Error', detail: msg });
+        }
+      },
+      error: (err: any) => {
+        this.loading = false;
+        const msg = err?.error?.message ?? err?.message ?? 'An error occurred while uploading photo.';
+        this.messgaeService.add({ severity: 'error', summary: 'Error', detail: msg });
+      }
+    });
+  }
+
+
+  onSignSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (!file) return;
+
+    this.loading = true;
+    this.sharedService.convertBase64(file).subscribe((base64) => {
+      this.signBase64String = base64;
+      this.doctorService.uploadSign(this.doctorId, base64).subscribe({
+        next: (res: any) => {
+          this.loading = false;
+          if (res?.success) {
+            this.messgaeService.add({ key: 'globalMessage', severity: 'info', summary: 'Success', detail: res.message?.toString() });
+            this.loadData();
+          } else {
+            const msg = res?.message ?? 'Unable to upload sign.';
+            this.messgaeService.add({ severity: 'error', summary: 'Error', detail: msg });
+          }
+        },
+        error: (err: any) => {
+          this.loading = false;
+          const msg = err?.error?.message ?? err?.message ?? 'An error occurred while uploading sign.';
+          this.messgaeService.add({ severity: 'error', summary: 'Error', detail: msg });
+        }
       });
-
-      // Show image preview
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        this.imgSrc = reader.result as string; // Set the image source for preview
-      };
-    }
-  }
-
-  onUploadImg(): void {
-    if (!this.imgBase64String) {
-      this.messgaeService.add({ severity: 'warn', summary: 'Warning', detail: 'Please select an image to upload.' });
-      return;
-    }
-
-    // Create the model object to send to the API
-    this.loading = true;
-
-    // Call the API to upload the image
-    this.doctorService.uploadSign(this.doctorId, this.imgBase64String).subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.messgaeService.add({ key: 'globalMessage', severity: 'info', summary: 'Success', detail: res.message.toString() });
-          this.loadData();  // Optionally reload data after success
-        }
-        this.loading = false;
-      },
-      error: (_) => {
-      },
     });
   }
 
-  OnUploadProfile():void{
-    if (!this.imgBase64String) {
-      this.messgaeService.add({ severity: 'warn', summary: 'Warning', detail: 'Please select an image to upload.' });
-      return;
-    }
+  openScheduleDialog(): void {
+    this.scheduleDialogVisible = true;
+    this.newSchedule = {
+      scheduleId: 0,
+      doctorId: this.doctorId,
+      branchId: Number.parseInt(this.sharedService.getDefaultBranchId() ?? "0"),
+      dayOfWeek: '',
+      startTime: '',
+      endTime: '',
+      maxPatient: 10,
+      status: true
+    };
+  }
 
-    // Create the model object to send to the API
-    this.loading = true;
+  saveSchedule(): void {
+    const branchId = Number.parseInt(this.sharedService.getDefaultBranchId() ?? '0');
+    this.isSubmitting = true;
 
-    // Call the API to upload the image
-    this.doctorService.uploadPhoto(this.doctorId, this.imgBase64String).subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.messgaeService.add({ key: 'globalMessage', severity: 'info', summary: 'Success', detail: res.message.toString() });
-          this.loadData();  // Optionally reload data after success
+    // First get an auto-generated schedule id from the server
+    this.doctorService.getScheduleAutoId(branchId).subscribe({
+      next: (res: any) => {
+        if (res && res.success) {
+          // server may return an object or a plain value in data
+          const autoId = (res.data && res.data.scheduleId) ? res.data.scheduleId : (res.data ?? 0);
+          this.newSchedule.scheduleId = autoId;
+
+          // now create the schedule
+          this.doctorService.createSchedule(this.newSchedule).subscribe({
+            next: (createRes: any) => {
+              this.isSubmitting = false;
+              if (createRes && createRes.success) {
+                this.messgaeService.add({ severity: 'success', summary: 'Success', detail: 'Schedule added successfully' });
+                this.scheduleDialogVisible = false;
+                this.loadSchedules();
+              } else {
+                const detailMsg = createRes?.message ?? createRes?.data ?? 'Unable to create schedule.';
+                this.messgaeService.add({ severity: 'error', summary: 'Error', detail: detailMsg });
+              }
+            },
+            error: (err: any) => {
+              this.isSubmitting = false;
+              const msg = err?.error?.message ?? err?.message ?? 'An error occurred while creating schedule.';
+              this.messgaeService.add({ severity: 'error', summary: 'Error', detail: msg });
+            }
+          });
+
+        } else {
+          this.isSubmitting = false;
+          const errMsg = res?.message ?? 'Unable to obtain schedule id.';
+          this.messgaeService.add({ severity: 'error', summary: 'Error', detail: errMsg });
         }
-        this.loading = false;
       },
-      error: (_) => {
-      },
+      error: (err: any) => {
+        this.isSubmitting = false;
+        const msg = err?.error?.message ?? err?.message ?? 'An error occurred while obtaining schedule id.';
+        this.messgaeService.add({ severity: 'error', summary: 'Error', detail: msg });
+      }
     });
   }
+
+  loadSchedules(): void {
+    const branchId = Number.parseInt(this.sharedService.getDefaultBranchId() ?? "0");
+
+    // getByDoctor expects (doctorId, branchId)
+    this.doctorService.getByDoctor(this.doctorId, branchId).subscribe({
+      next: (res) => {
+        const data = res?.data ?? [];
+        // Defensive: backend may return schedules for whole branch; ensure only this doctor's schedules are shown
+        this.schedules = Array.isArray(data) ? data.filter((s: any) => (s.doctorId == this.doctorId || s.doctorId == Number(this.doctorId))) : [];
+      }
+    });
+  }
+
+
 
 }
