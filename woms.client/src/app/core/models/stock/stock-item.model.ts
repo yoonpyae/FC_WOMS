@@ -1,6 +1,5 @@
 export interface StockItemModel {
     itemCode: string;
-    clinicId: number;
     itemName: string;
     chemicalName: string;
     typeCode: number;
