@@ -23,7 +23,7 @@ public partial class Doctor
     public string? Degree { get; set; }
 
     [StringLength(500)]
-    public string? Spalized { get; set; }
+    public string? Specialized { get; set; }
 
     [StringLength(200)]
     public string? Photo { get; set; }
