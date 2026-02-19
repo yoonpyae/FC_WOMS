@@ -76,7 +76,6 @@ export class DoctorComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private loggerService: LoggerService,
     private sharedService: SharedService,
-    private timeFormatPipe: TimeFormatPipe,
     private exportService: ExportService,
   ) {
     this.items = [
@@ -104,46 +103,13 @@ export class DoctorComponent implements OnInit {
     branchId: [0],
     name: ['', Validators.required],
     degree: ['', Validators.required],
-    spalized: ['', Validators.required],
+    specialized: ['', Validators.required],
     photo: [''],
     sign: [''],
-
-    referFee: [0, [Validators.required, Validators.min(0)]],
-    opdreferFee: [0, [Validators.required, Validators.min(0)]],
     consultantFee: [0, [Validators.required, Validators.min(0)]],
     ecgfee: [0, [Validators.required, Validators.min(0)]],
     xrayFee: [0, [Validators.required, Validators.min(0)]],
     ultrasoundFee: [0, [Validators.required, Validators.min(0)]],
-    roundFee: [0, [Validators.required, Validators.min(0)]],
-
-    isMonday: [false],
-    _1MonDayStartHour: [{ value: '', disabled: true }, Validators.required],
-    _1MonDayEndHour: [{ value: '', disabled: true }, Validators.required],
-
-    isTuesday: [false],
-    _2TueDayStartHour: [{ value: '', disabled: true }, Validators.required],
-    _2TueDayEndHour: [{ value: '', disabled: true }, Validators.required],
-
-    isWednesday: [false],
-    _3WedDayStartHour: [{ value: '', disabled: true }, Validators.required],
-    _3WedDayEndHour: [{ value: '', disabled: true }, Validators.required],
-
-    isThursday: [false],
-    _4ThuDayStartHour: [{ value: '', disabled: true }, Validators.required],
-    _4ThuDayEndHour: [{ value: '', disabled: true }, Validators.required],
-
-    isFriday: [false],
-    _5FriDayStartHour: [{ value: '', disabled: true }, Validators.required],
-    _5FriDayEndHour: [{ value: '', disabled: true }, Validators.required],
-
-    isSaturday: [false],
-    _6SatDayStartHour: [{ value: '', disabled: true }, Validators.required],
-    _6SatDayEndHour: [{ value: '', disabled: true }, Validators.required],
-
-    isSunday: [false],
-    _7SunDayStartHour: [{ value: '', disabled: true }, Validators.required],
-    _7SunDayEndHour: [{ value: '', disabled: true }, Validators.required],
-
     createdOn: [''],
     createdBy: [''],
     updatedOn: [''],
@@ -181,42 +147,14 @@ export class DoctorComponent implements OnInit {
     this.doctorService.getAutoId(branchId).subscribe({
       next: (res) => {
         this.doctorForm.reset();
-        this.doctorForm.controls['referFee'].setValue(0);
-        this.doctorForm.controls['opdreferFee'].setValue(0);
         this.doctorForm.controls['consultantFee'].setValue(0);
         this.doctorForm.controls['ecgfee'].setValue(0);
         this.doctorForm.controls['xrayFee'].setValue(0);
-        this.doctorForm.controls['roundFee'].setValue(0);
         this.doctorForm.controls['ultrasoundFee'].setValue(0);
         this.doctorForm.controls['ultrasoundFee'].setValue(0);
         this.doctorForm.controls['doctorId'].setValue(res.data as number);
         this.doctorForm.controls['branchId'].setValue(branchId);
         this.doctorForm.controls['status'].setValue(false);
-
-        this.doctorForm.controls['isMonday'].setValue(false);
-        this.doctorForm.controls['isTuesday'].setValue(false);
-        this.doctorForm.controls['isWednesday'].setValue(false);
-        this.doctorForm.controls['isThursday'].setValue(false);
-        this.doctorForm.controls['isFriday'].setValue(false);
-        this.doctorForm.controls['isSaturday'].setValue(false);
-        this.doctorForm.controls['isSunday'].setValue(false);
-
-        this.doctorForm.controls['_1MonDayStartHour'].disable();
-        this.doctorForm.controls['_1MonDayEndHour'].disable();
-        this.doctorForm.controls['_2TueDayStartHour'].disable();
-        this.doctorForm.controls['_2TueDayEndHour'].disable();
-        this.doctorForm.controls['_3WedDayStartHour'].disable();
-        this.doctorForm.controls['_3WedDayEndHour'].disable();
-        this.doctorForm.controls['_4ThuDayStartHour'].disable();
-        this.doctorForm.controls['_4ThuDayEndHour'].disable();
-        this.doctorForm.controls['_5FriDayStartHour'].disable();
-        this.doctorForm.controls['_5FriDayEndHour'].disable();
-        this.doctorForm.controls['_6SatDayStartHour'].disable();
-        this.doctorForm.controls['_6SatDayEndHour'].disable();
-        this.doctorForm.controls['_7SunDayStartHour'].disable();
-        this.doctorForm.controls['_7SunDayEndHour'].disable();
-
-
         this.isEdit = false;
         this.modalVisible = true;
       }
@@ -234,107 +172,13 @@ export class DoctorComponent implements OnInit {
       this.doctorForm.controls['branchId'].setValue(this.selectedDoctor.branchId);
       this.doctorForm.controls['name'].setValue(this.selectedDoctor.name);
       this.doctorForm.controls['degree'].setValue(this.selectedDoctor.degree);
-      this.doctorForm.controls['spalized'].setValue(this.selectedDoctor.spalized);
+      this.doctorForm.controls['specialized'].setValue(this.selectedDoctor.specialized);
       this.doctorForm.controls['photo'].setValue(this.selectedDoctor.photo);
       this.doctorForm.controls['sign'].setValue(this.selectedDoctor.sign);
-      this.doctorForm.controls['referFee'].setValue(this.selectedDoctor.referFee);
-      this.doctorForm.controls['opdreferFee'].setValue(this.selectedDoctor.opdreferFee);
       this.doctorForm.controls['consultantFee'].setValue(this.selectedDoctor.consultantFee);
       this.doctorForm.controls['ecgfee'].setValue(this.selectedDoctor.ecgfee);
       this.doctorForm.controls['xrayFee'].setValue(this.selectedDoctor.xrayFee);
       this.doctorForm.controls['ultrasoundFee'].setValue(this.selectedDoctor.ultrasoundFee);
-      this.doctorForm.controls['roundFee'].setValue(this.selectedDoctor.roundFee);
-
-      if (this.selectedDoctor.monTime != null && this.selectedDoctor.monTime !== '') {
-        this.doctorForm.controls['isMonday'].setValue(true);
-
-        let monTimeArray: string[] = this.selectedDoctor.monTime?.split('to') ?? [];
-
-        this.doctorForm.controls['_1MonDayStartHour'].setValue(this.timeFormatPipe.transformToDate(monTimeArray[0].trim()));
-        this.doctorForm.controls['_1MonDayStartHour'].enable();
-
-        this.doctorForm.controls['_1MonDayEndHour'].setValue(this.timeFormatPipe.transformToDate(monTimeArray[1].trim()));
-        this.doctorForm.controls['_1MonDayEndHour'].enable();
-      }
-
-      // Tuesday
-      if (this.selectedDoctor.tueTime != null && this.selectedDoctor.tueTime !== '') {
-        this.doctorForm.controls['isTuesday'].setValue(true);
-
-        let tueTimeArray: string[] = this.selectedDoctor.tueTime?.split('to') ?? [];
-
-        this.doctorForm.controls['_2TueDayStartHour'].setValue(this.timeFormatPipe.transformToDate(tueTimeArray[0].trim()));
-        this.doctorForm.controls['_2TueDayStartHour'].enable();
-
-        this.doctorForm.controls['_2TueDayEndHour'].setValue(this.timeFormatPipe.transformToDate(tueTimeArray[1].trim()));
-        this.doctorForm.controls['_2TueDayEndHour'].enable();
-      }
-
-      // Wednesday
-      if (this.selectedDoctor.wedTime != null && this.selectedDoctor.wedTime !== '') {
-        this.doctorForm.controls['isWednesday'].setValue(true);
-
-        let wedTimeArray: string[] = this.selectedDoctor.wedTime?.split('to') ?? [];
-
-        this.doctorForm.controls['_3WedDayStartHour'].setValue(this.timeFormatPipe.transformToDate(wedTimeArray[0].trim()));
-        this.doctorForm.controls['_3WedDayStartHour'].enable();
-
-        this.doctorForm.controls['_3WedDayEndHour'].setValue(this.timeFormatPipe.transformToDate(wedTimeArray[1].trim()));
-        this.doctorForm.controls['_3WedDayEndHour'].enable();
-      }
-
-      // Thursday
-      if (this.selectedDoctor.thuTime != null && this.selectedDoctor.thuTime !== '') {
-        this.doctorForm.controls['isThursday'].setValue(true);
-
-        let thuTimeArray: string[] = this.selectedDoctor.thuTime?.split('to') ?? [];
-
-        this.doctorForm.controls['_4ThuDayStartHour'].setValue(this.timeFormatPipe.transformToDate(thuTimeArray[0].trim()));
-        this.doctorForm.controls['_4ThuDayStartHour'].enable();
-
-        this.doctorForm.controls['_4ThuDayEndHour'].setValue(this.timeFormatPipe.transformToDate(thuTimeArray[1].trim()));
-        this.doctorForm.controls['_4ThuDayEndHour'].enable();
-      }
-
-      // Friday
-      if (this.selectedDoctor.friTime != null && this.selectedDoctor.friTime !== '') {
-        this.doctorForm.controls['isFriday'].setValue(true);
-
-        let friTimeArray: string[] = this.selectedDoctor.friTime?.split('to') ?? [];
-
-        this.doctorForm.controls['_5FriDayStartHour'].setValue(this.timeFormatPipe.transformToDate(friTimeArray[0].trim()));
-        this.doctorForm.controls['_5FriDayStartHour'].enable();
-
-        this.doctorForm.controls['_5FriDayEndHour'].setValue(this.timeFormatPipe.transformToDate(friTimeArray[1].trim()));
-        this.doctorForm.controls['_5FriDayEndHour'].enable();
-      }
-
-      // Saturday
-      if (this.selectedDoctor.satTime != null && this.selectedDoctor.satTime !== '') {
-        this.doctorForm.controls['isSaturday'].setValue(true);
-
-        let satTimeArray: string[] = this.selectedDoctor.satTime?.split('to') ?? [];
-
-        this.doctorForm.controls['_6SatDayStartHour'].setValue(this.timeFormatPipe.transformToDate(satTimeArray[0].trim()));
-        this.doctorForm.controls['_6SatDayStartHour'].enable();
-
-        this.doctorForm.controls['_6SatDayEndHour'].setValue(this.timeFormatPipe.transformToDate(satTimeArray[1].trim()));
-        this.doctorForm.controls['_6SatDayEndHour'].enable();
-      }
-
-      // Sunday
-      if (this.selectedDoctor.sunTime != null && this.selectedDoctor.sunTime !== '') {
-        this.doctorForm.controls['isSunday'].setValue(true);
-
-        let sunTimeArray: string[] = this.selectedDoctor.sunTime?.split('to') ?? [];
-
-        this.doctorForm.controls['_7SunDayStartHour'].setValue(this.timeFormatPipe.transformToDate(sunTimeArray[0].trim()));
-        this.doctorForm.controls['_7SunDayStartHour'].enable();
-
-        this.doctorForm.controls['_7SunDayEndHour'].setValue(this.timeFormatPipe.transformToDate(sunTimeArray[1].trim()));
-        this.doctorForm.controls['_7SunDayEndHour'].enable();
-      }
-
 
       this.doctorForm.controls['status'].setValue(this.selectedDoctor.status);
       this.modalVisible = true;
@@ -391,20 +235,10 @@ export class DoctorComponent implements OnInit {
       { key: 'branchId', value: 'Hospital ID' },
       { key: 'name', value: 'Doctor Name' },
       { key: 'degree', value: 'Degree' },
-      { key: 'spalized', value: 'Specialized' },
-      { key: 'referFee', value: 'Refer Fee' },
-      { key: 'opdreferFee', value: 'OPD-Refer Fee' },
+      { key: 'specialized', value: 'Specialized' },
       { key: 'ecgfee', value: 'ECG Fee' },
       { key: 'xrayFee', value: 'X-Ray Fee' },
       { key: 'ultrasoundFee', value: 'Ultrasound Fee' },
-      { key: 'roundFee', value: 'Round Fee' },
-      { key: 'monTime', value: 'Monday' },
-      { key: 'tueTime', value: 'Tuesday' },
-      { key: 'wedTime', value: 'Wednesday' },
-      { key: 'thuTime', value: 'Thursday' },
-      { key: 'friTime', value: 'Friday' },
-      { key: 'satTime', value: 'Saturday' },
-      { key: 'sunTime', value: 'Sunday' },
       { key: 'status', value: 'Status' },
       { key: 'createdOn', value: 'Created On' },
       { key: 'createdBy', value: 'Created By' },
@@ -421,69 +255,12 @@ export class DoctorComponent implements OnInit {
   }
 
   submit(): void {
-    let model = this.doctorForm.value as DoctorModel;
-
-    let _monTime: string | null =
-      this.doctorForm.controls['isMonday'].value ?
-        this.timeFormatPipe.transformFromDate(this.doctorForm.controls['_1MonDayStartHour'].value, 'hh:mm a')
-        + " to "
-        + this.timeFormatPipe.transformFromDate(this.doctorForm.controls['_1MonDayEndHour'].value, 'hh:mm a')
-        : null;
-
-    let _tueTime: string | null =
-      this.doctorForm.controls['isTuesday'].value ?
-        this.timeFormatPipe.transformFromDate(this.doctorForm.controls['_2TueDayStartHour'].value, 'hh:mm a')
-        + " to "
-        + this.timeFormatPipe.transformFromDate(this.doctorForm.controls['_2TueDayEndHour'].value, 'hh:mm a')
-        : null;
-
-    let _wedTime: string | null =
-      this.doctorForm.controls['isWednesday'].value ?
-        this.timeFormatPipe.transformFromDate(this.doctorForm.controls['_3WedDayStartHour'].value, 'hh:mm a')
-        + " to "
-        + this.timeFormatPipe.transformFromDate(this.doctorForm.controls['_3WedDayEndHour'].value, 'hh:mm a')
-        : null;
-
-    let _thuTime: string | null =
-      this.doctorForm.controls['isThursday'].value ?
-        this.timeFormatPipe.transformFromDate(this.doctorForm.controls['_4ThuDayStartHour'].value, 'hh:mm a')
-        + " to "
-        + this.timeFormatPipe.transformFromDate(this.doctorForm.controls['_4ThuDayEndHour'].value, 'hh:mm a')
-        : null;
-
-    let _friTime: string | null =
-      this.doctorForm.controls['isFriday'].value ?
-        this.timeFormatPipe.transformFromDate(this.doctorForm.controls['_5FriDayStartHour'].value, 'hh:mm a')
-        + " to "
-        + this.timeFormatPipe.transformFromDate(this.doctorForm.controls['_5FriDayEndHour'].value, 'hh:mm a')
-        : null;
-
-    let _satTime: string | null =
-      this.doctorForm.controls['isSaturday'].value ?
-        this.timeFormatPipe.transformFromDate(this.doctorForm.controls['_6SatDayStartHour'].value, 'hh:mm a')
-        + " to "
-        + this.timeFormatPipe.transformFromDate(this.doctorForm.controls['_6SatDayEndHour'].value, 'hh:mm a')
-        : null;
-
-    let _sunTime: string | null =
-      this.doctorForm.controls['isSunday'].value ?
-        this.timeFormatPipe.transformFromDate(this.doctorForm.controls['_7SunDayStartHour'].value, 'hh:mm a')
-        + " to "
-        + this.timeFormatPipe.transformFromDate(this.doctorForm.controls['_7SunDayEndHour'].value, 'hh:mm a')
-        : null;
-
-    model.monTime = _monTime;
-    model.tueTime = _tueTime;
-    model.wedTime = _wedTime;
-    model.thuTime = _thuTime;
-    model.friTime = _friTime;
-    model.satTime = _satTime;
-    model.sunTime = _sunTime;
+    const model = this.doctorForm.value as DoctorModel;
 
     this.loggerService.info(model);
     if (this.doctorForm.valid) {
-      let model = this.doctorForm.value as DoctorModel;
-      model.branchId = 1;
+      const branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
+      model.branchId = branchId;
 
       this.isSubmitting = true;
       this.loggerService.info(model);
@@ -540,111 +317,20 @@ export class DoctorComponent implements OnInit {
     }
   }
 
-  monDayChange(): void {
-    if (this.doctorForm.controls['isMonday'].value) {
-      this.doctorForm.controls['_1MonDayStartHour'].enable();
-      this.doctorForm.controls['_1MonDayEndHour'].enable();
-      this.doctorForm.controls['_1MonDayStartHour'].setValue(new Date("2000-01-01T09:00:00"));
-      this.doctorForm.controls['_1MonDayEndHour'].setValue(new Date("2000-01-01T17:00:00"));
-    }
-    else {
-      this.doctorForm.controls['_1MonDayStartHour'].disable();
-      this.doctorForm.controls['_1MonDayEndHour'].disable();
-      this.doctorForm.controls['_1MonDayStartHour'].setValue(false);
-      this.doctorForm.controls['_1MonDayEndHour'].setValue(false);
-    }
+  onCancel() {
+    this.doctorForm.reset();
+    this.modalVisible = false;
+    this.isSubmitting = false;
   }
 
-  tueDayChange(): void {
-    if (this.doctorForm.controls['isTuesday'].value) {
-      this.doctorForm.controls['_2TueDayStartHour'].enable();
-      this.doctorForm.controls['_2TueDayEndHour'].enable();
-      this.doctorForm.controls['_2TueDayStartHour'].setValue(new Date("2000-01-01T09:00:00"));
-      this.doctorForm.controls['_2TueDayEndHour'].setValue(new Date("2000-01-01T17:00:00"));
-    }
-    else {
-      this.doctorForm.controls['_2TueDayStartHour'].disable();
-      this.doctorForm.controls['_2TueDayEndHour'].disable();
-      this.doctorForm.controls['_2TueDayStartHour'].setValue(false);
-      this.doctorForm.controls['_2TueDayEndHour'].setValue(false);
-    }
-  }
-
-  wedDayChange(): void {
-    if (this.doctorForm.controls['isWednesday'].value) {
-      this.doctorForm.controls['_3WedDayStartHour'].enable();
-      this.doctorForm.controls['_3WedDayEndHour'].enable();
-      this.doctorForm.controls['_3WedDayStartHour'].setValue(new Date("2000-01-01T09:00:00"));
-      this.doctorForm.controls['_3WedDayEndHour'].setValue(new Date("2000-01-01T17:00:00"));
-    }
-    else {
-      this.doctorForm.controls['_3WedDayStartHour'].disable();
-      this.doctorForm.controls['_3WedDayEndHour'].disable();
-      this.doctorForm.controls['_3WedDayStartHour'].setValue(false);
-      this.doctorForm.controls['_3WedDayEndHour'].setValue(false);
-    }
-  }
-
-  thuDayChange(): void {
-    if (this.doctorForm.controls['isThursday'].value) {
-      this.doctorForm.controls['_4ThuDayStartHour'].enable();
-      this.doctorForm.controls['_4ThuDayEndHour'].enable();
-      this.doctorForm.controls['_4ThuDayStartHour'].setValue(new Date("2000-01-01T09:00:00"));
-      this.doctorForm.controls['_4ThuDayEndHour'].setValue(new Date("2000-01-01T17:00:00"));
-    }
-    else {
-      this.doctorForm.controls['_4ThuDayStartHour'].disable();
-      this.doctorForm.controls['_4ThuDayEndHour'].disable();
-      this.doctorForm.controls['_4ThuDayStartHour'].setValue(false);
-      this.doctorForm.controls['_4ThuDayEndHour'].setValue(false);
-    }
-  }
-
-  friDayChange(): void {
-    if (this.doctorForm.controls['isFriday'].value) {
-      this.doctorForm.controls['_5FriDayStartHour'].enable();
-      this.doctorForm.controls['_5FriDayEndHour'].enable();
-      this.doctorForm.controls['_5FriDayStartHour'].setValue(new Date("2000-01-01T09:00:00"));
-      this.doctorForm.controls['_5FriDayEndHour'].setValue(new Date("2000-01-01T17:00:00"));
-    }
-    else {
-      this.doctorForm.controls['_5FriDayStartHour'].disable();
-      this.doctorForm.controls['_5FriDayEndHour'].disable();
-      this.doctorForm.controls['_5FriDayStartHour'].setValue(false);
-      this.doctorForm.controls['_5FriDayEndHour'].setValue(false);
-    }
-  }
-
-  satDayChange(): void {
-    if (this.doctorForm.controls['isSaturday'].value) {
-      this.doctorForm.controls['_6SatDayStartHour'].enable();
-      this.doctorForm.controls['_6SatDayEndHour'].enable();
-      this.doctorForm.controls['_6SatDayStartHour'].setValue(new Date("2000-01-01T09:00:00"));
-      this.doctorForm.controls['_6SatDayEndHour'].setValue(new Date("2000-01-01T17:00:00"));
-    }
-    else {
-      this.doctorForm.controls['_6SatDayStartHour'].disable();
-      this.doctorForm.controls['_6SatDayEndHour'].disable();
-      this.doctorForm.controls['_6SatDayStartHour'].setValue(false);
-      this.doctorForm.controls['_6SatDayEndHour'].setValue(false);
-    }
-  }
-
-  sunDayChange(): void {
-    if (this.doctorForm.controls['isSunday'].value) {
-      this.doctorForm.controls['_7SunDayStartHour'].enable();
-      this.doctorForm.controls['_7SunDayEndHour'].enable();
-      this.doctorForm.controls['_7SunDayStartHour'].setValue(new Date("2000-01-01T09:00:00"));
-      this.doctorForm.controls['_7SunDayEndHour'].setValue(new Date("2000-01-01T17:00:00"));
-    }
-    else {
-      this.doctorForm.controls['_7SunDayStartHour'].disable();
-      this.doctorForm.controls['_7SunDayEndHour'].disable();
-      this.doctorForm.controls['_7SunDayStartHour'].setValue(false);
-      this.doctorForm.controls['_7SunDayEndHour'].setValue(false);
+  onFileChange(event: any, field: 'photo' | 'sign') {
+    const file = event.target.files[0];
+    if (file) {
+      this.doctorForm.patchValue({
+        [field]: file
+      });
     }
   }
 
   //#endregion
-
 }  
