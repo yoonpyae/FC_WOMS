@@ -416,22 +416,22 @@ export class AppointmentComponent implements OnInit {
   // #endregion
 
   // #region Helpers
-  getDoctorDutyTime(doctor: DoctorModel): string {
-    if (!this.selectedAppointmentDate) return '';
+  // getDoctorDutyTime(doctor: DoctorModel): string {
+  //   if (!this.selectedAppointmentDate) return '';
 
-    let date = new Date(this.selectedAppointmentDate);
-    let dayOfWeek = date.getDay(); // 0 (Sunday) to 6 (Saturday)
+  //   let date = new Date(this.selectedAppointmentDate);
+  //   let dayOfWeek = date.getDay(); // 0 (Sunday) to 6 (Saturday)
 
-    switch (dayOfWeek) {
-      case 0: return doctor.sunTime || '';
-      case 1: return doctor.monTime || '';
-      case 2: return doctor.tueTime || '';
-      case 3: return doctor.wedTime || '';
-      case 4: return doctor.thuTime || '';
-      case 5: return doctor.friTime || '';
-      case 6: return doctor.satTime || '';
-      default: return '';
-    }
-  }
+  //   switch (dayOfWeek) {
+  //     case 0: return doctor.sunTime || '';
+  //     case 1: return doctor.monTime || '';
+  //     case 2: return doctor.tueTime || '';
+  //     case 3: return doctor.wedTime || '';
+  //     case 4: return doctor.thuTime || '';
+  //     case 5: return doctor.friTime || '';
+  //     case 6: return doctor.satTime || '';
+  //     default: return '';
+  //   }
+  // }
   // #endregion
 }
