@@ -126,11 +126,6 @@ public partial class WOMSDbContext : DbContext
             entity.HasKey(e => new { e.DoctorId, e.BranchId }).HasName("PK_Doctor_1");
         });
 
-        modelBuilder.Entity<DoctorSchedule>(entity =>
-        {
-            entity.Property(e => e.ScheduleId).ValueGeneratedOnAdd();
-        });
-
         modelBuilder.Entity<LabService>(entity =>
         {
             entity.Property(e => e.ServiceId).ValueGeneratedNever();
