@@ -13,12 +13,12 @@ export class PacketTypeService {
 
   constructor(private httpClient: HttpClient) { }
 
-  get(clinicId: number): Observable<RootModel> {
-    return this.httpClient.get<RootModel>(`${environment.main_url}/stock/packettypes?clinicId=${clinicId}`);
+  get(): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/stock/packettypes`);
   }
 
-  getByAutoCode(clinicId: number): Observable<RootModel> {
-    return this.httpClient.get<RootModel>(`${environment.main_url}/stock/packettypes/auto-code?clinicId=${clinicId}`);
+  getByAutoCode(): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/stock/packettypes/auto-code`);
   }
 
   create(model: PacketTypeModel): Observable<RootModel> {
