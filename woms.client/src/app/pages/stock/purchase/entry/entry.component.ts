@@ -327,8 +327,7 @@ export class EntryComponent implements OnInit {
   }
 
   getMainStockItemByCode(code: string): void {
-    let clinicId: number = Number.parseInt((this.shareService.getDefaultClinicId() ?? '0'));
-    this.mainStockService.getByCode(code, clinicId).subscribe({
+    this.mainStockService.getByCode(code).subscribe({
       next: (res) => {
         this.currentMainStock = res.data as MainStockModel;
         this.typeCode = this.currentMainStock.typeCode;
