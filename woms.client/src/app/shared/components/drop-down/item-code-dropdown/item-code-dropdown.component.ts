@@ -64,12 +64,11 @@ export class ItemCodeDropdownComponent implements OnInit, OnDestroy {
   }
 
   public loadData(): void {
-    let clinicId: number = Number.parseInt((this.shareService.getDefaultClinicId() ?? "0"));
     this.loading = true;
-    this.stockItemService.get(clinicId).subscribe({
+    this.stockItemService.get().subscribe({
       next: (response) => {
         this.stockItems = response.data as StockItemModel[];
-        this.stockItems = this.stockItems.filter(item => item.itemCode.startsWith('A'));
+        this.stockItems = this.stockItems.filter(item => item.itemCode);
         this.loading = false;
         // this.loggerService.info(this.stockItems);
       },
