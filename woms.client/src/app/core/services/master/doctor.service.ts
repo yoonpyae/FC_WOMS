@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { DoctorModel } from '@core_models/master/doctor.model';
+import { DoctorModel, ScheduleModel } from '@core_models/master/doctor.model';
 import { RootModel } from '@core_models/root.model';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -25,36 +25,41 @@ export class DoctorService {
     return this.httpClient.get<RootModel>(`${environment.main_url}/master/doctors/auto-id?branchId=${branchId}`)
   }
 
+  getScheduleAutoId(branchId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/doctorschedules/auto-scheduleId?branchId=${branchId}`)
+  }
+
   getByActive(branchId: number): Observable<RootModel> {
     return this.httpClient.get<RootModel>(`${environment.main_url}/master/doctors/active?branchId=${branchId}`);
   }
 
-  getRound(branchId: number): Observable<RootModel> {
-    return this.httpClient.get<RootModel>(`${environment.main_url}/master/doctors/round?branchId=${branchId}`);
+  getByDoctor(doctorId: number, branchId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/doctorschedules?doctorId=${doctorId}&branchId=${branchId}`);
   }
 
   create(model: DoctorModel) {
     return this.httpClient.post<RootModel>(`${environment.main_url}/master/doctors`, model);
   }
 
+  createSchedule(model: ScheduleModel) {
+    return this.httpClient.post<RootModel>(`${environment.main_url}/master/doctorschedules`, model);
+  }
+
   update(model: DoctorModel) {
     return this.httpClient.put<RootModel>(`${environment.main_url}/master/doctors`, model);
+  }
+
+  updateSchedule(model: ScheduleModel) {
+    return this.httpClient.put<RootModel>(`${environment.main_url}/master/schedules`, model);
   }
 
   delete(id: number) {
     return this.httpClient.delete<RootModel>(`${environment.main_url}/master/doctors/${id}`, {});
   }
 
-  uploadPhoto(id: number, base64: string): Observable<RootModel> {
-
-    const model = {
-      id: id,
-      file: base64
-    }
-
+  uploadPhoto(id: number, formData: FormData): Observable<RootModel> {
     return this.httpClient.put<RootModel>(
-      `${environment.main_url}/master/doctors/uploadphoto`,
-      model
+      `${environment.main_url}/master/doctors/uploadphoto?id=${id}`, formData
     );
   }
 
