@@ -1,6 +1,5 @@
 export interface BranchModel {
     branchId: number;
-    clinicId: number;
     branchName: string;
     contactPerson: string;
     primaryPhone: string;
@@ -19,5 +18,4 @@ export interface BranchModel {
     deletedOn: string | null;
     deletedBy: string | null;
     remark: string | null;
-    clinic: null;
 }
