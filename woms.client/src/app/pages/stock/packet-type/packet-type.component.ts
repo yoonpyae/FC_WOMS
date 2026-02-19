@@ -82,7 +82,6 @@ export class PacketTypeComponent implements OnInit {
   private formBuilder = inject(FormBuilder);
   public packetTypeForm: FormGroup = this.formBuilder.group({
     typeCode: [0, Validators.required],
-    clinicId: [0, Validators.required],
     typeName: ['', Validators.required],
     capacity: [0, Validators.required],
     status: [false]
@@ -96,9 +95,7 @@ export class PacketTypeComponent implements OnInit {
 
   loadData(): void {
     this.loading = true;
-    let clinicId: number = Number.parseInt((this.sharedService.getDefaultClinicId() ?? "0"));
-    this.loggerService.info("clinicId");
-    this.packetTypeService.get(clinicId).subscribe({
+    this.packetTypeService.get().subscribe({
       next: res => {
         this.packetTypes = res.data as PacketTypeModel[];
         this.loading = false;
@@ -118,11 +115,9 @@ export class PacketTypeComponent implements OnInit {
   //#region CRUD
   create(): void {
     this.isEdit = false;
-    let clinicId: number = Number.parseInt((this.sharedService.getDefaultClinicId() ?? "0"));
-    this.packetTypeService.getByAutoCode(clinicId).subscribe({
+    this.packetTypeService.getByAutoCode().subscribe({
       next: res => {
         this.packetTypeForm.reset();
-        this.packetTypeForm.controls['clinicId'].setValue(clinicId);
         this.packetTypeForm.controls['typeCode'].setValue(res.data as number);
         this.packetTypeForm.controls['status'].setValue(false);
 
@@ -138,8 +133,6 @@ export class PacketTypeComponent implements OnInit {
     if (this.selectedPacketType) {
       this.loggerService.info(this.selectedPacketType);
 
-      this.packetTypeForm.controls['typeCode'].setValue(this.selectedPacketType.typeCode);
-      this.packetTypeForm.controls['clinicId'].setValue(this.selectedPacketType.clinicId);
       this.packetTypeForm.controls['typeCode'].setValue(this.selectedPacketType.typeCode);
       this.packetTypeForm.controls['typeName'].setValue(this.selectedPacketType.typeName);
       this.packetTypeForm.controls['capacity'].setValue(this.selectedPacketType.capacity);
