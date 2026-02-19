@@ -1,7 +1,6 @@
 export interface MainStockModel {
     itemCode: string;
     typeCode: number;
-    clinicId: number;
     branchId: number;
     purchasePrice: number;
     salePrice: number;
@@ -23,7 +22,6 @@ export interface ViMainStockModel {
     chemicalName?: string;
     typeCode: number;
     typeName: string;
-    clinicId: number;
     branchId: number;
     purchasePrice?: number;
     salePrice: number;
