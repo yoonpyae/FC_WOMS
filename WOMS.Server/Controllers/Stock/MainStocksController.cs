@@ -8,7 +8,7 @@
         #region CRUD Operation
         [HttpGet]
         [EndpointSummary("List")]
-        [EndpointDescription("List all Main Stocks by Clinic and Branch")]
+        [EndpointDescription("List all Main Stocks by Branch")]
         public async Task<IActionResult> Get(long branchId)
         {
             return ResponseHelper.OK_Result(
