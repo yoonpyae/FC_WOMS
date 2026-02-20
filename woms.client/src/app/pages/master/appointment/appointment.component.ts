@@ -1,9 +1,9 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
-import { AppointmentModel } from '@core_models/master/appointment.model';
-import { DoctorModel } from '@core_models/master/doctor.model';
-import { PatientModel, ViPatientModel } from '@core_models/master/patient.model';
+import { AppointmentModel, ViAppointmentModel } from '@core_models/master/appointment.model';
+import { DoctorWithSchedules, ScheduleModel } from '@core_models/master/doctor.model';
+import { ViPatientModel } from '@core_models/master/patient.model';
 import { AppointmentService } from '@core_services/master/appointment.service';
 import { DoctorService } from '@core_services/master/doctor.service';
 import { PatientDropDownComponent } from '../../../shared/components/drop-down/patient-drop-down/patient-drop-down.component';
@@ -24,7 +24,8 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { log } from 'console';
+import { DoctorDropDownComponent } from '@shared_component/drop-down/doctor-drop-down/doctor-drop-down.component';
+import { DropdownModule } from 'primeng/dropdown';
 
 @Component({
   selector: 'app-appointment',
@@ -42,21 +43,26 @@ import { log } from 'console';
     TagModule,
     TableModule,
     DialogModule,
+    DropdownModule,
     ConfirmDialogModule,
     DatePickerModule,
     SelectModule,
-    PatientDropDownComponent
+    PatientDropDownComponent,
+    DoctorDropDownComponent,
   ],
   templateUrl: './appointment.component.html',
   providers: [ConfirmationService, ExportService, DatePipe],
 })
 export class AppointmentComponent implements OnInit {
-  appointments: AppointmentModel[] = [];
+  appointments: ViAppointmentModel[] = [];
   selectedAppointment!: AppointmentModel;
 
-  doctors: DoctorModel[] = [];
-  selectedDoctor: DoctorModel | null = null;
-  selectedAppointmentDate: Date | null = null;
+  schedules: ScheduleModel[] = [];
+  selectedSchedule!: ScheduleModel;
+
+  doctors: DoctorWithSchedules[] = [];
+  selectedDoctor: DoctorWithSchedules | null = null;
+  selectedAppointmentDate: Date = new Date();
 
   selectedPatient: ViPatientModel | null = null;
 
@@ -72,6 +78,13 @@ export class AppointmentComponent implements OnInit {
   today!: any;
   minAppointmentDate: Date = new Date();
 
+  statuses = [
+    { label: 'Pending', value: 'Pending' },
+    { label: 'Confirmed', value: 'Confirmed' },
+    { label: 'Completed', value: 'Completed' },
+    { label: 'Cancelled', value: 'Cancelled' }
+  ];
+
   private formBuilder = inject(FormBuilder);
   public appointmentForm: FormGroup = this.formBuilder.group({
     ano: [0, Validators.required],
@@ -83,7 +96,7 @@ export class AppointmentComponent implements OnInit {
     phoneNo: new FormControl('', {
       validators: [Validators.required, Validators.pattern("^(0(1|9)[0-9]{7,9})$")]
     }),
-    status: [true],
+    status: ['Pending'],
     remark: [null as string | null],
   });
 
@@ -119,24 +132,17 @@ export class AppointmentComponent implements OnInit {
   loadData(): void {
     if (this.loading) return;
 
-    if (!this.selectedAppointmentDate || !this.selectedDoctor) {
-      this.appointments = [];
-      return;
-    }
-
     let branchId = Number.parseInt(this.sharedService.getDefaultBranchId() ?? "0");
-    let doctorId = this.selectedDoctor.doctorId;
     let appointmentDate = this.datePipe.transform(this.selectedAppointmentDate, 'yyyy-MM-dd') ?? '';
 
     this.loading = true;
 
     this.appointmentService.getDoctorAppointments(
       branchId,
-      doctorId,
       appointmentDate
     ).subscribe({
       next: (res) => {
-        this.appointments = res.data as AppointmentModel[];
+        this.appointments = res.data as ViAppointmentModel[];
         console.log('Loaded appointments:', this.appointments);
       },
       error: () => {
@@ -149,44 +155,12 @@ export class AppointmentComponent implements OnInit {
     });
   }
 
-  getDoctors(): void {
-    let branchId = Number.parseInt(this.sharedService.getDefaultBranchId() ?? '0');
-    this.loadingDoctors = true;
-
-    this.doctorService.get(branchId).subscribe({
-      next: (res) => {
-        this.doctors = res.data as DoctorModel[];
-        this.selectedDoctor = this.doctors.find(
-          x => x.doctorId == this.appointmentForm.controls['doctorId'].value
-        )!;
-        this.onDoctorChange();
-      },
-      error: () => {
-        this.loadingDoctors = false;
-      },
-      complete: () => {
-        this.loadingDoctors = false;
-      }
-    });
-  }
   // #endregion
 
   // #region CRUD Operations
   create(): void {
-    if (!this.selectedAppointmentDate || !this.selectedDoctor) {
-      this.modalVisible = false;
-      this.messageService.add({
-        key: 'globalMessage',
-        severity: 'warn',
-        summary: 'Warning',
-        detail: 'Please select both a date and a doctor before creating an appointment.',
-      });
-      return;
-    }
-
     this.appointmentForm.reset();
     this.selectedPatient = null;
-    this.appointmentForm.controls['doctorId'].setValue(this.selectedDoctor?.doctorId ?? 0);
     this.appointmentForm.controls['appointmentDate'].setValue(this.datePipe.transform(this.selectedAppointmentDate, 'yyyy-MM-dd'));
 
     let branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
@@ -195,7 +169,7 @@ export class AppointmentComponent implements OnInit {
       next: (res) => {
         this.appointmentForm.controls['ano'].setValue(res.data as number);
         this.appointmentForm.controls['branchId'].setValue(branchId);
-        this.appointmentForm.controls['status'].setValue(true);
+        this.appointmentForm.controls['status'].setValue('Pending');
         this.modalVisible = true;
       },
     });
@@ -207,7 +181,7 @@ export class AppointmentComponent implements OnInit {
       this.loggerService.info(this.selectedAppointment);
       let model = this.appointmentForm.value as AppointmentModel;
       model.appointmentDate = this.datePipe.transform(this.appointmentForm.controls['appointmentDate'].value, 'yyyy-MM-dd') ?? "";
-      model.doctorId = this.selectedDoctor?.doctorId ?? 0;
+      model.scheduleId = this.selectedSchedule.scheduleId ?? 0;
       this.appointmentService.create(model).subscribe({
         next: res => {
           this.modalVisible = false;
@@ -305,55 +279,7 @@ export class AppointmentComponent implements OnInit {
   }
   // #endregion
 
-   // #region UI & Event Handlers
-  onAppointmentDateChange(event: any): void {
-    let selectedDate: Date | null = null;
-
-    if (event instanceof Date && !isNaN(event.getTime())) {
-      selectedDate = event;
-    } else if (typeof event === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(event)) {
-      selectedDate = new Date(event);
-    }
-
-    this.selectedAppointmentDate = selectedDate;
-
-    if (!selectedDate) {
-      this.doctors = [];
-      this.selectedDoctor = null;
-      this.appointmentForm.get('doctorId')?.setValue(null);
-      this.appointments = [];
-      return;
-    }
-
-    this.appointmentForm.get('appointmentDate')?.setValue(this.datePipe.transform(selectedDate, 'yyyy-MM-dd'));
-
-    let branchId = Number.parseInt(this.sharedService.getDefaultBranchId() ?? "0");
-    let dayOfWeek = new Date(selectedDate).getDay();
-    this.appointmentService.getDoctorsOnDuty(branchId, dayOfWeek).subscribe({
-      next: (res) => {
-        this.doctors = res.data as DoctorModel[];
-        this.selectedDoctor = null;
-        this.appointments = [];
-      },
-      error: () => {
-        this.loading = false;
-      },
-      complete: () => {
-        this.loading = false;
-      }
-    });
-  }
-
-  onDoctorChange(): void {
-    if (this.selectedDoctor) {
-      this.appointmentForm.get('doctorId')?.setValue(this.selectedDoctor.doctorId);
-    }
-
-    if (this.selectedDoctor && this.selectedAppointmentDate) {
-    } else {
-      this.appointments = [];
-    }
-  }
+  // #region UI & Event Handlers
 
   onPatientChange(): void {
     if (this.selectedPatient) {
@@ -364,36 +290,6 @@ export class AppointmentComponent implements OnInit {
       this.appointmentForm.get('patientId')?.setValue('');
       this.appointmentForm.get('name')?.setValue('');
       this.appointmentForm.get('phoneNo')?.setValue('');
-    }
-  }
-
-  onViewClick(): void {
-    if (!this.selectedAppointmentDate && !this.selectedDoctor) {
-      this.messageService.add({
-        key: 'globalMessage',
-        severity: 'warn',
-        summary: 'Warning',
-        detail: 'Please select both a date and a doctor before viewing Appointments.',
-      });
-    }
-    else if (!this.selectedAppointmentDate) {
-      this.messageService.add({
-        key: 'globalMessage',
-        severity: 'warn',
-        summary: 'Warning',
-        detail: 'Please select a date before viewing Appointments.',
-      });
-    }
-    else if (!this.selectedDoctor) {
-      this.messageService.add({
-        key: 'globalMessage',
-        severity: 'warn',
-        summary: 'Warning',
-        detail: 'Please select a doctor before viewing Appointments.',
-      });
-    }
-    else {
-      this.loadData();
     }
   }
 
@@ -416,22 +312,72 @@ export class AppointmentComponent implements OnInit {
   // #endregion
 
   // #region Helpers
-  // getDoctorDutyTime(doctor: DoctorModel): string {
-  //   if (!this.selectedAppointmentDate) return '';
 
-  //   let date = new Date(this.selectedAppointmentDate);
-  //   let dayOfWeek = date.getDay(); // 0 (Sunday) to 6 (Saturday)
+  OnDoctorChange(event: any): void {
+    this.loggerService.info("Doctor changed");
+    if (this.selectedDoctor) {
+      this.appointmentForm.get('doctorId')?.setValue(this.selectedDoctor.doctorId);
+      this.GetDutytime(this.selectedAppointmentDate);
+    } else {
+      this.appointmentForm.get('doctorId')?.setValue(null);
+    }
+  }
 
-  //   switch (dayOfWeek) {
-  //     case 0: return doctor.sunTime || '';
-  //     case 1: return doctor.monTime || '';
-  //     case 2: return doctor.tueTime || '';
-  //     case 3: return doctor.wedTime || '';
-  //     case 4: return doctor.thuTime || '';
-  //     case 5: return doctor.friTime || '';
-  //     case 6: return doctor.satTime || '';
-  //     default: return '';
-  //   }
-  // }
+  selectSchedule(slot: any) {
+    this.selectedSchedule = slot;
+    // If you want to store the scheduleId in your Reactive Form:
+    this.appointmentForm.patchValue({ scheduleId: slot.scheduleId });
+  }
+
+  GetDutytime(selectedDate: Date): void {
+    if (!selectedDate || !this.selectedDoctor) return;
+
+    // Ensure we have a clean string for day of week
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayOfWeek = days[selectedDate.getDay()];
+
+    const branchId = Number(this.sharedService.getDefaultBranchId() ?? 0);
+    const doctorId = Number(this.selectedDoctor.doctorId);
+
+    this.doctorService.getScheduleByDoctorDay(doctorId, dayOfWeek, branchId).subscribe({
+      next: (res) => {
+        console.log('API Response:', res.data); // Debugging: Check what actually arrived
+
+        const data = res?.data ?? [];
+
+        // Use loose equality (==) or cast both to Number to be safe
+        this.schedules = data.filter((s: any) =>
+          Number(s.doctorId) === doctorId &&
+          s.dayOfWeek.trim().toLowerCase() === dayOfWeek.toLowerCase()
+        );
+
+        console.log('Filtered Schedules:', this.schedules);
+      },
+      error: (err) => {
+        console.error('Fetch error:', err);
+        this.schedules = [];
+      }
+    });
+  }
+
+  getSeverity(status: string) {
+    switch (status.toLowerCase()) {
+      case 'pending': return 'warning';
+      case 'confirmed': return 'info';
+      case 'completed': return 'success';
+      case 'cancelled': return 'danger';
+      default: return 'secondary';
+    }
+  }
+
+  getIcon(status: string) {
+    switch (status.toLowerCase()) {
+      case 'pending': return 'pi pi-clock';
+      case 'confirmed': return 'pi pi-calendar-check';
+      case 'completed': return 'pi pi-check-circle';
+      case 'cancelled': return 'pi pi-times-circle';
+      default: return 'pi pi-question-circle';
+    }
+  }
   // #endregion
 }
