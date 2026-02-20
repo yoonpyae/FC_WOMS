@@ -1,7 +1,7 @@
 <div class="card">
     <p-table #dt1 [value]="appointments" [paginator]="true" [rows]="20" [loading]="loading"
         styleClass="p-datatable-striped" sortField="createdOn" [sortOrder]="-1" [showCurrentPageReport]="true"
-        [globalFilterFields]="['name', 'phoneNo']" [tableStyle]="{ 'min-width': '50rem' }"
+        [globalFilterFields]="['patientName', 'patientPhone']" [tableStyle]="{ 'min-width': '50rem' }"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         [rowsPerPageOptions]="[20, 50, 100]" selectionMode="single" [(selection)]="selectedAppointment" dataKey="ano">
         <ng-template #caption>
@@ -14,49 +14,6 @@
                     <div class="flex flex-col w-full sm:w-auto">
                         <p-splitButton label="Create" icon="pi pi-plus" [model]="items" (onClick)="create()"
                             styleClass="w-full sm:w-auto"></p-splitButton>
-                    </div>
-
-                    <!-- Date Picker -->
-                    <div class="flex flex-col w-full sm:w-auto">
-                        <label class="font-semibold mb-1">Date</label>
-                        <p-date-picker [showIcon]="true" [iconDisplay]="'input'" inputId="icondisplay"
-                            [dateFormat]="'dd MM yy'" [showTime]="false" [(ngModel)]="today" placeholder="Select Date"
-                            (onSelect)="onAppointmentDateChange($event)" [minDate]="minAppointmentDate"
-                            [ngModelOptions]="{ standalone: true }" styleClass="w-full" [style]="{ width: '100%' }">
-                        </p-date-picker>
-                    </div>
-
-                    <!-- Doctor Dropdown -->
-                    <div class="flex flex-col w-full sm:w-auto">
-                        <label class="font-semibold mb-1">Doctor</label>
-                        <p-select [options]="doctors" [(ngModel)]="selectedDoctor" (onChange)="onDoctorChange()"
-                            dataKey="doctorId" [ngModelOptions]="{ standalone: true }" placeholder="Select Doctor"
-                            appendTo="body" class="w-full min-w-[180px]" [loading]="loadingDoctors">
-                            <ng-template let-doctor pTemplate="item">
-                                <div class="flex px-2 py-1 items-center">
-                                    {{ doctor.name }} - {{ doctor.spalized }}
-                                </div>
-                            </ng-template>
-                            <ng-template let-doctor pTemplate="selectedItem">
-                                <div *ngIf="doctor" class="flex items-center">
-                                    {{ doctor.name }}
-                                </div>
-                            </ng-template>
-                        </p-select>
-                    </div>
-
-                    <!-- Time Display -->
-                    <!-- <div class="flex flex-col w-full sm:w-auto">
-                        <label class="font-semibold mb-1">Time</label>
-                        <input type="text" class="p-inputtext p-component text-sm text-blue-600 w-full"
-                            [value]="selectedDoctor ? getDoctorDutyTime(selectedDoctor) : ''" readonly
-                            placeholder="Duty Time" />
-                    </div> -->
-
-                    <!-- View Button -->
-                    <div class="flex flex-col w-full sm:w-auto">
-                        <p-button label="View" icon="pi pi-eye" (onClick)="onViewClick()"
-                            styleClass="w-full sm:w-auto"></p-button>
                     </div>
                 </div>
 
@@ -79,29 +36,30 @@
         <ng-template #header>
             <tr style="white-space: nowrap">
                 <th pFrozenColumn [style]="{ width: '10px' }">#</th>
-                <th pSortableColumn="ano">
-                    Id
-                    <p-sortIcon field="ano"></p-sortIcon>
+                <th pSortableColumn="doctorName">
+                    Doctor
+                    <p-sortIcon field="doctorName"></p-sortIcon>
                 </th>
                 <th pSortableColumn="appointmentDate">
-                    Appointment Date
+                    Date & Time
                     <p-sortIcon field="appointmentDate"></p-sortIcon>
                 </th>
-                <th pSortableColumn="name">
+
+                <th pSortableColumn="patientName">
                     Name
-                    <p-sortIcon field="name"></p-sortIcon>
+                    <p-sortIcon field="patientName"></p-sortIcon>
                 </th>
-                <th pSortableColumn="phoneNo">
-                    phoneNo
-                    <p-sortIcon field="phoneNo"></p-sortIcon>
+                <th pSortableColumn="patientPhone">
+                    Patient Phone
+                    <p-sortIcon field="patientPhone"></p-sortIcon>
                 </th>
                 <th pSortableColumn="status">
                     Status
                     <p-sortIcon field="status"></p-sortIcon>
                 </th>
-                <th pSortableColumn="remark">
+                <th pSortableColumn="appointmentRemark">
                     Remark
-                    <p-sortIcon field="remark"></p-sortIcon>
+                    <p-sortIcon field="appointmentRemark"></p-sortIcon>
                 </th>
                 <th pSortableColumn="createdOn">
                     Created On
@@ -118,17 +76,23 @@
                 <td>
                     <span class="pi pi-circle" [class.pi-check-circle]="selectedAppointment === appointment"></span>
                 </td>
-                <td>{{ appointment.ano }}</td>
-                <td>{{ appointment.appointmentDate | date: "dd MMM yyyy" }} </td>
-                <td>{{ appointment.name }}</td>
-                <td>{{ appointment.phoneNo }}</td>
+                <td>{{ appointment.doctorName }}</td>
                 <td>
-                    <p-tag value="{{ appointment.status ? 'Active' : 'Inactive' }}"
-                        [severity]="appointment.status ? 'success' : 'info'" icon="{{
-              appointment.status ? 'pi pi-check' : 'pi pi-minus-circle'
-            }}" [rounded]="true"></p-tag>
+                    <span class="mr-2">{{ appointment.appointmentDate | date: "dd MMM yyyy" }}</span>
+                    <span
+                        class="bg-blue-50 text-blue-600 border-round px-2 py-1 text-xs font-medium border-1 border-blue-100">
+                        {{ appointment.startTime }}
+                    </span>
                 </td>
-                <td>{{ appointment.remark }}</td>
+                <td>{{ appointment.patientName }}</td>
+                <td>{{ appointment.patientPhone }}</td>
+                <td>
+                    <p-tag [value]="appointment.appointmentStatus"
+                        [severity]="getSeverity(appointment.appointmentStatus)"
+                        [icon]="getIcon(appointment.appointmentStatus)" [rounded]="true">
+                    </p-tag>
+                </td>
+                <td>{{ appointment.appointmentRemark }}</td>
                 <td>{{ appointment.createdOn | date: "dd/MMM/yyyy hh:mm:ss a" }}</td>
                 <td>{{ appointment.createdBy }}</td>
             </tr>
@@ -150,13 +114,6 @@
     <form [formGroup]="appointmentForm" (ngSubmit)="submit()">
         <div class="grid grid-cols-1 gap-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-                <!-- Appointment Number -->
-                <div class="flex flex-col gap-1">
-                    <label class="font-semibold">Appointment No</label>
-                    <input formControlName="ano" pInputText readonly class="bg-gray-100" />
-                </div>
-
                 <!-- Appointment Date -->
                 <div class="flex flex-col gap-1">
                     <label class="font-semibold">Appointment Date</label>
@@ -169,20 +126,39 @@
                 <!-- Doctor -->
                 <div class="flex flex-col gap-1">
                     <label class="font-semibold">Doctor</label>
-                    <input pInputText readonly class="bg-gray-100" [value]="selectedDoctor?.name" />
+                    <app-doctor-drop-down id="referDoctor" [(ngModel)]="selectedDoctor"
+                        [ngModelOptions]="{ standalone: true }" (onValueChange)="OnDoctorChange(selectedDoctor)"
+                        optionLabel="name" required [style]="{ width: '100%' }">
+                    </app-doctor-drop-down>
                 </div>
 
-                <!-- Duty Time -->
-                <!-- <div class="flex flex-col gap-1">
-                    <label class="font-semibold">Duty Time</label>
-                    <input type="text" class="p-inputtext p-component text-sm text-blue-600 bg-gray-100"
-                        [value]="selectedDoctor ? getDoctorDutyTime(selectedDoctor) : ''" readonly />
-                </div> -->
+                <div class="flex flex-col gap-2 mt-2" *ngIf="schedules.length > 0">
+                    <label class="font-semibold text-primary">Available Time Slots</label>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        <div *ngFor="let slot of schedules">
+                            <button type="button" (click)="selectSchedule(slot)"
+                                [ngClass]="selectedSchedule.scheduleId === slot.scheduleId ? 'bg-primary text-white border-primary' : 'bg-white text-gray-700 border-gray-300'"
+                                class="w-full py-2 px-3 border rounded-lg text-sm font-medium transition-all hover:border-primary flex items-center justify-center gap-2">
+                                <i class="pi pi-clock"></i>
+                                {{ slot.startTime }} - {{ slot.endTime }}
+                            </button>
+                        </div>
+                    </div>
+                    <small *ngIf="!selectedSchedule" class="text-red-500 text-xs">Please select a time
+                        slot.</small>
+                </div>
+
+                <div class="p-3 bg-orange-50 border-round mt-2" *ngIf="selectedDoctor && schedules.length === 0">
+                    <span class="text-orange-700 text-sm">
+                        <i class="pi pi-exclamation-triangle mr-1"></i>
+                        No available duty time for this doctor on the selected date.
+                    </span>
+                </div>
             </div>
 
             <!-- Patient Selection -->
             <div class="flex flex-col gap-1">
-                <label class="font-semibold">Patient (Optional)</label>
+                <label class="font-semibold">Patient</label>
                 <app-patient-drop-down [(ngModel)]="selectedPatient" (onValueChange)="onPatientChange()"
                     [ngModelOptions]="{ standalone: true }"></app-patient-drop-down>
             </div>
@@ -214,6 +190,22 @@
                 <textarea formControlName="remark" pInputText placeholder="Enter Remark..." rows="4"
                     class="w-full"></textarea>
             </div>
+
+            <!-- Status -->
+            <p-dropdown formControlName="status" [options]="statuses" optionLabel="label" optionValue="value"
+                class="w-full">
+                <ng-template pTemplate="selectedItem">
+                    <div class="flex align-items-center" *ngIf="appointmentForm.get('status')?.value">
+                        <p-tag [value]="appointmentForm.get('status')?.value"
+                            [severity]="getSeverity(appointmentForm.get('status')?.value)">
+                        </p-tag>
+                    </div>
+                </ng-template>
+
+                <ng-template let-status pTemplate="item">
+                    <p-tag [value]="status.label" [severity]="getSeverity(status.value)"></p-tag>
+                </ng-template>
+            </p-dropdown>
 
             <!-- Action Buttons -->
             <div class="flex justify-end mt-2 gap-2">
