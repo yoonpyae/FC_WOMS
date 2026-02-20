@@ -1,123 +1,149 @@
 <p-toast key="globalMessage"></p-toast>
 
+<div class="flex items-center gap-3 mb-6">
+    <p-button icon="pi pi-arrow-left" styleClass="p-button-rounded p-button-text p-button-secondary"
+        (onClick)="goBack()"></p-button>
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white m-0">Doctor Details</h1>
+</div>
+
 <div *ngIf="!loading && doctor; else loadingTpl" class="flex flex-col gap-6">
 
-    <!-- Doctor Header Card -->
-    <div class="flex flex-col md:flex-row bg-white rounded-xl shadow p-6 gap-6">
+    <div
+        class="flex flex-col md:flex-row bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 gap-6 transition-colors duration-200">
 
-        <!-- Photo + Upload -->
         <div class="flex flex-col items-center gap-4 w-full md:w-48">
-            <p-avatar [image]="doctor.photo || DEFAULT_IMAGE_URL" shape="circle" size="xlarge"></p-avatar>
+            <p-avatar [image]="doctor.photo || DEFAULT_IMAGE_URL" shape="circle" size="xlarge"
+                class="shadow-sm"></p-avatar>
             <div class="flex flex-wrap gap-2 justify-center">
-                <p-button label="Upload Photo" icon="pi pi-upload" (click)="triggerPhotoInput()" class="p-button-success"></p-button>
-                <input #photoInput type="file" accept="image/*" (change)="onPhotoSelected($event)" style="display:none" />
+                <p-button label="Profile" icon="pi pi-upload" (click)="upload(doctor)"
+                    styleClass="p-button-success p-button-sm"></p-button>
 
-                <p-button label="Upload Sign" icon="pi pi-file-upload" (click)="triggerSignInput()" class="p-button-secondary"></p-button>
-                <input #signInput type="file" accept="image/*" (change)="onSignSelected($event)" style="display:none" />
+                <!-- <p-button label="Signature" icon="pi pi-file-upload" (click)="triggerSignInput()"
+                    styleClass="p-button-secondary p-button-sm"></p-button> -->
             </div>
         </div>
 
-        <!-- Info Section -->
         <div class="flex-1 flex flex-col justify-between gap-4">
             <div>
-                <div class="text-2xl font-bold">{{ doctor.name }}</div>
-                <div class="text-gray-500">{{ doctor.degree }} • {{ doctor.specialized }}</div>
+                <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ doctor.name }}</div>
+                <div class="text-gray-500 dark:text-gray-400 font-medium">{{ doctor.degree }} &bull; {{
+                    doctor.specialized }}</div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+            <div
+                class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-100 dark:border-gray-700">
                 <div>
-                    <div class="text-xs text-gray-400">Status</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Status</div>
                     <p-tag [value]="doctor.status ? 'Active' : 'Inactive'"
                         [severity]="doctor.status ? 'success' : 'danger'"></p-tag>
                 </div>
                 <div>
-                    <div class="text-xs text-gray-400">Consultant Fee</div>
-                    <div class="text-sm">{{ doctor.consultantFee | currency }}</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Consultant Fee
+                    </div>
+                    <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ doctor.consultantFee | currency
+                        }}</div>
                 </div>
                 <div>
-                    <div class="text-xs text-gray-400">Created</div>
-                    <div class="text-sm">{{ doctor.createdOn || '—' }}</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Created</div>
+                    <div class="text-sm text-gray-900 dark:text-gray-300">{{ doctor.createdOn || '—' }}</div>
                 </div>
                 <div>
-                    <div class="text-xs text-gray-400">Updated</div>
-                    <div class="text-sm">{{ doctor.updatedOn || '—' }}</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Updated</div>
+                    <div class="text-sm text-gray-900 dark:text-gray-300">{{ doctor.updatedOn || '—' }}</div>
                 </div>
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex md:flex-col justify-end gap-2 md:gap-4 w-full md:w-auto">
-            <p-button icon="pi pi-pencil" label="Edit" class="p-button-warning w-full md:w-auto"></p-button>
-            <p-button icon="pi pi-trash" label="Delete" class="p-button-danger w-full md:w-auto"></p-button>
+        <div
+            class="flex flex-row md:flex-col justify-end gap-3 w-full md:w-auto mt-4 md:mt-0 border-t md:border-t-0 md:border-l border-gray-100 dark:border-gray-700 pt-4 md:pt-0 md:pl-4">
+            <p-button icon="pi pi-pencil" label="Edit" styleClass="p-button-warning w-full md:w-auto"></p-button>
+            <p-button icon="pi pi-trash" label="Delete"
+                styleClass="p-button-danger p-button-outlined w-full md:w-auto"></p-button>
         </div>
 
     </div>
 
-    <!-- Doctor Schedule -->
-    <div>
-        <p-fieldset legend="Doctor Schedule" class="bg-white rounded-xl p-6 shadow">
+    <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 transition-colors duration-200">
 
-            <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-                <div class="font-semibold text-lg">Schedules</div>
-                <p-button label="Add Schedule" icon="pi pi-plus" (click)="openScheduleDialog()"></p-button>
-            </div>
+        <div
+            class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 border-b border-gray-100 dark:border-gray-700 pb-4">
+            <div class="font-bold text-xl text-gray-900 dark:text-white">Doctor Schedule</div>
+            <p-button label="Add Schedule" icon="pi pi-plus" (click)="openScheduleDialog()"
+                styleClass="p-button-sm"></p-button>
+        </div>
 
-            <p-table [value]="schedules" [paginator]="true" [rows]="5" responsiveLayout="scroll">
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th>Day</th>
-                        <th>Start</th>
-                        <th>End</th>
-                        <th>Max Patient</th>
-                        <th style="width:120px">Actions</th>
-                    </tr>
-                </ng-template>
+        <p-table [value]="schedules" [paginator]="true" [rows]="5" responsiveLayout="scroll"
+            styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Day</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Max Patient</th>
+                    <th style="width:120px; text-align: center;">Actions</th>
+                </tr>
+            </ng-template>
 
-                <ng-template pTemplate="body" let-row>
-                    <tr>
-                        <td>{{ row.dayOfWeek }}</td>
-                        <td>{{ row.startTime }}</td>
-                        <td>{{ row.endTime }}</td>
-                        <td>{{ row.maxPatient }}</td>
-                        <td>
-                            <p-button icon="pi pi-pencil" class="p-button-rounded p-button-text"></p-button>
-                            <p-button icon="pi pi-trash"
-                                class="p-button-rounded p-button-text p-button-danger ml-2"></p-button>
-                        </td>
-                    </tr>
-                </ng-template>
+            <ng-template pTemplate="body" let-row>
+                <tr>
+                    <td class="font-medium text-gray-900 dark:text-gray-200">{{ row.dayOfWeek }}</td>
+                    <td class="text-gray-600 dark:text-gray-400">{{ row.startTime }}</td>
+                    <td class="text-gray-600 dark:text-gray-400">{{ row.endTime }}</td>
+                    <td class="text-gray-600 dark:text-gray-400">{{ row.maxPatient }}</td>
+                    <td class="text-center">
+                        <p-button icon="pi pi-pencil"
+                            styleClass="p-button-rounded p-button-text p-button-sm"></p-button>
+                        <p-button icon="pi pi-trash"
+                            styleClass="p-button-rounded p-button-text p-button-danger p-button-sm ml-2"></p-button>
+                    </td>
+                </tr>
+            </ng-template>
 
-                <ng-template pTemplate="emptymessage">
-                    <tr>
-                        <td colspan="5" class="text-center text-gray-400">No schedules available.</td>
-                    </tr>
-                </ng-template>
-            </p-table>
-
-        </p-fieldset>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="5" class="text-center p-8 text-gray-500 dark:text-gray-400">
+                        <i class="pi pi-calendar-times text-3xl mb-2 block"></i>
+                        No schedules available.
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
     </div>
 
-    <!-- Schedule Dialog -->
     <p-dialog header="Add Schedule" [(visible)]="scheduleDialogVisible" [modal]="true"
         [style]="{ width: '100%', maxWidth: '400px' }">
-        <div class="p-fluid flex flex-col gap-3">
-            <label>Day Of Week</label>
-            <select [(ngModel)]="newSchedule.dayOfWeek" class="p-dropdown p-inputtext w-full">
-                <option value="" disabled selected>Select Day</option>
-                <option *ngFor="let day of days" [value]="day.value">{{ day.label }}</option>
-            </select>
+        <div class="p-fluid flex flex-col gap-4 mt-2">
 
-            <label>Start Time</label>
-            <input type="time" pInputText [(ngModel)]="newSchedule.startTime" />
+            <div class="flex flex-col gap-1">
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Day Of Week</label>
+                <select [(ngModel)]="newSchedule.dayOfWeek" class="p-inputtext w-full">
+                    <option value="" disabled selected>Select Day</option>
+                    <option *ngFor="let day of days" [value]="day.value">{{ day.label }}</option>
+                </select>
+            </div>
 
-            <label>End Time</label>
-            <input type="time" pInputText [(ngModel)]="newSchedule.endTime" />
+            <div class="flex gap-4">
+                <div class="flex flex-col gap-1 flex-1">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Start Time</label>
+                    <input type="time" pInputText [(ngModel)]="newSchedule.startTime" />
+                </div>
+                <div class="flex flex-col gap-1 flex-1">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">End Time</label>
+                    <input type="time" pInputText [(ngModel)]="newSchedule.endTime" />
+                </div>
+            </div>
 
-            <label>Max Patient</label>
-            <input type="number" pInputText [(ngModel)]="newSchedule.maxPatient" />
+            <div class="flex flex-col gap-1">
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Max Patient</label>
+                <input type="number" pInputText [(ngModel)]="newSchedule.maxPatient" />
+            </div>
 
-            <div class="flex justify-end mt-4">
-                <p-button label="Save" (click)="saveSchedule()" class="p-button-success"></p-button>
+            <div class="flex justify-end gap-2 mt-2 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <p-button label="Cancel" (click)="scheduleDialogVisible = false"
+                    styleClass="p-button-text p-button-secondary"></p-button>
+                <p-button label="Save" icon="pi pi-check" (click)="saveSchedule()"
+                    styleClass="p-button-success"></p-button>
             </div>
         </div>
     </p-dialog>
@@ -125,5 +151,52 @@
 </div>
 
 <ng-template #loadingTpl>
-    <div class="p-4 bg-white rounded-xl shadow text-center text-gray-500">Loading doctor details…</div>
+    <div
+        class="flex flex-col items-center justify-center p-12 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 text-gray-500 dark:text-gray-400">
+        <i class="pi pi-spin pi-spinner text-3xl mb-4 text-primary"></i>
+        <span class="font-medium text-lg">Loading doctor details…</span>
+    </div>
 </ng-template>
+
+<!--#region File-->
+<p-dialog header="Upload Files" [(visible)]="uploadVisible" [breakpoints]="{
+    '1920px': '50vw',
+    '1440px': '30vw',
+    '1024px': '30vw',
+    '768px': '80vw',
+    '425px': '100vw',
+    '375px': '100vw',
+    '320px': '100vw',
+  }" [modal]="true" [style]="{ 'min-width': '50vw' }" [draggable]="false" [resizable]="false">
+  <ng-container *ngIf="loading; else uploadContent">
+    <div class="flex items-center justify-center py-8">
+      <i class="pi pi-spin pi-spinner text-3xl mr-2"></i>
+      <span>Uploading file...</span>
+    </div>
+  </ng-container>
+  <ng-template #uploadContent>
+    <p-fileUpload name="files[]" mode="advanced" [multiple]="true" (onSelect)="onSelectedPhotos($event)"
+      [maxFileSize]="5242880">
+      <ng-template pTemplate="header" let-files let-chooseCallback="chooseCallback" let-clearCallback="clearCallback"
+        let-uploadCallback="uploadCallback">
+        <div class="flex flex-wrap flex-1 gap-2">
+          <div class="flex gap-2">
+            <p-button icon="pi pi-images" [rounded]="true" [outlined]="true"
+              (click)="choose($event, chooseCallback)"></p-button>
+            <p-button icon="pi pi-cloud-upload" (onClick)="importPhoto(clearCallback)" [rounded]="true"
+              [outlined]="true" severity="success" [disabled]="!files || files.length === 0" />
+            <p-button (onClick)="clearCallback()" icon="pi pi-times" [rounded]="true" [outlined]="true"
+              severity="danger" [disabled]="!files || files.length === 0" />
+          </div>
+        </div>
+      </ng-template>
+      <ng-template #empty>
+        <div class="flex items-center justify-center flex-col">
+          <i class="pi pi-cloud-upload !border-2 !rounded-full !p-8 !text-4xl !text-muted-color"></i>
+          <p class="mt-6 mb-0">Drag and drop files to here to upload.</p>
+        </div>
+      </ng-template>
+    </p-fileUpload>
+  </ng-template>
+</p-dialog>
+<!--#endregion-->
