@@ -100,123 +100,129 @@
     </p-table>
 </div>
 
-<p-dialog header="Create Appointment" [(visible)]="modalVisible" (onShow)="setAutoFocus()" (onHide)="clearSelection()"
-    [breakpoints]="{
-    '1920px': '30vw',
-    '1440px': '40vw',
-    '1024px': '50vw',
-    '768px': '60vw',
-    '425px': '90vw',
-    '375px': '95vw',
-    '320px': '98vw'
-  }" [modal]="true" [style]="{ 'min-width': '320px', 'max-width': '500px', 'width': '100%' }" [draggable]="false"
-    [resizable]="false">
-    <form [formGroup]="appointmentForm" (ngSubmit)="submit()">
-        <div class="grid grid-cols-1 gap-4">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- Appointment Date -->
-                <div class="flex flex-col gap-1">
-                    <label class="font-semibold">Appointment Date</label>
-                    <input pInputText readonly class="bg-gray-100"
-                        [value]="selectedAppointmentDate | date: 'dd MMM yyyy'" />
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<p-dialog header="New Appointment" [(visible)]="modalVisible" [modal]="true" [draggable]="false" [resizable]="false"
+    [dismissableMask]="true" [style]="{ width: '95vw', 'max-width': '520px' }" styleClass="clean-dialog">
 
-                <!-- Doctor -->
-                <div class="flex flex-col gap-1">
-                    <label class="font-semibold">Doctor</label>
-                    <app-doctor-drop-down id="referDoctor" [(ngModel)]="selectedDoctor"
-                        [ngModelOptions]="{ standalone: true }" (onValueChange)="OnDoctorChange(selectedDoctor)"
-                        optionLabel="name" required [style]="{ width: '100%' }">
+    <form [formGroup]="appointmentForm" (ngSubmit)="submit()" class="p-fluid space-y-5">
+
+        <!-- SCHEDULE SECTION -->
+        <div class="space-y-4">
+
+            <div class="text-lg font-semibold text-900">
+                <i class="pi pi-calendar mr-2"></i> Schedule Information
+            </div>
+
+            <div class="grid grid-cols-1 gap-4">
+
+                <!-- DATE PICKER -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-700 font-medium">Appointment Date</label>
+                    <p-date-picker [showIcon]="true" [iconDisplay]="'input'" inputId="icondisplay"
+                        [dateFormat]="'dd MM yy'" [showTime]="false" [(ngModel)]="selectedAppointmentDate"
+                        placeholder="Select Date" [minDate]="today" [ngModelOptions]="{ standalone: true }"
+                        styleClass="w-full" [style]="{ width: '100%' }" dateFormat="dd M yy">
+                    </p-date-picker>
+                </div>
+
+                <!-- DOCTOR -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-700 font-medium">Doctor</label>
+                    <app-doctor-drop-down [(ngModel)]="selectedDoctor" [ngModelOptions]="{ standalone: true }"
+                        (onValueChange)="OnDoctorChange(selectedDoctor)" optionLabel="name"
+                        placeholder="Select a Specialist">
                     </app-doctor-drop-down>
                 </div>
 
-                <div class="flex flex-col gap-2 mt-2" *ngIf="schedules.length > 0">
-                    <label class="font-semibold text-primary">Available Time Slots</label>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        <div *ngFor="let slot of schedules">
-                            <button type="button" (click)="selectSchedule(slot)"
-                                [ngClass]="selectedSchedule.scheduleId === slot.scheduleId ? 'bg-primary text-white border-primary' : 'bg-white text-gray-700 border-gray-300'"
-                                class="w-full py-2 px-3 border rounded-lg text-sm font-medium transition-all hover:border-primary flex items-center justify-center gap-2">
-                                <i class="pi pi-clock"></i>
-                                {{ slot.startTime }} - {{ slot.endTime }}
-                            </button>
-                        </div>
-                    </div>
-                    <small *ngIf="!selectedSchedule" class="text-red-500 text-xs">Please select a time
-                        slot.</small>
+            </div>
+
+            <!-- TIME SLOTS -->
+            <div *ngIf="schedules.length > 0" class="space-y-2">
+                <label class="text-700 font-medium">Available Time</label>
+
+                <div class="flex flex-wrap gap-2">
+                    <button *ngFor="let slot of schedules" type="button" (click)="selectSchedule(slot)" [ngClass]="selectedSchedule?.scheduleId === slot.scheduleId 
+                            ? 'bg-primary text-white border-primary' 
+                            : 'bg-white border-300 text-700 hover:surface-100'"
+                        class="px-4 py-2 border border-round-lg text-sm font-medium transition-all">
+
+                        {{ slot.startTime }} - {{ slot.endTime }}
+                    </button>
                 </div>
 
-                <div class="p-3 bg-orange-50 border-round mt-2" *ngIf="selectedDoctor && schedules.length === 0">
-                    <span class="text-orange-700 text-sm">
-                        <i class="pi pi-exclamation-triangle mr-1"></i>
-                        No available duty time for this doctor on the selected date.
-                    </span>
-                </div>
+                <small *ngIf="!selectedSchedule" class="text-red-500">
+                    Please select a time slot.
+                </small>
             </div>
 
-            <!-- Patient Selection -->
-            <div class="flex flex-col gap-1">
-                <label class="font-semibold">Patient</label>
-                <app-patient-drop-down [(ngModel)]="selectedPatient" (onValueChange)="onPatientChange()"
-                    [ngModelOptions]="{ standalone: true }"></app-patient-drop-down>
+            <!-- NO SCHEDULE -->
+            <div *ngIf="selectedDoctor && schedules.length === 0"
+                class="p-3 border-round-lg bg-yellow-50 text-yellow-700 text-sm">
+                No availability found for this doctor on selected date.
             </div>
 
-            <!-- Name -->
-            <div class="flex flex-col gap-1">
-                <label class="font-semibold">Name <span class="text-red-500">*</span></label>
-                <input #nameInput formControlName="name" pInputText placeholder="Enter Name..." required autofocus
-                    [readonly]="selectedPatient !== null" />
-                <small *ngIf="appointmentForm.controls['name'].invalid && appointmentForm.get('name')?.dirty"
-                    class="text-xs text-red-500">Name is required.</small>
-            </div>
-
-            <!-- Phone Number -->
-            <div class="flex flex-col gap-1">
-                <label class="font-semibold">Phone Number <span class="text-red-500">*</span></label>
-                <input formControlName="phoneNo" pInputText placeholder="Enter Phone Number..." required inputmode="tel"
-                    [readonly]="selectedPatient !== null" />
-                <small *ngIf="appointmentForm.controls['phoneNo'].invalid && appointmentForm.get('phoneNo')?.dirty"
-                    class="text-xs text-red-500">Phone number is required.</small>
-                <small
-                    *ngIf="appointmentForm.controls['phoneNo'].invalid && appointmentForm.get('phoneNo')?.dirty && appointmentForm.get('phoneNo')?.touched"
-                    class="text-xs text-red-500">Phone format is invalid.</small>
-            </div>
-
-            <!-- Remark -->
-            <div class="flex flex-col gap-1">
-                <label class="font-semibold">Remark</label>
-                <textarea formControlName="remark" pInputText placeholder="Enter Remark..." rows="4"
-                    class="w-full"></textarea>
-            </div>
-
-            <!-- Status -->
-            <p-dropdown formControlName="status" [options]="statuses" optionLabel="label" optionValue="value"
-                class="w-full">
-                <ng-template pTemplate="selectedItem">
-                    <div class="flex align-items-center" *ngIf="appointmentForm.get('status')?.value">
-                        <p-tag [value]="appointmentForm.get('status')?.value"
-                            [severity]="getSeverity(appointmentForm.get('status')?.value)">
-                        </p-tag>
-                    </div>
-                </ng-template>
-
-                <ng-template let-status pTemplate="item">
-                    <p-tag [value]="status.label" [severity]="getSeverity(status.value)"></p-tag>
-                </ng-template>
-            </p-dropdown>
-
-            <!-- Action Buttons -->
-            <div class="flex justify-end mt-2 gap-2">
-                <p-button label="Cancel" icon="pi pi-times" severity="secondary" (onClick)="modalVisible=false"
-                    type="button" styleClass="p-button-text"></p-button>
-                <p-button icon="pi pi-check" label="Save" type="submit" [loading]="isSubmitting"
-                    severity="success"></p-button>
-            </div>
         </div>
+
+        <!-- PATIENT SECTION -->
+        <div class="space-y-4">
+
+            <div class="text-lg font-semibold text-900">
+                <i class="pi pi-user mr-2"></i> Patient Information
+            </div>
+
+
+
+            <div class="grid grid-cols-1 gap-4">
+                <div class="flex flex-col gap-2">
+                    <app-patient-drop-down [(ngModel)]="selectedPatient" (onValueChange)="onPatientChange()"
+                        [ngModelOptions]="{ standalone: true }">
+                    </app-patient-drop-down>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label class="text-700 font-medium">
+                        Phone Number <span class="text-red-500">*</span>
+                    </label>
+                    <input formControlName="phoneNo" pInputText placeholder="09xxxxxxxxx"
+                        [readonly]="selectedPatient !== null" class="w-full">
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- STATUS -->
+        <div class="flex flex-col gap-2">
+            <label class="text-700 font-medium">Status</label>
+            <p-dropdown formControlName="status" [options]="statuses" optionLabel="label" optionValue="value"
+                styleClass="w-full border-round-lg"> <ng-template pTemplate="selectedItem">
+                    <div class="flex align-items-center" *ngIf="appointmentForm.get('status')?.value"> <p-tag
+                            [value]="appointmentForm.get('status')?.value"
+                            [severity]="getSeverity(appointmentForm.get('status')?.value)"> </p-tag> </div>
+                </ng-template> <ng-template let-status pTemplate="item"> <p-tag [value]="status.label"
+                        [severity]="getSeverity(status.value)"></p-tag> </ng-template> </p-dropdown>
+        </div>
+
+        <!-- NOTES -->
+        <div class="flex flex-col gap-2">
+            <label class="text-700 font-medium">Remarks</label>
+            <textarea formControlName="remark" pInputText placeholder="Enter Remark..." rows="1"
+                class="w-full"></textarea>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="flex justify-content-end gap-3 pt-4 border-top-1 border-100">
+
+            <p-button label="Cancel" severity="secondary" (onClick)="modalVisible=false" type="button"
+                styleClass="p-button-text">
+            </p-button>
+
+            <p-button label="Confirm" icon="pi pi-check" type="submit" [loading]="isSubmitting" severity="success">
+            </p-button>
+
+        </div>
+
     </form>
 </p-dialog>
+
 
 <p-confirmDialog [breakpoints]="{
     '1920px': '30vw',
