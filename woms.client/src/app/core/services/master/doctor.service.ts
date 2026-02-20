@@ -37,6 +37,10 @@ export class DoctorService {
     return this.httpClient.get<RootModel>(`${environment.main_url}/master/doctorschedules?doctorId=${doctorId}&branchId=${branchId}`);
   }
 
+  getScheduleByDoctorDay(doctorId: number, dayOfWeek: string, branchId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/doctorschedules/by-doctor-day?doctorId=${doctorId}&dayOfWeek=${dayOfWeek}&branchId=${branchId}`);
+  }
+
   create(model: DoctorModel) {
     return this.httpClient.post<RootModel>(`${environment.main_url}/master/doctors`, model);
   }
