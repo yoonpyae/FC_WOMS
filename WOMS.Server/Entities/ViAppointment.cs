@@ -21,16 +21,11 @@ public partial class ViAppointment
 
     public string? AppointmentRemark { get; set; }
 
-    [StringLength(20)]
-    public string PatientId { get; set; } = null!;
-
     [StringLength(200)]
-    public string PatientName { get; set; } = null!;
+    public string? PatientName { get; set; }
 
     [StringLength(50)]
-    public string PatientPhone { get; set; } = null!;
-
-    public long ScheduleId { get; set; }
+    public string? PatientPhone { get; set; }
 
     [StringLength(50)]
     public string? DayOfWeek { get; set; }
@@ -39,19 +34,22 @@ public partial class ViAppointment
 
     public TimeOnly? EndTime { get; set; }
 
-    public long DoctorId { get; set; }
-
     [StringLength(200)]
     public string? DoctorName { get; set; }
 
     [StringLength(500)]
-    public string? Spalized { get; set; }
+    public string? Specialized { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedOn { get; set; }
 
     [StringLength(256)]
     public string? CreatedBy { get; set; }
+
+    public long ScheduleId { get; set; }
+
+    [StringLength(20)]
+    public string? PatientId { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? UpdatedOn { get; set; }
