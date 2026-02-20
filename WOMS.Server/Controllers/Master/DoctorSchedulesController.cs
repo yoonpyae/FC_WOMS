@@ -25,6 +25,14 @@ namespace WOMS.Server.Controllers.Master
                 await repo.DoctorSchedules.GetAsync(x => x.DoctorId == doctorId && x.BranchId == branchId),
                 null);
 
+        [HttpGet("by-doctor-day")]
+        [EndpointSummary("Get By doctor Id and day")]
+        [EndpointDescription("Get DoctorSchedules by doctor Id and day")]
+        public async Task<IActionResult> GetByDoctorAndDay(long branchId, long doctorId, string dayOfWeek)
+            => ResponseHelper.OK_Result(
+                await repo.DoctorSchedules.GetAsync(x => x.DoctorId == doctorId && x.DayOfWeek == dayOfWeek && x.BranchId == branchId),
+                null);
+
         [HttpGet("auto-scheduleId")]
         [EndpointSummary("Get Auto ScheduleId")]
         [EndpointDescription("Get an DoctorSchedules max Id")]
