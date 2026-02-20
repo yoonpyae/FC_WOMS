@@ -16,42 +16,32 @@ public class AppointmentsController(IRepositoryWrapper repo) : ControllerBase
         => ResponseHelper.OK_Result(
             await repo.ViAppointments.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId), null);
 
-    //[HttpGet("doctors-on-duty")]
-    //[EndpointSummary("Doctors on Duty")]
-    //[EndpointDescription("Lists all doctors who have duty on the selected day.")]
-    //public async Task<IActionResult> GetDoctorsOnDuty(long branchId, int dayOfWeek)
-    //{
-    //    if (dayOfWeek < 0 || dayOfWeek > 6)
-    //        return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Invalid day of the week.", ""));
+    [HttpGet("doctors-on-duty")]
+    [EndpointSummary("Doctors on Duty")]
+    [EndpointDescription("Lists all doctors who have duty on the selected day.")]
+    public async Task<IActionResult> GetDoctorsOnDuty(long branchId, string dayOfWeek)
+    {
+        if (string.IsNullOrWhiteSpace(dayOfWeek))
+            return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Day of week is required.", ""));
 
-    //    string? dutyDayProperty = ((DayOfWeek)dayOfWeek) switch
-    //    {
-    //        DayOfWeek.Monday => nameof(Doctor.MonTime),
-    //        DayOfWeek.Tuesday => nameof(Doctor.TueTime),
-    //        DayOfWeek.Wednesday => nameof(Doctor.WedTime),
-    //        DayOfWeek.Thursday => nameof(Doctor.ThuTime),
-    //        DayOfWeek.Friday => nameof(Doctor.FriTime),
-    //        DayOfWeek.Saturday => nameof(Doctor.SatTime),
-    //        DayOfWeek.Sunday => nameof(Doctor.SunTime),
-    //        _ => null
-    //    };
+        // Optional: Normalize day string
+        string normalizedDay = dayOfWeek.Trim().ToLowerInvariant();
 
-    //    IReadOnlyList<Doctor>? doctorsOnDuty = await repo.Doctors.GetAsync(x =>
-    //        x.BranchId == branchId &&
-    //        !string.IsNullOrEmpty(EF.Property<string>(x, dutyDayProperty!)) &&
-    //        !x.DeletedOn.HasValue);
+        IReadOnlyList<DoctorSchedule>? doctorsOnDuty = await repo.DoctorSchedules.GetAsync(x =>
+            x.BranchId == branchId &&
+            !x.DeletedOn.HasValue &&
+            x.DayOfWeek.ToLower() == normalizedDay);
 
-    //    return ResponseHelper.OK_Result(doctorsOnDuty, null);
-    //}
+        return ResponseHelper.OK_Result(doctorsOnDuty, null);
+    }
 
     [HttpGet("doctor-appointments")]
     [EndpointSummary("Doctor's Appointments")]
     [EndpointDescription("Lists all Appointments for a specific doctor on the selected date.")]
-    public async Task<IActionResult> GetDoctorAppointments(long branchId, long doctorId, DateOnly appointmentDate)
+    public async Task<IActionResult> GetDoctorAppointments(long branchId, DateOnly appointmentDate)
          => ResponseHelper.OK_Result(
               await repo.ViAppointments.GetAsync(x =>
                   x.BranchId == branchId &&
-                  x.DoctorId == doctorId &&
                   x.AppointmentDate == appointmentDate &&
                   !x.DeletedOn.HasValue), null);
 
