@@ -4,9 +4,8 @@ namespace WOMS.Server.Controllers.Master;
 [Route("api/master/[controller]")]
 [ApiController]
 public class DoctorsController(
-    IRepositoryWrapper repo,
+  IRepositoryWrapper repo,
     IFileService fileService,
-    IConvertion convertion,
     IConfiguration config) : ControllerBase
 {
     #region CRUD Operation
@@ -142,27 +141,48 @@ public class DoctorsController(
     [ValidateModel]
     [EndpointSummary("Upload-photo")]
     [EndpointDescription("Upload Image")]
-    public async Task<IActionResult> ImportImageAsync(long id, IFormFile photo)
+    public async Task<IActionResult> UploadPhoto(long id, IFormFile photo)
     {
-        if (photo == null || photo.Length == 0)
-            return BadRequest(new DefaultResponseMessageModel("No photo uploaded.", ""));
-
         try
         {
             Doctor? doctor = await repo.Doctors.GetFirstAsync(x => x.DoctorId == id);
-            if (doctor == null)
-                return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Doctor not found.", ""));
+            if (doctor != null)
+            {
+                if (!string.IsNullOrEmpty(doctor.Photo))
+                {
+                    DeleteExistingFile(doctor.Photo); // Delete the existing file if it exists
+                }
 
-            if (!string.IsNullOrEmpty(doctor.Photo))
-                DeleteExistingFile(doctor.Photo);
+                if (photo == null || photo.Length == 0)
+                {
+                    return BadRequest("No file uploaded.");
+                }
 
-            string extension = GetExtension(photo);
-            string filePath = $"files/doctor/photo/{doctor.DoctorId}{extension}";
+                string[] allowedExtensions = { ".jpg", ".jpeg", ".png" };
+                string extension = Path.GetExtension(photo.FileName).ToLower();
 
-            await fileService.WriteImage(photo, $"{id}", "doctor/photo");
-            doctor.Photo = filePath;
+                if (!allowedExtensions.Contains(extension))
+                {
+                    return BadRequest("Only JPG and PNG images are allowed.");
+                }
 
-            repo.Doctors.Update(doctor);
+                if (photo.Length > 2 * 1024 * 1024) // 2MB limit
+                {
+                    return BadRequest("File size must be less than 2MB.");
+                }
+
+                _ = await fileService.WriteFile(
+                    photo,
+                    $"{id}",
+                    "doctor/photo");
+                doctor.Photo = @$"files/doctor/photo/{doctor.DoctorId}{GetExtension(photo)}";
+                repo.Doctors.Update(doctor);
+            }
+            else
+            {
+                return ResponseHelper.NotFound_Request(null,
+                    new DefaultResponseMessageModel("Doctor's photo not found.", ""));
+            }
 
             return await repo.SaveAsync()
                 ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully Uploaded Doctor Photo.", ""))
@@ -179,42 +199,43 @@ public class DoctorsController(
     [ValidateModel]
     [EndpointSummary("Upload-Sign")]
     [EndpointDescription("Upload Sign")]
-    public async Task<IActionResult> ImportSignAsync(DoctorUploadModel model)
+    public async Task<IActionResult> ImportSignAsync(long id, IFormFile signFile)
     {
-        if (string.IsNullOrEmpty(model.File))
-            return BadRequest(new DefaultResponseMessageModel("No sign file uploaded.", ""));
-
         try
         {
-            Doctor? doctor = await repo.Doctors.GetFirstAsync(x => x.DoctorId == model.Id);
-            if (doctor == null)
-                return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Doctor not found.", ""));
-
-            if (!string.IsNullOrEmpty(doctor.Sign))
-                DeleteExistingFile(doctor.Sign);
-
-            // Get extension and decode Base64
-            string extension = convertion.GetFileExtension(model.File);
-            byte[] imageBytes;
-            try
+            Doctor? doctor = await repo.Doctors.GetFirstAsync(x => x.DoctorId == id);
+            if (doctor != null)
             {
-                imageBytes = DecodeBase64(model.File ?? "");
+                if (!string.IsNullOrEmpty(doctor.Sign))
+                {
+                    DeleteExistingFile(doctor.Sign); // Delete the existing file if it exists
+                }
+
+                if (signFile == null || signFile.Length == 0)
+                {
+                    return BadRequest("No file uploaded.");
+                }
+
+                string[] allowedExtensions = { ".jpg", ".jpeg", ".png" };
+                string extension = Path.GetExtension(signFile.FileName).ToLower();
+
+                if (!allowedExtensions.Contains(extension))
+                {
+                    return BadRequest("Only JPG and PNG images are allowed.");
+                }
+
+                _ = await fileService.WriteFile(
+                    signFile,
+                    $"{id}",
+                    "doctor/sign");
+                doctor.Sign = @$"files/doctor/sign/{doctor.DoctorId}{GetExtension(signFile)}";
+                repo.Doctors.Update(doctor);
             }
-            catch (FormatException)
+            else
             {
-                return BadRequest(new DefaultResponseMessageModel("Invalid Base64 string.", ""));
+                return ResponseHelper.NotFound_Request(null,
+                    new DefaultResponseMessageModel("Doctor's sign not found.", ""));
             }
-
-            string fileName = $"{model.Id}{extension}";
-            string filePath = $"images/doctor/sign/{fileName}";
-
-            using MemoryStream memoryStream = new(imageBytes);
-            IFormFile formFile = new FormFile(memoryStream, 0, memoryStream.Length, "fileUpload", fileName);
-
-            await fileService.WriteImage(formFile, $"{model.Id}", "doctor/sign");
-            doctor.Sign = filePath;
-
-            repo.Doctors.Update(doctor);
 
             return await repo.SaveAsync()
                 ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully Uploaded Doctor Sign.", ""))
@@ -237,23 +258,7 @@ public class DoctorsController(
 
     private string GetExtension(IFormFile file)
     {
-        string ext = Path.GetExtension(file.FileName);
-        return string.IsNullOrEmpty(ext) ? "" : ext.ToLower();
-    }
-
-    private byte[] DecodeBase64(string base64String)
-    {
-        if (string.IsNullOrWhiteSpace(base64String))
-            throw new ArgumentException("Base64 string is empty");
-
-        // Remove data URI prefix if present
-        var commaIndex = base64String.IndexOf(',');
-        if (commaIndex >= 0)
-            base64String = base64String[(commaIndex + 1)..];
-
-        // Remove whitespace / newlines
-        base64String = base64String.Trim();
-        return Convert.FromBase64String(base64String);
+        return ("." + file.FileName.Split('.')[^1]).ToLower();
     }
 
     #endregion
