@@ -144,12 +144,7 @@ export class PatientComponent implements OnInit {
         dob,
       });
 
-      this.patientEntryComponent.selectedDoctor = this.selectedPatient.doctorId
-        ? { doctorId: this.selectedPatient.doctorId, name: this.selectedPatient.name } as DoctorModel
-        : null;
-
       this.patientEntryComponent.getStates();
-      this.patientEntryComponent.getDoctors();
     }
   }
 
@@ -172,7 +167,7 @@ export class PatientComponent implements OnInit {
               this.selectedPatient = null as any;
             },
             error: (err) => {
-      
+
               this.loading = false;
             },
             complete: () => {
@@ -212,7 +207,7 @@ export class PatientComponent implements OnInit {
     }
   }
 
-    excel(): void {
+  excel(): void {
     let exportData = this.selectedPatient ? [this.selectedPatient] : this.patients;
 
     if (exportData.length === 0) {
@@ -229,14 +224,12 @@ export class PatientComponent implements OnInit {
     let columns = [
       { key: 'patientId', value: 'Patient ID' },
       { key: 'name', value: 'Name' },
-      { key: 'nrc', value: 'NRC' },
       { key: 'dob', value: 'Date of Birth' },
-      { key: 'age', value: 'Age' },
+      { key: 'gender', value: 'Gender' },
       { key: 'stateId', value: 'State ID' },
       { key: 'Township ID', value: 'Township ID' },
       { key: 'addressDetail', value: 'Address Detail' },
       { key: 'phone', value: 'Phone Number' },
-      { key: 'doctorId', value: 'Doctor ID' },
       { key: 'createdOn', value: 'Created On' },
       { key: 'createdBy', value: 'Created By' },
       { key: 'updatedOn', value: 'Updated On' },
