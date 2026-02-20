@@ -20,6 +20,10 @@ export interface DoctorModel {
     remark: null;
 }
 
+export interface DoctorWithSchedules extends DoctorModel {
+    schedules: ScheduleModel[];
+}
+
 export interface ScheduleModel {
     scheduleId: number;
     doctorId: number;
