@@ -26,6 +26,7 @@ import { ToastModule } from 'primeng/toast';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { DoctorDropDownComponent } from '@shared_component/drop-down/doctor-drop-down/doctor-drop-down.component';
 import { DropdownModule } from 'primeng/dropdown';
+import { CalendarModule } from 'primeng/calendar';
 
 @Component({
   selector: 'app-appointment',
@@ -49,6 +50,7 @@ import { DropdownModule } from 'primeng/dropdown';
     SelectModule,
     PatientDropDownComponent,
     DoctorDropDownComponent,
+    CalendarModule
   ],
   templateUrl: './appointment.component.html',
   providers: [ConfirmationService, ExportService, DatePipe],
@@ -75,8 +77,7 @@ export class AppointmentComponent implements OnInit {
 
   @ViewChild('nameInput') nameInput!: ElementRef;
 
-  today!: any;
-  minAppointmentDate: Date = new Date();
+  today: Date = new Date();
 
   statuses = [
     { label: 'Pending', value: 'Pending' },
@@ -341,21 +342,10 @@ export class AppointmentComponent implements OnInit {
 
     this.doctorService.getScheduleByDoctorDay(doctorId, dayOfWeek, branchId).subscribe({
       next: (res) => {
-        console.log('API Response:', res.data); // Debugging: Check what actually arrived
-
         const data = res?.data ?? [];
-
-        // Use loose equality (==) or cast both to Number to be safe
-        this.schedules = data.filter((s: any) =>
-          Number(s.doctorId) === doctorId &&
-          s.dayOfWeek.trim().toLowerCase() === dayOfWeek.toLowerCase()
-        );
-
-        console.log('Filtered Schedules:', this.schedules);
-      },
-      error: (err) => {
-        console.error('Fetch error:', err);
-        this.schedules = [];
+        this.schedules = Array.isArray(data)
+          ? data.filter((s: any) => s.doctorId == doctorId)
+          : [];
       }
     });
   }
