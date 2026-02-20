@@ -55,13 +55,12 @@ public class PatientsController(
         
         // Update fields
         patient.Name = model.Name;
-        patient.Nrc = model.Nrc;
         patient.Dob = model.Dob;
-        patient.Age = model.Age;
         patient.StateId = model.StateId;
         patient.TownshipId = model.TownshipId;
         patient.AddressDetail = model.AddressDetail;
         patient.Phone = model.Phone;
+        patient.Gender= model.Gender;
         patient.UpdatedOn = DateTime.Now;
         patient.UpdatedBy = User.Identity?.Name ?? string.Empty;
         patient.Status = model.Status;
