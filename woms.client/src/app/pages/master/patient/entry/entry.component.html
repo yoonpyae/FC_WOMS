@@ -1,110 +1,86 @@
-<div class="flex flex-col">
-    <form [formGroup]="patientForm" (submit)="submit()">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Name Field -->
-            <div class="flex flex-col gap-2 col-span-1">
-                <label class="font-semibold">Name</label>
+<form [formGroup]="patientForm" (submit)="submit()" class="p-fluid mt-2">
+    <div class="grid">
+        <div class="col-12 field">
+            <label class="font-bold text-900 ml-1">Full Name</label>
+            <span class="p-input-icon-left">
+                <i class="pi pi-user"></i>
                 <input formControlName="name" pInputText (input)="transformToUppercase('name')"
-                    class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                    placeholder="Enter Name..." />
-                <small *ngIf="patientForm.controls['name'].invalid && patientForm.get('name')?.dirty"
-                    class="text-red-500 text-xs"> Name is required. </small>
-            </div>
-
-            <!-- Doctor Dropdown -->
-            <div class="flex flex-col gap-2 col-span-1">
-                <label class="font-semibold">Doctor</label>
-                <app-doctor-drop-down [(ngModel)]="selectedDoctor"
-                    [ngClass]="{'border border-red-500 rounded-[6px]': !selectedDoctor && formSubmitted}"
-                    [ngModelOptions]="{ standalone: true }" optionLabel="name"
-                    (onValueChange)="OnDoctorChange(selectedDoctor)" [style]="{ width: '100%' }">
-                </app-doctor-drop-down>
-                <small *ngIf="!selectedDoctor && formSubmitted" class="text-red-500 text-xs mt-1 flex items-center">
-                    Doctor is required.
-                </small>
-            </div>
-
-            <!-- Date of Birth -->
-            <div class="flex flex-col gap-2 col-span-1">
-                <label class="font-semibold">Date of Birth</label>
-                <p-date-picker formControlName="dob" [showIcon]="true" [dateFormat]="'yy-mm-dd'" [showTime]="false"
-                    [style]="{ width: '100%' }" [maxDate]="maxDate"
-                    [ngClass]="{'p-invalid': patientForm.get('dob')?.invalid && (patientForm.get('dob')?.touched || patientForm.get('dob')?.dirty)}">
-                </p-date-picker>
-                <small
-                    *ngIf="patientForm.get('dob')?.invalid && (patientForm.get('dob')?.touched || patientForm.get('dob')?.dirty)"
-                    class="text-red-500 text-xs">
-                    Date of Birth is required.
-                </small>
-            </div>
-
-            <!-- Age -->
-            <div class="flex flex-col gap-2 col-span-1">
-                <label class="font-semibold">Age</label>
-                <input formControlName="age" placeholder="Age" pInputText
-                    class="border rounded px-3 py-2 bg-gray-100 w-full" readonly />
-            </div>
-
-            <!-- Phone Number -->
-            <div class="flex flex-col gap-2 col-span-1">
-                <label class="font-semibold">Phone Number</label>
-                <input formControlName="phone" pInputText placeholder="Enter Phone Number..." required inputmode="tel"
-                    class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400" />
-                <small *ngIf="patientForm.controls['phone'].invalid && patientForm.get('phone')?.dirty && 
-                             patientForm.get('phone')?.untouched" class="p-text text-sm text-red-500"> Phone is
-                    required </small>
-                <small *ngIf="patientForm.controls['phone'].invalid && patientForm.get('phone')?.dirty && 
-                              patientForm.get('phone')?.touched" class="p-text text-sm text-red-500"> Phone
-                    Format is invalid </small>
-            </div>
-
-            <!-- NRC -->
-            <div class="flex flex-col gap-2 col-span-1">
-                <label class="font-semibold">NRC</label>
-                <input formControlName="nrc" pInputText (input)="transformToUppercase('nrc')"
-                    class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                    placeholder="Enter NRC..." />
-            </div>
-
-            <!-- State -->
-            <div class="flex flex-col gap-2 md:col-span-1">
-                <label class="font-semibold">State</label>
-                <p-select [options]="states" [(ngModel)]="SelectedState" (onChange)="onStateChange()"
-                    optionLabel="stateName" dataKey="stateId" placeholder="Select State"
-                    [ngModelOptions]="{ standalone: true }" [filter]="true" filterBy="stateName" [showClear]="true"
-                    [ngClass]="{ 'ng-invalid ng-dirty': !SelectedState && formSubmitted }" appendTo="body">
-                </p-select>
-                <small *ngIf="!SelectedState && formSubmitted" class="text-red-500 text-xs">
-                    State is required.
-                </small>
-            </div>
-
-            <!-- Township -->
-            <div class="flex flex-col gap-2 md:col-span-1">
-                <label class="font-semibold">Township</label>
-                <p-select [options]="townships" [(ngModel)]="SelectedTownship" (onChange)="onTownshipChange()"
-                    optionLabel="townshipName" dataKey="townshipId" placeholder="Select Township"
-                    [ngModelOptions]="{ standalone: true }" [filter]="true" filterBy="townshipName" [showClear]="true"
-                    [ngClass]="{ 'ng-invalid ng-dirty': !SelectedTownship && formSubmitted }" appendTo="body">
-                </p-select>
-                <small *ngIf="!SelectedTownship && formSubmitted" class="text-red-500 text-xs">
-                    Township is required.
-                </small>
-            </div>
-
-            <!-- Address Details -->
-            <div class="flex flex-col gap-2 md:col-span-2">
-                <label class="font-semibold">Address Details</label>
-                <textarea id="addressDetail" pInputTextarea rows="4" placeholder="Enter address detail"
-                    formControlName="addressDetail"
-                    class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="flex flex-col mt-4 gap-2">
-                <p-button icon="pi pi-check" label="{{ isEdit ? 'Update' : 'Save' }}" type="submit"
-                    [loading]="isSubmitting" [severity]="isEdit ? 'info' : 'success'"></p-button>
-            </div>
+                    placeholder="e.g. JOHN DOE" />
+            </span>
+            <small *ngIf="patientForm.controls['name'].invalid && patientForm.get('name')?.dirty"
+                class="text-red-500 mt-1 block anim-fade-in">Name is required.</small>
         </div>
-    </form>
-</div>
+
+        <div class="col-12 md:col-8 field">
+            <label class="font-bold text-900 ml-1">Date of Birth</label>
+            <p-date-picker formControlName="dob" [showIcon]="true" [dateFormat]="'yy-mm-dd'" [maxDate]="maxDate"
+                placeholder="YYYY-MM-DD" styleClass="w-full">
+            </p-date-picker>
+            <small
+                *ngIf="patientForm.get('dob')?.invalid && (patientForm.get('dob')?.touched || patientForm.get('dob')?.dirty)"
+                class="text-red-500 mt-1 block">DOB is required.</small>
+        </div>
+
+        <div class="col-12 md:col-4 field">
+            <label class="font-bold text-900 ml-1">Age</label>
+            <input formControlName="age" pInputText class="surface-100 font-bold text-center" readonly />
+        </div>
+
+        <div class="col-12 md:col-6 field">
+            <label class="font-bold text-900 ml-1">Phone Number</label>
+            <span class="p-input-icon-left">
+                <i class="pi pi-phone"></i>
+                <input formControlName="phone" pInputText placeholder="09..." inputmode="tel" />
+            </span>
+            <small *ngIf="patientForm.controls['phone'].invalid && patientForm.get('phone')?.dirty"
+                class="text-red-500 mt-1 block">Valid phone required.</small>
+        </div>
+
+        <div class="col-12 md:col-6 field">
+            <label class="font-bold text-900 ml-1">Gender</label>
+            <p-select [options]="genders" formControlName="gender" optionLabel="label"
+                placeholder="Select Gender"></p-select>
+        </div>
+    </div>
+
+    <p-divider align="left" styleClass="my-4">
+        <span class="text-500 font-medium text-sm"><i class="pi pi-map-marker mr-2"></i>LOCATION</span>
+    </p-divider>
+
+    <div class="grid">
+        <div class="col-12 md:col-6 field">
+            <label class="font-bold text-900 ml-1">State</label>
+            <p-select [options]="states" [(ngModel)]="SelectedState" (onChange)="onStateChange()"
+                optionLabel="stateName" dataKey="stateId" placeholder="Select State"
+                [ngModelOptions]="{ standalone: true }" [filter]="true" [showClear]="true" appendTo="body">
+            </p-select>
+        </div>
+
+        <div class="col-12 md:col-6 field">
+            <label class="font-bold text-900 ml-1">Township</label>
+            <p-select [options]="townships" [(ngModel)]="SelectedTownship" (onChange)="onTownshipChange()"
+                optionLabel="townshipName" dataKey="townshipId" placeholder="Select Township"
+                [ngModelOptions]="{ standalone: true }" [filter]="true" [showClear]="true" appendTo="body">
+            </p-select>
+        </div>
+
+        <div class="col-12 field">
+            <label class="font-bold text-900 ml-1">Address Details</label>
+            <textarea pInputTextarea rows="3" placeholder="Street name, House No..." formControlName="addressDetail"
+                class="w-full"></textarea>
+        </div>
+    </div>
+
+    <div class="flex align-items-center justify-content-between mt-3 p-3 surface-50 border-round-lg">
+        <div class="flex align-items-center gap-3">
+            <label class="font-bold text-700">Active Status</label>
+            <p-toggle-switch formControlName="status"></p-toggle-switch>
+        </div>
+
+        <div class="flex gap-2">
+            <p-button [label]="isEdit ? 'Update Patient' : 'Register Patient'" type="submit" [loading]="isSubmitting"
+                [severity]="isEdit ? 'info' : 'success'"
+                [icon]="isEdit ? 'pi pi-user-edit' : 'pi pi-user-plus'"></p-button>
+        </div>
+    </div>
+</form>
