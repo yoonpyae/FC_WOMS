@@ -17,15 +17,8 @@ public partial class ViPatient
     [StringLength(200)]
     public string Name { get; set; } = null!;
 
-    [Column("NRC")]
-    [StringLength(50)]
-    public string? Nrc { get; set; }
-
     [Column("DOB")]
     public DateOnly? Dob { get; set; }
-
-    [StringLength(50)]
-    public string? Age { get; set; }
 
     public int? StateId { get; set; }
 
@@ -64,4 +57,7 @@ public partial class ViPatient
     public bool Status { get; set; }
 
     public string? Remark { get; set; }
+
+    [StringLength(7)]
+    public string? Gender { get; set; }
 }
