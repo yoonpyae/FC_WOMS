@@ -1,7 +1,6 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DoctorModel } from '@core_models/master/doctor.model';
 import { PatientModel } from '@core_models/master/patient.model';
 import { StateModel } from '@core_models/master/state.model';
 import { TownshipModel } from '@core_models/master/townsip.model';
@@ -12,7 +11,6 @@ import { TownshipService } from '@core_services/master/township.service';
 import { DoctorDropDownComponent } from '@shared_component/drop-down/doctor-drop-down/doctor-drop-down.component';
 import { LoggerService } from '@shared_services/logger.service';
 import { SharedService } from '@shared_services/shared.service';
-import { DropdownStateService } from '@shared_services/state-management/dropdown-state.service';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -26,6 +24,7 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { DividerModule } from 'primeng/divider';
 
 @Component({
   selector: 'app-patient-entry',
@@ -46,18 +45,12 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
     TableModule,
     DialogModule,
     SelectModule,
-
     DatePickerModule,
-
-    // Custom Components
-    DoctorDropDownComponent
+    DividerModule
   ],
-  providers: [DropdownStateService],
   templateUrl: './entry.component.html'
 })
 export class EntryComponent implements OnInit {
-  doctors: DoctorModel[] = [];
-  selectedDoctor: DoctorModel | null = null;
   selectedPatient!: PatientModel;
 
   states: StateModel[] = [];
@@ -75,13 +68,13 @@ export class EntryComponent implements OnInit {
   @Input() isEdit: boolean = false;
   @Output() onSubmitted = new EventEmitter<string>();
 
+  genders = [{ label: 'Male' }, { label: 'Female' }];
 
   private formBuilder = inject(FormBuilder);
   public patientForm: FormGroup = this.formBuilder.group({
     patientId: [''],
     branchId: [0, Validators.required],
     name: ['', Validators.required],
-    nrc: [''],
     dob: [new Date(), Validators.required],
     age: [{ value: '', disabled: true }],
     stateId: [0, Validators.required],
@@ -90,6 +83,7 @@ export class EntryComponent implements OnInit {
     phone: new FormControl('', {
       validators: [Validators.required, Validators.pattern("^(0(1|9)[0-9]{7,9})$")]
     }),
+    gender: ['', Validators.required],
     doctorId: [0, Validators.required],
     status: true,
   });
@@ -167,37 +161,6 @@ export class EntryComponent implements OnInit {
 
   // #endregion
 
-  // #region Doctor Methods
-
-  getDoctors(): void {
-    let branchId = Number.parseInt(this.sharedService.getDefaultBranchId() ?? "0");
-    this.doctorService.getByActive(branchId).subscribe({
-      next: (res) => {
-        let doctors = res.data as DoctorModel[];
-        if (this.isEdit) {
-          let doctorId = this.patientForm.get('doctorId')?.value;
-          if (doctorId) {
-            this.selectedDoctor = doctors.find(d => d.doctorId === doctorId) ?? null;
-          }
-        }
-      },
-      error: (err) => {
-        this.showMessage('warn', 'Warning', err?.message?.en ?? 'Failed to load doctors.');
-      }
-    });
-  }
-
-  OnDoctorChange(event: any): void {
-    this.loggerService.info("Doctor changed");
-    if (this.selectedDoctor) {
-      this.patientForm.get('doctorId')?.setValue(this.selectedDoctor.doctorId);
-    } else {
-      this.patientForm.get('doctorId')?.setValue(null);
-    }
-  }
-
-  // #endregion
-
   submit(): void {
     this.formSubmitted = true;
 
@@ -226,7 +189,6 @@ export class EntryComponent implements OnInit {
       this.patientForm.valid &&
       this.SelectedState &&
       this.SelectedTownship &&
-      this.selectedDoctor &&
       dobValid
     ) {
       let model = this.patientForm.value as PatientModel;
@@ -302,18 +264,15 @@ export class EntryComponent implements OnInit {
       patientId: '',
       branchId: Number.parseInt(this.sharedService.getDefaultBranchId() ?? '0'),
       name: '',
-      nrc: '',
       dob: new Date(),
-      age: '',
       addressDetail: '',
       phone: '',
-      doctorId: 0,
+      gender: '',
       stateId: 0,
       townshipId: 0,
       status: true,
     });
 
-    this.selectedDoctor = null;
     this.SelectedState = null;
     this.SelectedTownship = null;
     this.selectedPatient = null as any;
