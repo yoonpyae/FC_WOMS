@@ -57,24 +57,26 @@ export class DoctorService {
     return this.httpClient.delete<RootModel>(`${environment.main_url}/master/doctors/${id}`, {});
   }
 
-  uploadPhoto(id: number, formData: FormData): Observable<RootModel> {
+  uploadPhoto(id: number, file: File): Observable<RootModel> {
+
+    const formData = new FormData();
+    formData.append('photo', file, file.name);
+
     return this.httpClient.put<RootModel>(
-      `${environment.main_url}/master/doctors/uploadphoto?id=${id}`, formData
+      `${environment.main_url}/master/doctors/uploadphoto?id=${id}`,
+      formData
     );
   }
 
-  uploadSign(id: number, base64: string): Observable<RootModel> {
+  uploadSign(id: number, file: File): Observable<RootModel> {
 
-    const model = {
-      id: id,
-      file: base64
-    }
+    const formData = new FormData();
+    formData.append('sign', file, file.name);
 
     return this.httpClient.put<RootModel>(
-      `${environment.main_url}/master/doctors/uploadsign`,
-      model
+      `${environment.main_url}/master/doctors/uploadsign?id=${id}`,
+      formData
     );
   }
-
 }
 
