@@ -2,14 +2,12 @@ export interface PatientModel {
   patientId: string;
   branchId: number;
   name: string;
-  nrc: string;
   dob: string;
-  age: string;
   stateId: number;
   townshipId: number;
   addressDetail: string;
   phone: string;
-  doctorId: number;
+  gender: number;
   createdOn: string | null;
   createdBy: string | null;
   updatedOn: string | null;
@@ -24,11 +22,7 @@ export interface ViPatientModel {
   patientId: string;
   branchId: number;
   name: string;
-  nrc: string;
   dob: string;
-  age: string;
-  doctorId: number;
-  doctorName: string;
   stateId: number;
   stateName: string;
   townshipId: number;
@@ -43,4 +37,5 @@ export interface ViPatientModel {
   deletedBy: string | null;
   status: boolean;
   remark: null;
+  gender: string;
 }
