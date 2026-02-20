@@ -4,8 +4,7 @@
         [loading]="loading" styleClass="p-datatable-striped" [showCurrentPageReport]="true"
         [globalFilterFields]="['patientId','name', 'age','nrc']" [tableStyle]="{ 'min-width': '50rem' }"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        [rowsPerPageOptions]="[20, 50, 100]" selectionMode="single" [(selection)]="selectedPatient"
-        dataKey="patientId">
+        [rowsPerPageOptions]="[20, 50, 100]" selectionMode="single" [(selection)]="selectedPatient" dataKey="patientId">
         <ng-template #caption>
             <div class="grid grid-cols-12 mb-4">
                 <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
@@ -30,9 +29,8 @@
                 <th pSortableColumn="patientId">Id <p-sortIcon field="patientId"></p-sortIcon></th>
                 <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
                 <th pSortableColumn="dob">Date of Birth <p-sortIcon field="dob"></p-sortIcon></th>
-                <th pSortableColumn="age">Age <p-sortIcon field="age"></p-sortIcon></th>
-                <th pSortableColumn="nrc">NRC <p-sortIcon field="nrc"></p-sortIcon></th>
                 <th pSortableColumn="phone">Phone <p-sortIcon field="phone"></p-sortIcon></th>
+                <th pSortableColumn="gender">Gender <p-sortIcon field="gender"></p-sortIcon></th>
                 <th pSortableColumn="addressDetail">Address <p-sortIcon field="addressDetail"></p-sortIcon></th>
                 <th pSortableColumn="stateName">State <p-sortIcon field="stateName"></p-sortIcon></th>
                 <th pSortableColumn="townshipName">Township <p-sortIcon field="townshipName"></p-sortIcon></th>
@@ -47,15 +45,13 @@
         <ng-template #body let-patient let-rowData>
             <tr style="white-space: nowrap" [pSelectableRow]="patient">
                 <td>
-                    <span class="pi pi-circle"
-                        [class.pi-check-circle]="selectedPatient === patient"></span>
+                    <span class="pi pi-circle" [class.pi-check-circle]="selectedPatient === patient"></span>
                 </td>
                 <td>{{ patient.patientId }}</td>
                 <td>{{ patient.name }}</td>
                 <td>{{ patient.dob | date: "dd/MMM/yyyy" }}</td>
-                <td>{{ patient.age }}</td>
-                <td>{{ patient.nrc }}</td>
                 <td>{{ patient.phone }}</td>
+                <td>{{ patient.gender }}</td>
                 <td>{{ patient.addressDetail }}</td>
                 <td>{{ patient.stateName }}</td>
                 <td>{{ patient.townshipName }}</td>
@@ -76,16 +72,10 @@
 </div>
 <!-- #endregion -->
 
-<p-dialog header="{{ isEdit ? 'Edit Patient' : 'Create Patient' }}" [(visible)]="modalVisible"
-    (onHide)="clearSelection()" [breakpoints]="{
-    '1920px': '30vw',
-    '1440px': '40vw',
-    '1024px': '50vw',
-    '768px': '80vw',
-    '425px': '100vw',
-    '375px': '100vw',
-    '320px': '100vw',
-  }" [modal]="true" [style]="{ 'min-width': '30vw' }" [draggable]="false" [resizable]="false">
+<p-dialog [header]="isEdit ? 'Edit Patient Profile' : 'Register New Patient'" [(visible)]="modalVisible"
+    (onHide)="clearSelection()" [modal]="true" [draggable]="false" [resizable]="false"
+    [style]="{ width: '95vw', 'max-width': '650px' }" [breakpoints]="{ '960px': '75vw', '640px': '95vw' }"
+    styleClass="modern-patient-dialog">
     <app-patient-entry [isEdit]="isEdit" (onSubmitted)="handlePatientSubmitted($event)">
     </app-patient-entry>
 </p-dialog>
