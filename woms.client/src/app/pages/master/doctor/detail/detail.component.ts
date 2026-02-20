@@ -21,7 +21,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FieldsetModule } from 'primeng/fieldset';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ExportService } from '@shared_services/export.service';
-
+import { Location } from '@angular/common';
 import { ImageModule } from 'primeng/image';
 import { SharedService } from '@shared_services/shared.service';
 
@@ -118,10 +118,11 @@ export class DetailComponent implements OnInit {
   attachModal: boolean = false;
   constructor(
     private doctorService: DoctorService,
-    private messgaeService: MessageService,
+    private messageService: MessageService,
     private sharedService: SharedService,
     private route: ActivatedRoute,
     private loggerService: LoggerService,
+    private location: Location
   ) {
   }
 
@@ -148,73 +149,79 @@ export class DetailComponent implements OnInit {
     });
   }
 
-  triggerPhotoInput(): void {
-    this.photoInput.nativeElement.click();
-  }
+ //#region Profile Photo
 
-  triggerSignInput(): void {
-    this.signInput.nativeElement.click();
-  }
-
-  onPhotoSelected(event: any): void {
-    const file: File = event.target.files[0];
-    if (!file) return;
-
-    // preview
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => this.imgSrc = reader.result as string;
-
-    this.loading = true;
-    const formData = new FormData();
-    formData.append('photo', file);
-
-    this.doctorService.uploadPhoto(this.doctorId, formData).subscribe({
-      next: (res: any) => {
-        this.loading = false;
-        if (res?.success) {
-          this.messgaeService.add({ key: 'globalMessage', severity: 'info', summary: 'Success', detail: res.message?.toString() });
-          this.loadData();
-        } else {
-          const msg = res?.message ?? 'Unable to upload photo.';
-          this.messgaeService.add({ severity: 'error', summary: 'Error', detail: msg });
-        }
-      },
-      error: (err: any) => {
-        this.loading = false;
-        const msg = err?.error?.message ?? err?.message ?? 'An error occurred while uploading photo.';
-        this.messgaeService.add({ severity: 'error', summary: 'Error', detail: msg });
+  onSelectedPhotos(event: any) {
+    this.files = event.currentFiles.filter((file: File) => {
+      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+        this.messageService.add({
+          key: 'globalMessage',
+          severity: 'error',
+          summary: 'Error',
+          detail: `File ${file.name} exceeds the 2MB limit.`,
+        });
+        return false;
       }
+      return true;
     });
-  }
 
-
-  onSignSelected(event: any): void {
-    const file: File = event.target.files[0];
-    if (!file) return;
-
-    this.loading = true;
-    this.sharedService.convertBase64(file).subscribe((base64) => {
-      this.signBase64String = base64;
-      this.doctorService.uploadSign(this.doctorId, base64).subscribe({
-        next: (res: any) => {
-          this.loading = false;
-          if (res?.success) {
-            this.messgaeService.add({ key: 'globalMessage', severity: 'info', summary: 'Success', detail: res.message?.toString() });
-            this.loadData();
-          } else {
-            const msg = res?.message ?? 'Unable to upload sign.';
-            this.messgaeService.add({ severity: 'error', summary: 'Error', detail: msg });
-          }
-        },
-        error: (err: any) => {
-          this.loading = false;
-          const msg = err?.error?.message ?? err?.message ?? 'An error occurred while uploading sign.';
-          this.messgaeService.add({ severity: 'error', summary: 'Error', detail: msg });
-        }
+    if (this.files && this.files.length > 0) {
+      this.isFileSelected = true;
+      this.files.forEach((file: File) => {
+        this.loggerService.info(this.files);
       });
+    }
+  }
+
+  choose(event: any, callback: Function) {
+    callback();
+  }
+
+  importPhoto(clearCallback: Function): void {
+    if (!this.selectedDoctor || this.files.length === 0) {
+      this.messageService.add({
+        key: 'globalMessage',
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Please select a photo before uploading.',
+      });
+      return;
+    }
+    this.loading = true;
+    const selectedFile = this.files[0]; // Get the first selected file
+
+    this.doctorService.uploadPhoto(this.selectedDoctor.doctorId, selectedFile).subscribe({
+      next: () => {
+        this.messageService.add({
+          key: 'globalMessage',
+          severity: 'success',
+          summary: 'Success',
+          detail: 'File uploaded successfully.',
+        });
+        this.uploadVisible = false;
+        this.loadData();
+        this.loading = false;
+        clearCallback(); // Call clearCallback after successful upload
+      },
+      error: (err) => {
+        this.messageService.add({
+          key: 'globalMessage',
+          severity: 'error',
+          summary: 'Error',
+          detail: err.message || 'File upload failed.',
+        });
+        this.loading = false;
+      },
     });
   }
+
+  upload(rowData: any): void {
+    this.selectedDoctor = rowData;
+    this.loggerService.info(rowData);
+    this.uploadVisible = true;
+  }
+
+  // #endregion
 
   openScheduleDialog(): void {
     this.scheduleDialogVisible = true;
@@ -247,31 +254,31 @@ export class DetailComponent implements OnInit {
             next: (createRes: any) => {
               this.isSubmitting = false;
               if (createRes && createRes.success) {
-                this.messgaeService.add({ severity: 'success', summary: 'Success', detail: 'Schedule added successfully' });
+                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Schedule added successfully' });
                 this.scheduleDialogVisible = false;
                 this.loadSchedules();
               } else {
                 const detailMsg = createRes?.message ?? createRes?.data ?? 'Unable to create schedule.';
-                this.messgaeService.add({ severity: 'error', summary: 'Error', detail: detailMsg });
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: detailMsg });
               }
             },
             error: (err: any) => {
               this.isSubmitting = false;
               const msg = err?.error?.message ?? err?.message ?? 'An error occurred while creating schedule.';
-              this.messgaeService.add({ severity: 'error', summary: 'Error', detail: msg });
+              this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
             }
           });
 
         } else {
           this.isSubmitting = false;
           const errMsg = res?.message ?? 'Unable to obtain schedule id.';
-          this.messgaeService.add({ severity: 'error', summary: 'Error', detail: errMsg });
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: errMsg });
         }
       },
       error: (err: any) => {
         this.isSubmitting = false;
         const msg = err?.error?.message ?? err?.message ?? 'An error occurred while obtaining schedule id.';
-        this.messgaeService.add({ severity: 'error', summary: 'Error', detail: msg });
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
       }
     });
   }
@@ -289,6 +296,8 @@ export class DetailComponent implements OnInit {
     });
   }
 
-
+  goBack() {
+    this.location.back();
+  }
 
 }
