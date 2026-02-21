@@ -68,10 +68,10 @@ public class IdGenerateService(
         return stringBuilder.ToString();
     }
 
-    public string GetLabVoucherVno(long BranchId)
+    public string GetConsultationId(long BranchId)
     {
         StringBuilder stringBuilder = new();
-        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"L{BranchId}-", "ddMMyy"));
+        _ = stringBuilder.Append(randomizer.RandomAlphanumeric(6, $"C{BranchId}-", "ddMMyy"));
         return stringBuilder.ToString();
     }
 }
