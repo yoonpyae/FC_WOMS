@@ -70,6 +70,8 @@ public partial class WOMSDbContext : DbContext
 
     public virtual DbSet<ViAppointment> ViAppointments { get; set; }
 
+    public virtual DbSet<ViConsultation> ViConsultations { get; set; }
+
     public virtual DbSet<ViMainStock> ViMainStocks { get; set; }
 
     public virtual DbSet<ViPatient> ViPatients { get; set; }
@@ -77,6 +79,10 @@ public partial class WOMSDbContext : DbContext
     public virtual DbSet<ViPharmacyVoucher> ViPharmacyVouchers { get; set; }
 
     public virtual DbSet<ViPharmacyVoucherDetail> ViPharmacyVoucherDetails { get; set; }
+
+    public virtual DbSet<ViPrescription> ViPrescriptions { get; set; }
+
+    public virtual DbSet<ViPrescriptionItem> ViPrescriptionItems { get; set; }
 
     public virtual DbSet<ViPurchase> ViPurchases { get; set; }
 
@@ -188,6 +194,11 @@ public partial class WOMSDbContext : DbContext
             entity.ToView("VI_Appointment");
         });
 
+        modelBuilder.Entity<ViConsultation>(entity =>
+        {
+            entity.ToView("VI_Consultation");
+        });
+
         modelBuilder.Entity<ViMainStock>(entity =>
         {
             entity.ToView("VI_MainStock");
@@ -206,6 +217,16 @@ public partial class WOMSDbContext : DbContext
         modelBuilder.Entity<ViPharmacyVoucherDetail>(entity =>
         {
             entity.ToView("VI_PharmacyVoucherDetail");
+        });
+
+        modelBuilder.Entity<ViPrescription>(entity =>
+        {
+            entity.ToView("VI_Prescription");
+        });
+
+        modelBuilder.Entity<ViPrescriptionItem>(entity =>
+        {
+            entity.ToView("VI_PrescriptionItem");
         });
 
         modelBuilder.Entity<ViPurchase>(entity =>
