@@ -35,6 +35,9 @@ namespace WOMS.Server.Services.Repository
         private IPharmacyVoucherDetailRepo? _pharmacyVoucherDetail;
         private IPatientRepo? _patient;
         private IAppointmentRepo? _appointment;
+        private IConsultationRepo? _consultation;
+        private IPrescriptionRepo? _prescription;
+        private IPrescriptionItemRepo? _prescriptionItem;
 
         #endregion
 
@@ -47,6 +50,9 @@ namespace WOMS.Server.Services.Repository
         private IViPatientRepo? _viPatient;
         private IViAppointmentRepo? _viAppointment;
         private IVISupplierRepo? _viSupplier;
+        private IViConsultationRepo? _viConsultation;
+        private IViPrescriptionRepo? _viPrescription;
+        private IViPrescriptionItemRepo? _viPrescriptionItem;
 
         #endregion
 
@@ -216,6 +222,33 @@ namespace WOMS.Server.Services.Repository
                 return _appointment;
             }
         }
+
+        public IConsultationRepo Consultations
+        {
+            get
+            {
+                _consultation ??= new ConsultationRepo(Context);
+                return _consultation;
+            }
+        }
+
+        public IPrescriptionRepo Prescriptions
+        {
+            get
+            {
+                _prescription ??= new PrescriptionRepo(Context);
+                return _prescription;
+            }
+        }
+
+        public IPrescriptionItemRepo PrescriptionItems
+        {
+            get
+            {
+                _prescriptionItem ??= new PrescriptionItemRepo(Context);
+                return _prescriptionItem;
+            }
+        }
         #endregion
 
         #region View Properties
@@ -289,6 +322,33 @@ namespace WOMS.Server.Services.Repository
             {
                 _viSupplier ??= new ViSupplierRepo(Context);
                 return _viSupplier;
+            }
+        }
+
+        public IViConsultationRepo ViConsultations
+        {
+            get
+            {
+                _viConsultation ??= new ViConsultationRepo(Context);
+                return _viConsultation;
+            }
+        }
+
+        public IViPrescriptionRepo ViPrescriptions
+        {
+            get
+            {
+                _viPrescription ??= new ViPrescriptionRepo(Context);
+                return _viPrescription;
+            }
+        }
+
+        public IViPrescriptionItemRepo ViPrescriptionItems
+        {
+            get
+            {
+                _viPrescriptionItem ??= new ViPrescriptionItemRepo(Context);
+                return _viPrescriptionItem;
             }
         }
         #endregion
