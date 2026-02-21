@@ -39,10 +39,10 @@ public interface IIdGenerateService
     string GetOPDVNo(long BranchId);
 
     /// <summary>
-    /// Damange VNO => [D1-010125-RXYDQC]
+    /// Consultation ID => [C-010125-RXYDQC]
     /// </summary>
     /// <param name="BranchId"></param>
     /// <returns></returns>
-    string GetLabVoucherVno(long BranchId);
-      
+    string GetConsultationId(long BranchId);
+
 }
