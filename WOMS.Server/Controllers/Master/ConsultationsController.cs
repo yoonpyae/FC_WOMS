@@ -81,7 +81,7 @@ namespace WOMS.Server.Controllers.Master
                 : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to update consultation record.", ""));
         }
 
-        [HttpDelete("{id:string}")]
+        [HttpDelete]
         [EndpointSummary("Delete")]
         [EndpointDescription("Deletes a consultation record.")]
         public async Task<IActionResult> Delete(string id)
