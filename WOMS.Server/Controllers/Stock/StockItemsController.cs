@@ -29,13 +29,13 @@ public class StockItemsController(
             : ResponseHelper.OK_Result(true, new DefaultResponseMessageModel("Item name can be use for item code", ""));
     }
 
-    //[HttpGet("auto-id")]
-    //[EndpointSummary("Get Item Code")]
-    //[EndpointDescription("Gets a stock item code.")]
-    //public async Task<IActionResult> GetAutoId(string Name, long ClinicId)
-    //{
-    //    return ResponseHelper.OK_Result(await idGenerateService.GetItemCode(Name, ClinicId), null);
-    //}
+    [HttpGet("auto-id")]
+    [EndpointSummary("Get Item Code")]
+    [EndpointDescription("Gets a stock item code.")]
+    public async Task<IActionResult> GetAutoId(string Name, long BranchId)
+    {
+        return ResponseHelper.OK_Result(await idGenerateService.GetItemCode(Name, BranchId), null);
+    }
 
     [HttpPost]
     [ValidateModel]
