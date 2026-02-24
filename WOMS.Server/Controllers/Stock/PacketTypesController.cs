@@ -16,19 +16,19 @@
                 await repo.PacketTypes.GetAsync(x => !x.DeletedOn.HasValue), null);
         }
 
-        //[HttpGet("auto-code")]
-        //[EndpointSummary("Get Auto Code")]
-        //[EndpointDescription("Get Auto Code for Packet Type")]
-        //public async Task<IActionResult> GetAutoCode()
-        //{
-        //    PacketType? lastRecord = await repo.PacketTypes.GetFirstAsync(
-        //        q => q.OrderByDescending(x => x.TypeCode));
+        [HttpGet("auto-code")]
+        [EndpointSummary("Get Auto Code")]
+        [EndpointDescription("Get Auto Code for Packet Type")]
+        public async Task<IActionResult> GetAutoCode(long branchId)
+        {
+            PacketType? lastRecord = await repo.PacketTypes.GetFirstAsync(x => x.BranchId == branchId,
+                q => q.OrderByDescending(x => x.TypeCode));
 
-        //    long maxCode = lastRecord?.TypeCode ?? 0;
-        //    maxCode++;
+            long maxCode = lastRecord?.TypeCode ?? 0;
+            maxCode++;
 
-        //    return ResponseHelper.OK_Result(maxCode, null);
-        //}
+            return ResponseHelper.OK_Result(maxCode, null);
+        }
 
         [HttpPost]
         [ValidateModel]
