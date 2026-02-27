@@ -34,8 +34,6 @@ public partial class WOMSDbContext : DbContext
 
     public virtual DbSet<DoctorSchedule> DoctorSchedules { get; set; }
 
-    public virtual DbSet<LabService> LabServices { get; set; }
-
     public virtual DbSet<MainStock> MainStocks { get; set; }
 
     public virtual DbSet<Opdvoucher> Opdvouchers { get; set; }
@@ -52,11 +50,11 @@ public partial class WOMSDbContext : DbContext
 
     public virtual DbSet<Prescription> Prescriptions { get; set; }
 
-    public virtual DbSet<PrescriptionItem> PrescriptionItems { get; set; }
-
     public virtual DbSet<Purchase> Purchases { get; set; }
 
     public virtual DbSet<PurchaseDetail> PurchaseDetails { get; set; }
+
+    public virtual DbSet<Service> Services { get; set; }
 
     public virtual DbSet<State> States { get; set; }
 
@@ -81,8 +79,6 @@ public partial class WOMSDbContext : DbContext
     public virtual DbSet<ViPharmacyVoucherDetail> ViPharmacyVoucherDetails { get; set; }
 
     public virtual DbSet<ViPrescription> ViPrescriptions { get; set; }
-
-    public virtual DbSet<ViPrescriptionItem> ViPrescriptionItems { get; set; }
 
     public virtual DbSet<ViPurchase> ViPurchases { get; set; }
 
@@ -132,11 +128,6 @@ public partial class WOMSDbContext : DbContext
             entity.HasKey(e => new { e.DoctorId, e.BranchId }).HasName("PK_Doctor_1");
         });
 
-        modelBuilder.Entity<LabService>(entity =>
-        {
-            entity.Property(e => e.ServiceId).ValueGeneratedNever();
-        });
-
         modelBuilder.Entity<MainStock>(entity =>
         {
             entity.HasKey(e => new { e.ItemCode, e.TypeCode }).HasName("PK_MainStock_1");
@@ -151,7 +142,7 @@ public partial class WOMSDbContext : DbContext
 
         modelBuilder.Entity<PacketType>(entity =>
         {
-            entity.Property(e => e.TypeCode).ValueGeneratedNever();
+            entity.HasKey(e => new { e.TypeCode, e.BranchId }).HasName("PK_PacketType_1");
         });
 
         modelBuilder.Entity<Patient>(entity =>
@@ -169,19 +160,21 @@ public partial class WOMSDbContext : DbContext
             entity.HasKey(e => new { e.Vno, e.ItemCode, e.TypeCode }).HasName("PK_SaleDetail");
         });
 
-        modelBuilder.Entity<Prescription>(entity =>
+        modelBuilder.Entity<Service>(entity =>
         {
-            entity.Property(e => e.CreatedOn).HasDefaultValueSql("(getdate())");
-        });
+            entity.HasKey(e => e.ServiceId).HasName("PK_LabService");
 
-        modelBuilder.Entity<PrescriptionItem>(entity =>
-        {
-            entity.Property(e => e.CreatedOn).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.ServiceId).ValueGeneratedNever();
         });
 
         modelBuilder.Entity<State>(entity =>
         {
             entity.Property(e => e.StateId).ValueGeneratedNever();
+        });
+
+        modelBuilder.Entity<StockItem>(entity =>
+        {
+            entity.HasKey(e => new { e.ItemCode, e.BranchId }).HasName("PK_StockItem_1");
         });
 
         modelBuilder.Entity<Township>(entity =>
@@ -222,11 +215,6 @@ public partial class WOMSDbContext : DbContext
         modelBuilder.Entity<ViPrescription>(entity =>
         {
             entity.ToView("VI_Prescription");
-        });
-
-        modelBuilder.Entity<ViPrescriptionItem>(entity =>
-        {
-            entity.ToView("VI_PrescriptionItem");
         });
 
         modelBuilder.Entity<ViPurchase>(entity =>
