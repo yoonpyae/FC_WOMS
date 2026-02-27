@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WOMS.Server.Entities;
 
-[PrimaryKey("PrescriptionId", "ConsultationId")]
+[PrimaryKey("PrescriptionId", "ConsultationId", "ItemCode")]
 [Table("Prescription")]
 public partial class Prescription
 {
@@ -19,26 +19,39 @@ public partial class Prescription
 
     public long BranchId { get; set; }
 
-    [Column(TypeName = "datetime")]
-    public DateTime? Date { get; set; }
+    [Key]
+    [StringLength(5)]
+    public string ItemCode { get; set; } = null!;
 
-    [Column(TypeName = "datetime")]
-    public DateTime CreatedOn { get; set; }
+    public long? Dosage { get; set; }
+
+    public long? Frequency { get; set; }
+
+    public long? Duration { get; set; }
 
     [StringLength(50)]
+    public string? Instruction { get; set; }
+
+    public long? Quantity { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? CreatedOn { get; set; }
+
+    [StringLength(256)]
     public string? CreatedBy { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? UpdatedOn { get; set; }
 
-    [StringLength(50)]
+    [StringLength(256)]
     public string? UpdatedBy { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? DeletedOn { get; set; }
 
-    [StringLength(50)]
+    [StringLength(256)]
     public string? DeletedBy { get; set; }
 
-    public bool Status { get; set; }
+    [Column(TypeName = "datetime")]
+    public DateTime Date { get; set; }
 }
