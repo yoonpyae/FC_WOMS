@@ -6,11 +6,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WOMS.Server.Entities;
 
+[PrimaryKey("TypeCode", "BranchId")]
 [Table("PacketType")]
 public partial class PacketType
 {
     [Key]
     public long TypeCode { get; set; }
+
+    [Key]
+    public long BranchId { get; set; }
 
     [StringLength(200)]
     public string? TypeName { get; set; }
