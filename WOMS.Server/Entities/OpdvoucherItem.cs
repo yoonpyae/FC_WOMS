@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WOMS.Server.Entities;
 
-[PrimaryKey("Opdvno", "ServiceId")]
+[PrimaryKey("Opdvno", "ServiceId", "ConsultationId")]
 [Table("OPDVoucherItem")]
 public partial class OpdvoucherItem
 {
@@ -17,6 +17,10 @@ public partial class OpdvoucherItem
 
     [Key]
     public long ServiceId { get; set; }
+
+    [Key]
+    [StringLength(20)]
+    public string ConsultationId { get; set; } = null!;
 
     [StringLength(200)]
     public string? Result { get; set; }
@@ -29,22 +33,4 @@ public partial class OpdvoucherItem
     public double? UnitPrice { get; set; }
 
     public double? Amount { get; set; }
-
-    [Column(TypeName = "datetime")]
-    public DateTime? CreatedOn { get; set; }
-
-    [StringLength(256)]
-    public string? CreatedBy { get; set; }
-
-    [Column(TypeName = "datetime")]
-    public DateTime? UpdatedOn { get; set; }
-
-    [StringLength(256)]
-    public string? UpdatedBy { get; set; }
-
-    [Column(TypeName = "datetime")]
-    public DateTime? DeletedOn { get; set; }
-
-    [StringLength(256)]
-    public string? DeletedBy { get; set; }
 }
