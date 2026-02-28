@@ -27,7 +27,6 @@ namespace WOMS.Server.Interfaces.Repositories
         IAppointmentRepo Appointments { get; }
         IConsultationRepo Consultations { get; }
         IPrescriptionRepo Prescriptions { get; }
-        IPrescriptionItemRepo PrescriptionItems { get; }
 
         #endregion
 
@@ -43,7 +42,6 @@ namespace WOMS.Server.Interfaces.Repositories
         IVISupplierRepo ViSuppliers { get; }
         IViConsultationRepo ViConsultations { get; }
         IViPrescriptionRepo ViPrescriptions { get; }
-        IViPrescriptionItemRepo ViPrescriptionItems { get; }
 
         #endregion
 
