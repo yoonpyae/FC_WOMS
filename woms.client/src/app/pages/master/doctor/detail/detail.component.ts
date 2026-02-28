@@ -24,6 +24,7 @@ import { ExportService } from '@shared_services/export.service';
 import { Location } from '@angular/common';
 import { ImageModule } from 'primeng/image';
 import { SharedService } from '@shared_services/shared.service';
+import { environment } from '@env/environment';
 
 @Component({
   selector: 'app-detail',
@@ -70,7 +71,7 @@ export class DetailComponent implements OnInit {
   imageChangedEvent: any = '';
   croppedImage: any = '';
   croppedImgBase64: any[] = [];
-
+  apiUrl = environment.web_url;
   paramValue!: string | '';
   doctor!: DoctorModel;
   doctorId: number = 0;
