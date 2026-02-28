@@ -12,7 +12,7 @@
         class="flex flex-col md:flex-row bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 gap-6 transition-colors duration-200">
 
         <div class="flex flex-col items-center gap-4 w-full md:w-48">
-            <p-avatar [image]="doctor.photo || DEFAULT_IMAGE_URL" shape="circle" size="xlarge"
+            <p-avatar [image]="apiUrl+ '/'  + doctor.photo || DEFAULT_IMAGE_URL" shape="circle" size="xlarge"
                 class="shadow-sm"></p-avatar>
             <div class="flex flex-wrap gap-2 justify-center">
                 <p-button label="Profile" icon="pi pi-upload" (click)="upload(doctor)"
