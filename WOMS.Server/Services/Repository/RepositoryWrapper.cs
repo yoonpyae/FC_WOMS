@@ -37,7 +37,6 @@ namespace WOMS.Server.Services.Repository
         private IAppointmentRepo? _appointment;
         private IConsultationRepo? _consultation;
         private IPrescriptionRepo? _prescription;
-        private IPrescriptionItemRepo? _prescriptionItem;
 
         #endregion
 
@@ -52,7 +51,6 @@ namespace WOMS.Server.Services.Repository
         private IVISupplierRepo? _viSupplier;
         private IViConsultationRepo? _viConsultation;
         private IViPrescriptionRepo? _viPrescription;
-        private IViPrescriptionItemRepo? _viPrescriptionItem;
 
         #endregion
 
@@ -241,14 +239,6 @@ namespace WOMS.Server.Services.Repository
             }
         }
 
-        public IPrescriptionItemRepo PrescriptionItems
-        {
-            get
-            {
-                _prescriptionItem ??= new PrescriptionItemRepo(Context);
-                return _prescriptionItem;
-            }
-        }
         #endregion
 
         #region View Properties
@@ -340,15 +330,6 @@ namespace WOMS.Server.Services.Repository
             {
                 _viPrescription ??= new ViPrescriptionRepo(Context);
                 return _viPrescription;
-            }
-        }
-
-        public IViPrescriptionItemRepo ViPrescriptionItems
-        {
-            get
-            {
-                _viPrescriptionItem ??= new ViPrescriptionItemRepo(Context);
-                return _viPrescriptionItem;
             }
         }
         #endregion
