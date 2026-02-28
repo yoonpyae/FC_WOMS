@@ -68,6 +68,8 @@ public class EncryptionService
         return streamReader.ReadToEnd();
     }
 
+
+
     /// <summary>
     /// Initializes and returns an AES encryption algorithm instance with a predefined key and IV.
     /// </summary>
