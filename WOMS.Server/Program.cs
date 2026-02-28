@@ -57,6 +57,7 @@ app.MapScalarApiReference("/docs", options =>
 });
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 
