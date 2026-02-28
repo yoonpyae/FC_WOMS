@@ -138,7 +138,6 @@ public class DoctorsController(
     #region Image-Upload
 
     [HttpPut("uploadPhoto")]
-    [ValidateModel]
     [EndpointSummary("Upload-photo")]
     [EndpointDescription("Upload Image")]
     public async Task<IActionResult> UploadPhoto(long id, IFormFile photo)
