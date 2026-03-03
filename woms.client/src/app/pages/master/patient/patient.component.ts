@@ -200,10 +200,11 @@ export class PatientComponent implements OnInit {
     }
   }
 
-  handlePatientSubmitted(success: string | boolean) {
+  handlePatientSubmitted(success: boolean) {
     if (success) {
       this.modalVisible = false;
       this.loadData();
+      this.clearSelection();
     }
   }
 
