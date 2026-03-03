@@ -1,45 +1,27 @@
 import { RouterLink } from "@angular/router";
 import { last } from "rxjs";
+import { rootCertificates } from "tls";
 const ADMIN: string[] = ['admin'];
 const ADMIN_MANAGER: string[] = ['admin', 'manager'];
 const ADMIN_MANAGER_CASHIER: string[] = ['admin', 'manager', 'cashier'];
 
 export const NAVIGATION_MENU: Readonly<any[]> = [
   {
-    label: 'Home',
+    label: 'Overview',
     items: [
       {
         label: 'Dashboard',
         icon: 'pi pi-fw pi-chart-pie',
         routerLink: ['/dashboard'],
-      },
-      {
-        label: 'Master',
-        icon: 'pi pi-fw pi-database',
-        items: [
-
-          // {
-          //   label: 'Medical Checkup',
-          //   items: [
-          //     { label: 'Checkup-Company', routerLink: ['/master/checkup-company'] },
-          //     { label: 'Checkup Types', routerLink: ['/master/checkup-types'] },
-          //   ]
-          // },
-          {
-            label: 'Diagnostic Tests',
-            items: [
-              { label: 'ECG Test', routerLink: ['/master/ecg-tests'] },
-              { label: 'Ultrasound Test', routerLink: ['/master/ultrasound-tests'] },
-              { label: 'X-Ray Test', routerLink: ['/master/xray-tests'] },
-              { label: 'Physiotherapy', routerLink: ['/master/physiotherapies'] },
-
-            ]
-          },
-        ]
-      },
+      }
+    ],
+  },
+  {
+    label: 'Outpatient Department',
+    items: [
       {
         label: 'Doctor',
-        icon: 'pi pi-fw pi-users',
+        icon: 'pi pi-fw pi-id-card',
         routerLink: ['/doctor']
       },
       {
@@ -53,44 +35,82 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
         routerLink: ['/appointment']
       },
       {
-        label: 'Stock',
+        label: 'Service',
+        icon: 'pi pi-fw pi-briefcase',
+        items: [
+          { label: 'OPD Service', routerLink: ['/opd/opd-service'] },
+          { label: 'OPD Doctor Attach', routerLink: ['/opd/opd-doctor-attach'] },
+        ]
+      }
+    ]
+  },
+  {
+    label: 'Stock Management',
+    items: [
+      {
+        label: 'Supplier',
+        icon: 'pi pi-fw pi-truck',
+        routerLink: ['/stock/supplier']
+      },
+      {
+        label: 'Stock Operations',
         icon: 'pi pi-fw pi-box',
         items: [
-          { label: 'Supplier', routerLink: ['/stock/supplier'] },
           { label: 'Packet Type', routerLink: ['/stock/packet-types'] },
           { label: 'Stock Item', routerLink: ['/stock/stock-items'] },
           { label: 'Purchase', routerLink: ['/stock/purchases'] },
           { label: 'Main Stock', routerLink: ['/stock/main-stocks'] },
-          { label: 'Stock Issue', routerLink: ['/stock/stock-issue'] },
-          { label: 'Damage Voucher', routerLink: ['/stock/damage-vouchers'] }
         ]
-      },
+      }
+    ]
+  },
+  {
+    label: 'Vouchers & Billing',
+    items: [
       {
         label: 'Lab Voucher',
-        icon: 'pi pi-book',
+        icon: 'pi pi-fw pi-receipt',
         items: [
           { label: 'Create Voucher', routerLink: ['/lab-voucher/create-vouchers'] },
           { label: 'History', routerLink: ['/lab-voucher/histories'] }
         ]
       },
-
       {
         label: 'Pharmacy Voucher',
-        icon: 'pi pi-book',
+        icon: 'pi pi-fw pi-receipt',
         items: [
           { label: 'Create Voucher', routerLink: ['/pharmacy-voucher/create-vouchers'] },
           { label: 'History', routerLink: ['/pharmacy-voucher/histories'] }
         ]
       },
       {
-        label: 'OPD',
-        icon: 'pi pi-users',
+        label: 'OPD Voucher',
+        icon: 'pi pi-fw pi-receipt',
         items: [
-          { label: 'OPD Booking', routerLink: ['/opd/opd-bookings'] },
-          { label: 'OPD Voucher', routerLink: ['/opd/opd-vouchers'] },
-          { label: 'OPD Doctor Attach', routerLink: ['/opd/opd-doctor-attach'] },
+          { label: 'Create Voucher', routerLink: ['/opd-voucher/create-vouchers'] },
+          { label: 'History', routerLink: ['/opd-voucher/histories'] }
         ]
-      },
-    ],
+      }
+    ]
   },
+  {
+    label: 'Reports',
+    items: [
+      {
+        label: 'Appointment Reports',
+        icon: 'pi pi-fw pi-chart-bar',
+        routerLink: ['/reports/appointment-reports']
+      },
+      {
+        label: 'Stock Reports',
+        icon: 'pi pi-fw pi-chart-line',
+        routerLink: ['/reports/stock-reports']
+      },
+      {
+        label: 'Voucher Reports',
+        icon: 'pi pi-fw pi-file-excel',
+        routerLink: ['/reports/voucher-reports']
+      }
+    ]
+  }
 ];
