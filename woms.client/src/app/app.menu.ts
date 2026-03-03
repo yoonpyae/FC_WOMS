@@ -35,6 +35,11 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
         routerLink: ['/appointment']
       },
       {
+        label: 'Consultation',
+        icon: 'pi pi-fw pi-stethoscope',
+        routerLink: ['/consultation']
+      },
+      {
         label: 'Service',
         icon: 'pi pi-fw pi-briefcase',
         items: [
