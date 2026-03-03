@@ -1,0 +1,203 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="card" *ngIf="!showForm">
+    <p-table #dt1 [value]="consultations" [paginator]="true" [rows]="20" [loading]="loading" sortField="createdOn"
+        [sortOrder]="-1" styleClass="p-datatable-striped" [showCurrentPageReport]="true"
+        [globalFilterFields]="['consultationId','symptoms','diagnosis','patientName','doctorName','status']"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [rowsPerPageOptions]="[20,50,100]" selectionMode="single" [(selection)]="selectedConsultation"
+        dataKey="consultationId">
+        <ng-template #caption>
+
+            <div class="grid grid-cols-12 mb-4">
+                <div class=" md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
+                    <p-toast></p-toast>
+                    <p-splitButton label="Create" icon="pi pi-plus" [model]="items"
+                        (onClick)="create()"></p-splitButton>
+                </div>
+                <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
+                    <p-iconfield iconPosition="left" class="ml-auto">
+                        <p-inputicon>
+                            <i class="pi pi-search"></i>
+                        </p-inputicon>
+                        <input #search pInputText type="text" (input)="dt1.filterGlobal(search.value, 'contains')"
+                            placeholder="Search keyword" class="w-full" />
+                    </p-iconfield>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template #header>
+            <tr style="white-space:nowrap">
+                <th pFrozenColumn [style]="{ width:'10px' }">#</th>
+                <th pSortableColumn="consultationId">Id
+                    <p-sortIcon field="consultationId"></p-sortIcon>
+                </th>
+
+                <th pSortableColumn="patientName">Patient Name
+                    <p-sortIcon field="patientName"></p-sortIcon>
+                </th>
+                <th pSortableColumn="doctorName">Doctor Name
+                    <p-sortIcon field="doctorName"></p-sortIcon>
+                </th>
+                <th pSortableColumn="symptoms">Symptoms
+                    <p-sortIcon field="symptoms"></p-sortIcon>
+                </th>
+                <th pSortableColumn="diagnosis">Diagnosis
+                    <p-sortIcon field="diagnosis"></p-sortIcon>
+                </th>
+                <th pSortableColumn="visitDate">Visit Date
+                    <p-sortIcon field="visitDate"></p-sortIcon>
+                </th>
+                <th pSortableColumn="notes">Notes
+                    <p-sortIcon field="notes"></p-sortIcon>
+                </th>
+                <th pSortableColumn="status">Status
+                    <p-sortIcon field="status"></p-sortIcon>
+                </th>
+                <th pSortableColumn="createdOn">Created On
+                    <p-sortIcon field="createdOn"></p-sortIcon>
+                </th>
+                <th pSortableColumn="createdBy">Created By
+                    <p-sortIcon field="createdBy"></p-sortIcon>
+                </th>
+                <th pSortableColumn="updatedOn">Updated On
+                    <p-sortIcon field="updatedOn"></p-sortIcon>
+                </th>
+                <th pSortableColumn="updatedBy">Updated By
+                    <p-sortIcon field="updatedBy"></p-sortIcon>
+                </th>
+
+            </tr>
+        </ng-template>
+        <ng-template #body let-consultation>
+            <tr style="white-space:nowrap" [pSelectableRow]="consultation">
+                <td>
+                    <span class="pi pi-circle" [class.pi-check-circle]="selectedConsultation===consultation"></span>
+                </td>
+                <td>{{ consultation.consultationId }}</td>
+                <td>{{ consultation.patientName }}</td>
+                <td>{{ consultation.doctorName}}</td>
+                <td>{{ consultation.symptoms}}</td>
+                <td>{{ consultation.diagnosis}}</td>
+                <td>{{ consultation.visitDate | date : 'dd/MMM/yyyy' }}</td>
+                <td>{{ consultation.notes}}</td>
+                <td>
+                    <p-tag value="{{ consultation.status?'Active':'InActive' }}"
+                        [severity]="consultation.status?'success':'info'"
+                        icon="{{ consultation.status?'pi pi-check':'pi pi-minus-circle' }}" [rounded]="true"></p-tag>
+                </td>
+
+                <td>{{ consultation.createdOn | date : 'dd/MMM/yyyy hh:mm:ss a' }}</td>
+                <td>{{ consultation.createdBy }}</td>
+                <td>{{ consultation.updatedOn | date : 'dd/MMM/yyyy hh:mm:ss a' }}</td>
+                <td>{{ consultation.updatedBy }}</td>
+
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<div *ngIf="showForm" [formGroup]="consultationForm">
+
+    <div class="flex items-center gap-3 mb-4">
+        <p-button icon="pi pi-arrow-left" [rounded]="true" [text]="true" severity="secondary"
+            (onClick)="cancelForm()"></p-button>
+        <div>
+            <h2 class="text-2xl font-bold m-0">{{ isEdit ? 'Edit Consultation' : 'Create Prescription' }}</h2>
+            <p class="text-gray-500 m-0 text-sm">Create a new prescription for a patient.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-6">
+
+        <div class="col-span-12 md:col-span-8 flex flex-col gap-6">
+
+            <div class="card bg-white p-6 rounded-lg border border-gray-200">
+                <h3 class="text-lg font-bold mb-4">Prescription Details</h3>
+
+                <div class="grid grid-cols-12 gap-4 mb-4">
+                    <div class="col-span-12 md:col-span-6 flex flex-col">
+                        <label class="text-sm font-semibold mb-2">Prescription Date</label>
+                        <p-select formControlName="visitDate" class="w-full"></p-select>
+                    </div>
+                </div>
+
+                <div class="flex flex-col mb-4">
+                    <label class="text-sm font-semibold mb-2">Diagnosis</label>
+                    <textarea pTextarea formControlName="diagnosis" rows="3" class="w-full"
+                        placeholder="Enter diagnosis or reason for prescription"></textarea>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-bold m-0">Medications</h3>
+                <p-button label="Add Medication" icon="pi pi-plus" size="small" severity="contrast"
+                    (onClick)="addMedication()"></p-button>
+            </div>
+
+            <div formArrayName="prescriptions" class="flex flex-col gap-4">
+                <div *ngFor="let med of prescriptionsArray.controls; let i = index" [formGroupName]="i"
+                    class="card bg-white p-6 rounded-lg border border-gray-200 relative">
+
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-md m-0">Medication #{{ i + 1 }}</h4>
+                        <p-button icon="pi pi-trash" [text]="true" severity="danger"
+                            *ngIf="prescriptionsArray.length > 1" (onClick)="removeMedication(i)"></p-button>
+                    </div>
+
+                    <div class="flex flex-col mb-4">
+                        <label class="text-sm font-semibold mb-2">Medication Name</label>
+                        <app-item-code-dropdown [(ngModel)]="selectedStockItem" [ngModelOptions]="{ standalone: true }"
+                            (onValueChange)="onStockItemChange($event)" ngDefaultControl placeholder="Select medication..."
+                            [style]="{ width: '100%' }" required>
+                        </app-item-code-dropdown>
+                    </div>
+
+                    <div class="grid grid-cols-12 gap-4 mb-4">
+                        <div class="col-span-12 md:col-span-6 flex flex-col">
+                            <label class="text-sm font-semibold mb-2">Dosage</label>
+                            <p-select [options]="dosages" formControlName="dosage" class="w-full"></p-select>
+                        </div>
+                        <div class="col-span-12 md:col-span-6 flex flex-col">
+                            <label class="text-sm font-semibold mb-2">Frequency</label>
+                            <p-select [options]="frequencies" formControlName="frequency" class="w-full"></p-select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12 gap-4 mb-4">
+                        <div class="col-span-12 md:col-span-6 flex flex-col">
+                            <label class="text-sm font-semibold mb-2">Duration (Days)</label>
+                            <input pInputText type="number" formControlName="duration" class="w-full" />
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col mb-2">
+                        <label class="text-sm font-semibold mb-2">Special Instructions</label>
+                        <textarea pTextarea formControlName="instruction" rows="2" class="w-full"
+                            placeholder="Enter any special instructions for this medication"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-4">
+                <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="cancelForm()"></p-button>
+                <p-button label="Create Prescription" severity="contrast" (onClick)="saveConsultation()"
+                    [loading]="isSubmitting"></p-button>
+            </div>
+        </div>
+
+        <div class="col-span-12 md:col-span-4 flex flex-col gap-6">
+
+            <div class="card bg-white p-6 rounded-lg border border-gray-200">
+                <h3 class="text-lg font-bold mb-4">Patient Information</h3>
+                <div class="flex flex-col mb-4">
+                    <label class="text-sm font-semibold mb-2">Select a patient for this prescription.</label>
+                    <app-patient-drop-down (onValueChange)="onPatientSelected($event)">
+                    </app-patient-drop-down>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
