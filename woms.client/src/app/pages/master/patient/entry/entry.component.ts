@@ -66,8 +66,8 @@ export class EntryComponent implements OnInit {
   maxDate: Date = new Date();
 
   @Input() isEdit: boolean = false;
-  @Output() onSubmitted = new EventEmitter<string>();
-
+  @Output() onSubmitted = new EventEmitter<boolean>();
+  
   genders = [{ label: 'Male' }, { label: 'Female' }];
 
   private formBuilder = inject(FormBuilder);
@@ -84,7 +84,6 @@ export class EntryComponent implements OnInit {
       validators: [Validators.required, Validators.pattern("^(0(1|9)[0-9]{7,9})$")]
     }),
     gender: ['', Validators.required],
-    doctorId: [0, Validators.required],
     status: true,
   });
 
@@ -207,7 +206,7 @@ export class EntryComponent implements OnInit {
               summary: 'Success',
               detail: res.message.en,
             });
-            this.onSubmitted.emit(res.data?.patientId || 'success');
+            this.onSubmitted.emit(true);
             this.loggerService.success(res.data?.patientId);
           },
           error: (err) => {
@@ -234,7 +233,7 @@ export class EntryComponent implements OnInit {
               summary: 'Success',
               detail: res.message.en,
             });
-            this.onSubmitted.emit(res.data);
+            this.onSubmitted.emit(true);
             this.loggerService.success(res.data);
           },
           error: (err) => {
@@ -252,6 +251,13 @@ export class EntryComponent implements OnInit {
         });
       }
     } else {
+      this.messageService.add({
+        key: 'globalMessage',
+        severity: 'error',
+        summary: 'Validation Failed',
+        detail: 'Please check the required fields and ensure the phone number format is correct.',
+      });
+
       Object.keys(this.patientForm.controls).forEach((field) => {
         let control = this.patientForm.get(field);
         control?.markAsDirty({ onlySelf: true });
