@@ -141,27 +141,19 @@
 
             </div>
 
-
-
             <!-- Gender -->
 
             <div class="flex flex-col gap-2 col-span-1">
-
                 <label class="font-semibold">Gender</label>
-
-                <p-select [options]="genders" formControlName="gender" optionLabel="label" placeholder="Select Gender"
+                <p-select [options]="genders" formControlName="gender" optionLabel="label" optionValue="label"
+                    placeholder="Select Gender"
                     [ngClass]="{ 'ng-invalid ng-dirty': patientForm.controls['gender'].invalid && patientForm.controls['gender'].touched }"
-                    class="w-full"></p-select>
-
+                    class="w-full">
+                </p-select>
                 <small *ngIf="patientForm.controls['gender'].invalid && formSubmitted" class="text-red-500 text-xs">
-
                     Gender is required.
-
                 </small>
-
             </div>
-
-
 
             <!-- Status -->
 
