@@ -1,4 +1,5 @@
 import { RouterLink } from "@angular/router";
+import { UserRole } from "@core_models/user-role";
 import { last } from "rxjs";
 import { rootCertificates } from "tls";
 const ADMIN: string[] = ['admin'];
@@ -22,26 +23,31 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
       {
         label: 'Doctor',
         icon: 'pi pi-fw pi-id-card',
-        routerLink: ['/doctor']
+        routerLink: ['/doctor'],
+        data: { roles: [UserRole.SuperAdmin] }
       },
       {
         label: 'Patient',
         icon: 'pi pi-fw pi-user',
-        routerLink: ['/patient']
+        routerLink: ['/patient'],
+        data: { roles: [UserRole.Receptionist, UserRole.SuperAdmin, UserRole.Doctor] }
       },
       {
         label: 'Appointment',
         icon: 'pi pi-fw pi-calendar',
-        routerLink: ['/appointment']
+        routerLink: ['/appointment'],
+        data: { roles: [UserRole.Receptionist, UserRole.SuperAdmin] }
       },
       {
         label: 'Consultation',
-        icon: 'pi pi-fw pi-stethoscope',
-        routerLink: ['/consultation']
+        icon: 'pi pi-fw pi-file-edit',
+        routerLink: ['/consultation'],
+        data: { roles: [UserRole.Doctor] }
       },
       {
         label: 'Service',
         icon: 'pi pi-fw pi-briefcase',
+        data: { roles: [UserRole.SuperAdmin] },
         items: [
           { label: 'OPD Service', routerLink: ['/opd/opd-service'] },
           { label: 'OPD Doctor Attach', routerLink: ['/opd/opd-doctor-attach'] },
@@ -55,11 +61,13 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
       {
         label: 'Supplier',
         icon: 'pi pi-fw pi-truck',
-        routerLink: ['/stock/supplier']
+        routerLink: ['/stock/supplier'],
+        data: { roles: [UserRole.SuperAdmin] }
       },
       {
         label: 'Stock Operations',
         icon: 'pi pi-fw pi-box',
+        data: { roles: [UserRole.Pharmacist, UserRole.SuperAdmin] },
         items: [
           { label: 'Packet Type', routerLink: ['/stock/packet-types'] },
           { label: 'Stock Item', routerLink: ['/stock/stock-items'] },
@@ -73,16 +81,9 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
     label: 'Vouchers & Billing',
     items: [
       {
-        label: 'Lab Voucher',
-        icon: 'pi pi-fw pi-receipt',
-        items: [
-          { label: 'Create Voucher', routerLink: ['/lab-voucher/create-vouchers'] },
-          { label: 'History', routerLink: ['/lab-voucher/histories'] }
-        ]
-      },
-      {
         label: 'Pharmacy Voucher',
         icon: 'pi pi-fw pi-receipt',
+        data: { roles: [UserRole.Pharmacist, UserRole.SuperAdmin] },
         items: [
           { label: 'Create Voucher', routerLink: ['/pharmacy-voucher/create-vouchers'] },
           { label: 'History', routerLink: ['/pharmacy-voucher/histories'] }
@@ -91,6 +92,7 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
       {
         label: 'OPD Voucher',
         icon: 'pi pi-fw pi-receipt',
+        data: { roles: [UserRole.Receptionist, UserRole.SuperAdmin] },
         items: [
           { label: 'Create Voucher', routerLink: ['/opd-voucher/create-vouchers'] },
           { label: 'History', routerLink: ['/opd-voucher/histories'] }
@@ -100,6 +102,7 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
   },
   {
     label: 'Reports',
+    data: { roles: [UserRole.SuperAdmin] },
     items: [
       {
         label: 'Appointment Reports',
