@@ -25,6 +25,8 @@ import { StockItemModel } from '@core_models/stock/stock-item.model';
 import { PatientDropDownComponent } from '@shared_component/drop-down/patient-drop-down/patient-drop-down.component';
 import { DropdownStateService } from '@shared_services/state-management/dropdown-state.service';
 import { ItemCodeDropdownComponent } from '@shared_component/drop-down/item-code-dropdown/item-code-dropdown.component';
+import { DatePickerModule } from 'primeng/datepicker';
+import { ConsultationEntryModel } from '@core_models/master/prescription.model';
 
 @Component({
   selector: 'app-consultation',
@@ -37,7 +39,6 @@ import { ItemCodeDropdownComponent } from '@shared_component/drop-down/item-code
     ToastModule,
     ButtonModule,
     SplitButton,
-    ToggleSwitch,
     InputTextModule,
     TextareaModule,
     InputIconModule,
@@ -49,6 +50,7 @@ import { ItemCodeDropdownComponent } from '@shared_component/drop-down/item-code
     SelectModule,
     PatientDropDownComponent,
     ItemCodeDropdownComponent,
+    DatePickerModule
   ],
   providers: [ConfirmationService, DropdownStateService, DatePipe, DecimalPipe, ExportService],
   templateUrl: './consultation.component.html',
@@ -66,11 +68,17 @@ export class ConsultationComponent implements OnInit {
   showForm: boolean = false;
   isEdit: boolean = false;
 
+  // cached id of currently logged in doctor (derived from user cookie)
+  private get currentDoctorId(): number {
+    const id = this.sharedService.getUserId();
+    return id ? Number.parseInt(id) : 0;
+  }
+
   // Mock data for dropdowns (Replace with real service calls)
   patients: ViPatientModel[] = [];
   selectedPatient!: ViPatientModel;
   stockItems: StockItemModel[] = [];
-  selectedStockItem: StockItemModel | null = null;
+  selectedStockItems: any[] = [];
   dosages: string[] = ['Select dosage', '10mg', '20mg', '500mg'];
   frequencies: string[] = ['Select frequency', 'Once daily', 'Twice daily', 'Once daily at bedtime'];
   patientId = '';
@@ -80,7 +88,7 @@ export class ConsultationComponent implements OnInit {
 
   private formBuilder = inject(FormBuilder);
   public consultationForm: FormGroup = this.formBuilder.group({
-    consultationId: [''],
+    consultationId: ['TEMP_ID'],
     branchId: [0, Validators.required],
     patientId: ['', Validators.required],
     doctorId: [0, Validators.required],
@@ -120,18 +128,22 @@ export class ConsultationComponent implements OnInit {
 
   addMedication() {
     const medGroup = this.formBuilder.group({
+      consultationId: ['TEMP_ID'],
       itemCode: ['', Validators.required],
       dosage: ['Select dosage'],
       frequency: ['Select frequency'],
-      duration: [30],
+      duration: [3],
       instruction: [''],
       quantity: [1]
     });
     this.prescriptionsArray.push(medGroup);
+
+    this.selectedStockItems.push(null);
   }
 
   removeMedication(index: number) {
     this.prescriptionsArray.removeAt(index);
+    this.selectedStockItems.splice(index, 1);
   }
 
   // --- Data Operations ---
@@ -150,7 +162,22 @@ export class ConsultationComponent implements OnInit {
   create(): void {
     this.isEdit = false;
     this.showForm = true;
-    this.consultationForm.reset({ visitDate: new Date(), status: 'Active' });
+
+    this.consultationForm.get('visitDate')?.enable();
+    this.consultationForm.get('patientId')?.enable();
+
+    // reset form and seed branch/doctor default values
+    this.consultationForm.reset({ consultationId: 'TEMP_ID', visitDate: new Date(), status: 'Active' });
+    this.consultationForm.patchValue({
+      branchId: Number.parseInt(this.sharedService.getDefaultBranchId() ?? '0'),
+      doctorId: this.currentDoctorId
+    });
+
+    this.selectedPatient = {} as ViPatientModel;
+    this.patientId = '';
+    this.name = '';
+    this.selectedStockItems = [];
+
     this.prescriptionsArray.clear();
     this.addMedication(); // Add one default blank medication row
   }
@@ -161,18 +188,156 @@ export class ConsultationComponent implements OnInit {
   }
 
   saveConsultation(): void {
+    const branchId = Number.parseInt(this.sharedService.getDefaultBranchId() ?? '0');
+    this.consultationForm.patchValue({ branchId, doctorId: this.currentDoctorId });
+
     if (this.consultationForm.invalid) {
       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Please fill all required fields.' });
       return;
     }
 
-    // Here you will send this.consultationForm.value to your backend API.
-    // Ensure your backend endpoint can accept both the Consultation details AND the array of Prescriptions.
-    console.log("Submitting Payload:", this.consultationForm.value);
+    this.isSubmitting = true;
+
+    // 1. Get the raw form value
+    const formValue = this.consultationForm.getRawValue();
+
+    // 2. Separate the prescriptions array from the rest of the consultation data
+    const { prescriptions, ...consultationData } = formValue;
+
+    // 3. Structure the payload to match your C# ConsultationCreationDto
+    const payload: ConsultationEntryModel = {
+      consultation: consultationData,
+      prescriptions: prescriptions
+    };
+
+    // 4. Send the correctly structured payload
+    const request$ = this.isEdit
+      ? this.consultationService.update(payload)
+      : this.consultationService.create(payload);
+
+    request$.subscribe({
+      next: res => {
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: res.message?.en ?? 'Saved successfully.' });
+        this.loadData();
+        this.cancelForm();
+      },
+      error: err => {
+        this.loggerService.error(err);
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'An error occurred while saving.' });
+        this.isSubmitting = false;
+      },
+      complete: () => {
+        this.isSubmitting = false;
+      }
+    });
   }
 
-  update(): void { /* Bind selected record to form and set showForm = true */ }
-  delete(): void { }
+  update(): void {
+    if (!this.selectedConsultation) {
+      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Please select a record to update.' });
+      return;
+    }
+
+    this.isEdit = true;
+    this.showForm = true;
+    this.consultationForm.reset();
+
+    const branchId = Number.parseInt(this.sharedService.getDefaultBranchId() ?? '0');
+    const visitDateObj = this.selectedConsultation.visitDate ? new Date(this.selectedConsultation.visitDate) : new Date();
+
+    this.consultationForm.patchValue({
+      ...this.selectedConsultation,
+      visitDate: visitDateObj,
+      branchId,
+      doctorId: this.currentDoctorId
+    });
+
+    this.consultationForm.get('visitDate')?.disable();
+    this.consultationForm.get('patientId')?.disable();
+
+    this.selectedPatient = {
+      patientId: this.selectedConsultation.patientId,
+      name: (this.selectedConsultation as any).patientName || ''
+    } as ViPatientModel;
+
+    this.prescriptionsArray.clear();
+
+    this.consultationService.getPrescriptionByConsultationId(this.selectedConsultation.consultationId).subscribe({
+      next: (res: any) => {
+        const prescriptions: any[] = res.data?.prescriptions || [];
+        if (prescriptions.length > 0) {
+          prescriptions.forEach((p, i) => {
+
+            this.selectedStockItems[i] = {
+              itemCode: p.itemCode,
+              itemName: p.itemName || p.itemCode
+            };
+
+            const medGroup = this.formBuilder.group({
+              consultationId: [this.selectedConsultation.consultationId],
+              itemCode: [p.itemCode, Validators.required],
+              dosage: [p.dosage],
+              frequency: [p.frequency],
+              duration: [p.duration || 3],
+              instruction: [p.instruction || ''],
+              quantity: [p.quantity || 1]
+            });
+            this.prescriptionsArray.push(medGroup);
+          });
+        } else {
+          this.addMedication();
+        }
+      },
+      error: (err: any) => this.loggerService.error("Failed to load prescriptions")
+    });
+  }
+
+  delete(): void {
+    // 1. Check if a row is actually selected in the table
+    if (!this.selectedConsultation) {
+      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Please select a record to delete.' });
+      return;
+    }
+
+    // 2. Show the PrimeNG confirmation dialog
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete the consultation record for ${this.selectedConsultation.patientName}?`,
+      header: 'Confirm Deletion',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text p-button-secondary',
+
+      // 3. If the user clicks "Yes" (Accept)
+      accept: () => {
+        this.loading = true;
+
+        // Call your backend delete API passing the string ID
+        this.consultationService.delete(this.selectedConsultation.consultationId).subscribe({
+          next: (res: any) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: res.message?.en ?? 'Consultation deleted successfully.'
+            });
+
+            // @ts-ignore (If TypeScript complains about nulling the strict type)
+            this.selectedConsultation = null;
+            this.loadData();
+          },
+          error: (err: any) => {
+            this.loggerService.error("Delete Error");
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'An error occurred while deleting the record.'
+            });
+            this.loading = false;
+          }
+        });
+      }
+    });
+  }
+
   excel(): void { }
 
   //#region Patient
@@ -183,22 +348,30 @@ export class ConsultationComponent implements OnInit {
     if (patient) {
       this.name = patient.name;
       this.patientId = patient.patientId;
+      this.consultationForm.patchValue({ patientId: patient.patientId });
     } else {
       this.name = '';
       this.patientId = '';
+      this.consultationForm.patchValue({ patientId: '' });
     }
   }
   //#
 
   // #region Stock Item
-  onStockItemChange(medicine: StockItemModel): void {
+  onStockItemChange(medicine: StockItemModel, index: number): void {
     this.loggerService.info("Stock Item Change");
+
+    // Get the specific form group for this row
+    const medGroup = this.prescriptionsArray.at(index) as FormGroup;
+
     if (medicine) {
       this.itemCode = medicine.itemCode;
       this.itemName = medicine.itemName;
+      medGroup.patchValue({ itemCode: medicine.itemCode });
     } else {
       this.itemCode = '';
       this.itemName = '';
+      medGroup.patchValue({ itemCode: '' });
     }
   }
   // #endregion
