@@ -1,0 +1,253 @@
+<div class="flex flex-col gap-4">
+    <div class="flex items-center gap-3">
+        <p-button icon="pi pi-arrow-left" [rounded]="true" [text]="true" severity="secondary"
+            routerLink="/patient"></p-button>
+        <div>
+            <h2 class="text-2xl font-bold m-0">Patient Details</h2>
+            <p class="text-gray-500 m-0 text-sm">View and manage patient information.</p>
+        </div>
+    </div>
+
+    <div *ngIf="loading" class="flex justify-center items-center py-10">
+        <p-progressSpinner styleClass="w-10 h-10"></p-progressSpinner>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6" *ngIf="!loading && patient">
+
+        <div class="lg:col-span-3 flex flex-col gap-4">
+            <div class="card bg-white rounded-lg border border-gray-200 p-0 overflow-hidden">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-lg m-0">Patient Profile</h3>
+                </div>
+
+                <div class=" text-sm text-gray-500">Patient ID: {{ patient.patientId }}</div>
+
+                <div class="flex flex-col items-center p-6">
+
+                    <h2 class="font-bold text-xl m-0">{{ patient.name }}</h2>
+
+                    <p class="text-gray-500 text-sm m-1">{{ age }} years • {{ patient.gender }}</p>
+
+                    <div class="flex gap-2 mt-2">
+                        <p-tag [severity]="patient.status ? 'success' : 'info'"
+                            [value]="patient.status ? 'Active' : 'Inactive'" [rounded]="true"></p-tag>
+                    </div>
+                </div>
+
+                <p-divider class="m-0"></p-divider>
+
+                <div class="p-4">
+                    <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-3"><i class="pi pi-user"></i>
+                        Personal Information</h4>
+                    <div class="flex flex-col gap-2 text-sm">
+                        <p><span class="text-gray-500 w-24 inline-block">Date of Birth:</span> {{ patient.dob | date:
+                            'dd-MMM-yyyy' }}</p>
+                        <p><span class="text-gray-500 w-24 inline-block">Phone:</span> {{ patient.phone || '-' }}</p>
+                        <p class="flex">
+                            <span class="text-gray-500 w-24 shrink-0">Address:</span>
+                            <span>{{ patient.addressDetail }}, {{ patient.townshipName }}, {{ patient.stateName
+                                }}</span>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="lg:col-span-9">
+            <div class="card bg-white rounded-lg border border-gray-200 p-0">
+                <p-tabView>
+
+                    <p-tabPanel header="Appointments">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-6">
+                                <div>
+                                    <h3 class="font-bold text-xl m-0">Appointment History</h3>
+                                    <p class="text-gray-500 text-sm m-0 mt-1">View all appointments and medical visits.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <p-table [value]="appointments" [paginator]="true" [rows]="5"
+                                styleClass="p-datatable-striped p-datatable-sm" responsiveLayout="scroll">
+
+                                <ng-template pTemplate="header">
+                                    <tr class="text-sm">
+                                        <th>Date & Time</th>
+                                        <th>Type</th>
+                                        <th>Doctor</th>
+                                        <th>Status</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </ng-template>
+
+                                <ng-template pTemplate="body" let-appt>
+                                    <tr>
+                                        <td>
+                                            <div class="font-semibold text-gray-800">{{ appt.appointmentDate | date:
+                                                'yyyy-MM-dd' }}</div>
+                                            <div class="text-xs text-gray-500 mt-1">{{ appt.appointmentDate + 'T' +
+                                                appt.startTime | date: 'shortTime' }}</div>
+                                        </td>
+                                        <td>{{ appt.specialized || 'Consultation' }}</td>
+                                        <td>{{ appt.doctorName || '-' }}</td>
+                                        <td>
+                                            <p-tag [severity]="getSeverity(appt.appointmentStatus)"
+                                                [value]="appt.appointmentStatus" [rounded]="true"></p-tag>
+                                        </td>
+                                        <td class="text-sm text-gray-600 max-w-[200px] truncate"
+                                            [title]="appt.appointmentRemark">
+                                            {{ appt.appointmentRemark || 'No notes available' }}
+                                        </td>
+                                    </tr>
+                                </ng-template>
+
+                                <ng-template pTemplate="empty">
+                                    <tr>
+                                        <td colspan="5" class="text-center p-6 text-gray-500">
+                                            No appointment history found for this patient.
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                    </p-tabPanel>
+
+
+                    <p-tabPanel header="Consultations">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-6">
+                                <div>
+                                    <h3 class="font-bold text-xl m-0">Consultation History</h3>
+                                    <p class="text-gray-500 text-sm m-0 mt-1">Review past visits, diagnoses, and
+                                        prescribed medications.</p>
+                                </div>
+                                <p-button label="New Consultation" icon="pi pi-plus" severity="contrast"
+                                    routerLink="/consultation"></p-button>
+                            </div>
+
+                            <p-table [value]="consultations" [paginator]="true" [rows]="5"
+                                styleClass="p-datatable-striped p-datatable-sm" responsiveLayout="scroll">
+
+                                <ng-template pTemplate="header">
+                                    <tr class="text-sm">
+                                        <th>Visit Date</th>
+                                        <th>Doctor</th>
+                                        <th>Symptoms</th>
+                                        <th>Diagnosis</th>
+                                        <th>Status</th>
+                                        <th class="text-center">Details</th>
+                                    </tr>
+                                </ng-template>
+
+                                <ng-template pTemplate="body" let-consult>
+                                    <tr>
+                                        <td>
+                                            <div class="font-semibold text-gray-800">{{ consult.visitDate |
+                                                date:'yyyy-MM-dd' }}</div>
+                                            <div class="text-xs text-gray-500 mt-1">{{ consult.visitDate |
+                                                date:'shortTime' }}</div>
+                                        </td>
+                                        <td>{{ consult.doctorName }}</td>
+                                        <td class="max-w-[150px] truncate" [title]="consult.symptoms">{{
+                                            consult.symptoms || '-' }}</td>
+                                        <td class="max-w-[150px] truncate" [title]="consult.diagnosis">{{
+                                            consult.diagnosis || 'Pending...' }}</td>
+                                        <td>
+                                            <p-tag [severity]="getSeverity(consult.status)" [value]="consult.status"
+                                                [rounded]="true"></p-tag>
+                                        </td>
+                                        <td class="text-center">
+                                            <p-button icon="pi pi-eye" [rounded]="true" severity="secondary"
+                                                [text]="true" (onClick)="viewDetails(consult)"></p-button>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+
+                                <ng-template pTemplate="empty">
+                                    <tr>
+                                        <td colspan="6" class="text-center p-6 text-gray-500">
+                                            No consultation history found for this patient.
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+
+                            <p-dialog header="Visit Details" [(visible)]="displayDetails" [modal]="true"
+                                [style]="{ width: '90vw', 'max-width': '800px' }" [draggable]="false"
+                                [resizable]="false">
+
+                                <ng-container *ngIf="selectedConsult">
+
+                                    <div class="flex gap-4 mb-4 text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
+                                        <div><i class="pi pi-calendar mr-2"></i>{{ selectedConsult.visitDate |
+                                            date:'medium' }}</div>
+                                        <div><i class="pi pi-user-md mr-2"></i>{{ selectedConsult.doctorName }}</div>
+                                    </div>
+
+                                    <div class="mb-5">
+                                        <h4 class="font-semibold text-gray-700 border-b pb-2 mb-3"><i
+                                                class="pi pi-file-edit mr-2"></i>Clinical Notes</h4>
+                                        <p
+                                            class="text-sm text-gray-700 leading-relaxed bg-blue-50/50 p-4 rounded-lg border border-blue-100">
+                                            {{ selectedConsult.notes || 'No clinical notes recorded for this visit.' }}
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <h4 class="font-semibold text-gray-700 border-b pb-2 mb-3"><i
+                                                class="pi pi-receipt mr-2"></i>Prescribed Medications</h4>
+
+                                        <p-table [value]="consultationPrescriptions[selectedConsult.consultationId]"
+                                            styleClass="p-datatable-gridlines p-datatable-sm" responsiveLayout="scroll">
+                                            <ng-template pTemplate="header">
+                                                <tr class="text-xs bg-gray-100">
+                                                    <th>Item Code</th>
+                                                    <th>Dosage</th>
+                                                    <th>Frequency</th>
+                                                    <th>Duration</th>
+                                                    <th>Qty</th>
+                                                    <th>Instructions</th>
+                                                </tr>
+                                            </ng-template>
+                                            <ng-template pTemplate="body" let-med>
+                                                <tr class="text-sm">
+                                                    <td class="font-semibold text-blue-600">{{ med.itemCode }}</td>
+                                                    <td>{{ med.dosage || '-' }}</td>
+                                                    <td>{{ med.frequency || '-' }}</td>
+                                                    <td>{{ med.duration ? med.duration + ' Days' : '-' }}</td>
+                                                    <td>{{ med.quantity || '-' }}</td>
+                                                    <td>{{ med.instruction || '-' }}</td>
+                                                </tr>
+                                            </ng-template>
+                                            <ng-template pTemplate="empty">
+                                                <tr>
+                                                    <td colspan="6"
+                                                        class="text-center text-gray-500 p-4 text-sm bg-gray-50">
+                                                        <i class="pi pi-info-circle mr-2"></i> No medications were
+                                                        prescribed during this visit.
+                                                    </td>
+                                                </tr>
+                                            </ng-template>
+                                        </p-table>
+                                    </div>
+
+                                </ng-container>
+
+                                <ng-template pTemplate="footer">
+                                    <p-button label="Close" icon="pi pi-times" (onClick)="displayDetails = false"
+                                        severity="secondary" [text]="true"></p-button>
+                                </ng-template>
+                            </p-dialog>
+
+                        </div>
+                    </p-tabPanel>
+
+                    <p-tabPanel header="Lab Results"></p-tabPanel>
+                    <p-tabPanel header="Billing"></p-tabPanel>
+
+                </p-tabView>
+            </div>
+        </div>
+    </div>
+</div>
