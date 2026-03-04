@@ -44,6 +44,7 @@
                 </th>
                 <th pSortableColumn="updatedBy" *ngIf="!isDoctor">Updated By <p-sortIcon field="updatedBy"></p-sortIcon>
                 </th>
+                <th pFrozenColumn alignFrozen="right" class="text-center text-sm" *ngIf="isDoctor">Actions</th>
             </tr>
         </ng-template>
 
@@ -60,7 +61,6 @@
                 <td>{{ patient.addressDetail }}</td>
                 <td>{{ patient.stateName }}</td>
                 <td>{{ patient.townshipName }}</td>
-                <td>{{ patient.doctorName }}</td>
                 <td>
                     <p-tag value="{{ patient.status ? 'Active' : 'Inactive' }}"
                         [severity]="patient.status ? 'success' : 'info'"
@@ -71,9 +71,14 @@
                 <td *ngIf="!isDoctor">{{ patient.createdBy || '-' }}</td>
                 <td *ngIf="!isDoctor">{{ patient.updatedOn | date: "dd/MMM/yyyy hh:mm:ss a" }}</td>
                 <td *ngIf="!isDoctor">{{ patient.updatedBy }}</td>
+                <td pFrozenColumn alignFrozen="right" class="text-center">
+                    <p-button icon="pi pi-ellipsis-h" [text]="true" [rounded]="true" severity="secondary"
+                        (onClick)="showActions($event, patient, actionMenu)" *ngIf="isDoctor"></p-button>
+                </td>
             </tr>
         </ng-template>
     </p-table>
+    <p-menu #actionMenu [popup]="true" [model]="actionMenuItems" appendTo="body" styleClass="w-48"></p-menu>
 </div>
 <!-- #endregion -->
 
