@@ -17,7 +17,7 @@ public partial class ViPrescription
     public long BranchId { get; set; }
 
     [Column(TypeName = "datetime")]
-    public DateTime? Date { get; set; }
+    public DateTime Date { get; set; }
 
     [StringLength(200)]
     public string? DoctorName { get; set; }
@@ -27,9 +27,11 @@ public partial class ViPrescription
     [StringLength(5)]
     public string ItemCode { get; set; } = null!;
 
-    public long? Dosage { get; set; }
+    [StringLength(50)]
+    public string? Dosage { get; set; }
 
-    public long? Frequency { get; set; }
+    [StringLength(20)]
+    public string? Frequency { get; set; }
 
     public long? Duration { get; set; }
 
