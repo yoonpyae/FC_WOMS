@@ -14,7 +14,7 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
-import { Menu } from 'primeng/menu';
+import { Menu, MenuModule } from 'primeng/menu';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -23,6 +23,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { EntryComponent } from './entry/entry.component';
 import { DoctorModel } from '@core_models/master/doctor.model';
 import { UserRole } from '@core_models/user-role';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-patient',
@@ -43,7 +44,8 @@ import { UserRole } from '@core_models/user-role';
     TableModule,
     DialogModule,
     ConfirmDialogModule,
-    EntryComponent
+    EntryComponent,
+    MenuModule
   ],
   standalone: true,
   providers: [ConfirmationService, ExportService, DatePipe],
@@ -62,7 +64,7 @@ export class PatientComponent implements OnInit {
   modalVisible: boolean = false;
   today: Date = new Date();
   @ViewChild(EntryComponent) patientEntryComponent!: EntryComponent;
-
+  actionMenuItems: MenuItem[] = [];
   constructor(
     private exportService: ExportService,
     private patientService: PatientService,
@@ -70,6 +72,7 @@ export class PatientComponent implements OnInit {
     private messageService: MessageService,
     private loggerService: LoggerService,
     private sharedService: SharedService,
+    private router: Router,
   ) {
     this.items = [
       {
@@ -247,5 +250,53 @@ export class PatientComponent implements OnInit {
 
     // Use exportSelectColsWithDynamicHeader for exporting data
     this.exportService.exportSelectColsWithDynamicHeader(exportData, columns, 'Patient');
+  }
+
+  showActions(event: Event, patient: ViPatientModel, menu: any) {
+    this.selectedPatient = patient;
+
+    if (this.isDoctor) {
+      // DOCTOR VIEW (Read-Only actions)
+      this.actionMenuItems = [
+        {
+          label: 'Actions',
+          items: [
+            { label: 'View profile', command: () => this.router.navigate(['/patient/detail', patient.patientId]) },
+            { label: 'Medical history', command: () => this.featureComingSoon() },
+            { label: 'Prescriptions', command: () => this.featureComingSoon() }
+          ]
+        }
+      ];
+    } else {
+      // ADMIN / RECEPTIONIST VIEW (Full Access)
+      this.actionMenuItems = [
+        {
+          label: 'Actions',
+          items: [
+            { label: 'View profile', command: () => this.update() },
+            { label: 'Edit details', command: () => this.update() },
+            { label: 'Medical history', command: () => this.featureComingSoon() },
+            { label: 'Prescriptions', command: () => this.featureComingSoon() },
+            { separator: true }, // Adds the subtle line above Delete
+            {
+              label: 'Delete',
+              style: { color: '#ef4444' }, // Tailwind's red-500 color
+              command: () => this.delete()
+            }
+          ]
+        }
+      ];
+    }
+
+    menu.toggle(event);
+  }
+
+  featureComingSoon() {
+    this.messageService.add({
+      key: 'globalMessage',
+      severity: 'info',
+      summary: 'Coming Soon',
+      detail: 'This module is currently under development.'
+    });
   }
 }
