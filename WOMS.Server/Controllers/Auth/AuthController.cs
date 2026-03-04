@@ -1,6 +1,11 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using WOMS.Server.Models;
 
 namespace WOMS.Server.Controllers.Auth
 {
@@ -11,12 +16,14 @@ namespace WOMS.Server.Controllers.Auth
         UserManager<IdentityUser> userManager,
         IRepositoryWrapper repo,
         ILogger<AuthController> logger,
-        ITokenBuilder tokenBuilder) : ControllerBase
+        ITokenBuilder tokenBuilder,
+        IConfiguration configuration) : ControllerBase
     {
         private readonly ILogger<AuthController> _logger = logger;
         private readonly ITokenBuilder _tokenBuilder = tokenBuilder;
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly IRepositoryWrapper _repo = repo;
+        private readonly IConfiguration _configuration = configuration;
 
         [AllowAnonymous]
         [HttpPost("access-token")]
@@ -309,6 +316,35 @@ namespace WOMS.Server.Controllers.Auth
 
             await _userManager.AddClaimAsync(user, new Claim("Master_Read", "Branch"));
             return ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully Created", ""));
+        }
+
+        [AllowAnonymous]
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        {
+            IdentityUser? user = await _userManager.FindByNameAsync(model.Username);
+            if (user == null) return Unauthorized();
+
+            if (!await _userManager.CheckPasswordAsync(user, model.Password)) return Unauthorized();
+
+            IList<string> roles = await _userManager.GetRolesAsync(user);
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
+            };
+            // Add role claims
+            claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(8),
+                signingCredentials: creds);
+
+            return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token), roles });
         }
     }
 }
