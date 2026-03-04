@@ -28,6 +28,53 @@ namespace WOMS.Server.Controllers.Master
                         await repo.ViConsultations.GetFirstAsync(x => x.Ano == id && x.BranchId == branchId), null);
         }
 
+        [HttpGet("{patientId}")]
+        [EndpointSummary("Get By Patient Id")]
+        [EndpointDescription("Gets consultations and prescriptions with specified patient id.")]
+        public async Task<IActionResult> Get(string patientId, long branchId)
+        {
+            var consultations = await repo.ViConsultations.GetAsync(x => x.PatientId == patientId && x.BranchId == branchId);
+
+            if (consultations == null || !consultations.Any())
+            {
+                return ResponseHelper.OK_Result(new List<object>(), null);
+            }
+
+            var consultationIds = consultations.Select(c => c.ConsultationId).ToList();
+            var prescriptions = await repo.ViPrescriptions.GetAsync(x => consultationIds.Contains(x.ConsultationId) && x.BranchId == branchId);
+
+            var result = consultations.Select(c => new
+            {
+                Consultation = c,
+                Prescriptions = prescriptions.Where(p => p.ConsultationId == c.ConsultationId).ToList()
+            });
+
+            return ResponseHelper.OK_Result(result, null);
+        }
+
+        [HttpGet("getpatient-info")]
+        [EndpointSummary("Get Patient Info")]
+        
+        public async Task<IActionResult> GetPatientInfo(string patientId, long branchId)
+        {
+            var app = await repo.ViAppointments.GetFirstAsync(x => x.PatientId == patientId && x.BranchId == branchId && x.AppointmentStatus == "Confirmed");
+            var patient = await repo.Patients.GetFirstAsync(x => x.PatientId == patientId && x.BranchId == branchId);
+            if (app == null)
+            {
+                return ResponseHelper.OK_Result(new
+                {
+                    Patient = patient,
+                    Appointment = app
+                }, new DefaultResponseMessageModel("Patient Is Here!", ""));
+            }
+            
+            return ResponseHelper.OK_Result(new
+            {
+                Patient = patient,
+                Appointment = app
+            }, null);
+        }
+
         [HttpPost]
         [EndpointSummary("Create")]
         [EndpointDescription("Creates a new consultation record with multiple prescriptions.")]
