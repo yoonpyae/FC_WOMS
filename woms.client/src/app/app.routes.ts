@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { AppLayout } from './layout/component/app.layout';
 import { AuthGuardService } from '@shared_services/auth-guard.service';
+import { UserRole } from '@core_models/user-role';
 
 // Auth & Core Pages
 import { HomeComponent } from './pages/home/home.component';
@@ -59,7 +60,7 @@ export const routes: Routes = [
 			{
 				path: 'doctor',
 				canActivate: [AuthGuardService],
-				data: { title: 'Doctor' },
+				data: { title: 'Doctor', roles: [UserRole.SuperAdmin] },
 				children: [
 					{ path: '', component: DoctorComponent },
 					{ path: 'detail', component: DoctorDetailComponent },
@@ -70,23 +71,23 @@ export const routes: Routes = [
 				path: 'patient',
 				component: PatientComponent,
 				canActivate: [AuthGuardService],
-				data: { title: 'Patient' },
+				data: { title: 'Patient', roles: [UserRole.Receptionist, UserRole.SuperAdmin, UserRole.Doctor] },
 			},
 			{
 				path: 'appointment',
 				component: AppointmentComponent,
 				canActivate: [AuthGuardService],
-				data: { title: 'Appointment' },
+				data: { title: 'Appointment', roles: [UserRole.Receptionist, UserRole.SuperAdmin] },
 			},
 			{
 				path: 'consultation',
 				component: ConsultationComponent,
 				canActivate: [AuthGuardService],
-				data: { title: 'Consultation' },
-				// children: [
-				//   { path: 'create', component: ConsultationCreateComponent },
-				//   { path: 'detail/:id', component: ConsultationDetailComponent }
-				// ]
+				data: { title: 'Consultation', roles: [UserRole.Doctor] },
+				children: [
+					{ path: 'create', component: ConsultationComponent },
+					{ path: 'detail/:id', component: ConsultationComponent }
+				]
 			},
 			{
 				path: 'opd',
@@ -102,7 +103,7 @@ export const routes: Routes = [
 			{
 				path: 'stock',
 				canActivate: [AuthGuardService],
-				data: { title: 'Stock Management' },
+				data: { title: 'Stock Management', roles: [UserRole.Pharmacist, UserRole.SuperAdmin] },
 				children: [
 					{ path: 'supplier', component: SupplierComponent, data: { title: 'Supplier' } },
 					{ path: 'packet-types', component: PacketTypeComponent, data: { title: 'Packet Type' } },
@@ -114,18 +115,9 @@ export const routes: Routes = [
 
 			// --- VOUCHERS & BILLING ---
 			{
-				path: 'lab-voucher',
-				canActivate: [AuthGuardService],
-				data: { title: 'Lab Voucher' },
-				children: [
-					// { path: 'create-vouchers', component: LabCreateVoucherComponent, data: { title: 'Create Voucher' } },
-					// { path: 'histories', component: LabHistoryComponent, data: { title: 'History' } },
-				]
-			},
-			{
 				path: 'pharmacy-voucher',
 				canActivate: [AuthGuardService],
-				data: { title: 'Pharmacy Voucher' },
+				data: { title: 'Pharmacy Voucher', roles: [UserRole.Pharmacist, UserRole.SuperAdmin] },
 				children: [
 					{ path: 'create-vouchers', component: PharmacyCreateVoucherComponent, data: { title: 'Create Voucher' } },
 					{ path: 'histories', component: PharmacyVoHistoryComponent, data: { title: 'History' } },
@@ -134,7 +126,7 @@ export const routes: Routes = [
 			{
 				path: 'opd-voucher',
 				canActivate: [AuthGuardService],
-				data: { title: 'OPD Voucher' },
+				data: { title: 'OPD Voucher', roles: [UserRole.Receptionist, UserRole.SuperAdmin] },
 				children: [
 					// TODO: Import and attach your OPD Voucher components here once created
 					// { path: 'create-vouchers', component: YourOpdVoucherCreateComponent },
@@ -146,7 +138,7 @@ export const routes: Routes = [
 			{
 				path: 'reports',
 				canActivate: [AuthGuardService],
-				data: { title: 'Reports' },
+				data: { title: 'Reports', roles: [UserRole.SuperAdmin] },
 				children: [
 					// TODO: Import and attach your Report components here once created
 					// { path: 'appointment-reports', component: AppointmentReportComponent },
