@@ -9,7 +9,8 @@
             <div class="grid grid-cols-12 mb-4">
                 <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
                     <p-toast></p-toast>
-                    <p-splitButton label="Create" icon="pi pi-plus" [model]="items" (onClick)="create()">
+                    <p-splitButton *ngIf="!isDoctor" label="Create" icon="pi pi-plus" [model]="items"
+                        (onClick)="create()">
                     </p-splitButton>
                 </div>
                 <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
@@ -25,7 +26,7 @@
         </ng-template>
         <ng-template #header>
             <tr style="white-space: nowrap">
-                <th pFrozenColumn [style]="{ width: '10px' }">#</th>
+                <th pFrozenColumn [style]="{ width: '10px' }" *ngIf="!isDoctor">#</th>
                 <th pSortableColumn="patientId">Id <p-sortIcon field="patientId"></p-sortIcon></th>
                 <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
                 <th pSortableColumn="dob">Date of Birth <p-sortIcon field="dob"></p-sortIcon></th>
@@ -35,16 +36,20 @@
                 <th pSortableColumn="stateName">State <p-sortIcon field="stateName"></p-sortIcon></th>
                 <th pSortableColumn="townshipName">Township <p-sortIcon field="townshipName"></p-sortIcon></th>
                 <th pSortableColumn="status">Status <p-sortIcon field="status"></p-sortIcon></th>
-                <th pSortableColumn="createdOn">Created On <p-sortIcon field="createdOn"></p-sortIcon></th>
-                <th pSortableColumn="createdBy">Created By <p-sortIcon field="createdBy"></p-sortIcon></th>
-                <th pSortableColumn="updatedOn">Updated On <p-sortIcon field="updatedOn"></p-sortIcon></th>
-                <th pSortableColumn="updatedBy">Updated By <p-sortIcon field="updatedBy"></p-sortIcon></th>
+                <th pSortableColumn="createdOn" *ngIf="!isDoctor">Created On <p-sortIcon field="createdOn"></p-sortIcon>
+                </th>
+                <th pSortableColumn="createdBy" *ngIf="!isDoctor">Created By <p-sortIcon field="createdBy"></p-sortIcon>
+                </th>
+                <th pSortableColumn="updatedOn" *ngIf="!isDoctor">Updated On <p-sortIcon field="updatedOn"></p-sortIcon>
+                </th>
+                <th pSortableColumn="updatedBy" *ngIf="!isDoctor">Updated By <p-sortIcon field="updatedBy"></p-sortIcon>
+                </th>
             </tr>
         </ng-template>
 
         <ng-template #body let-patient let-rowData>
             <tr style="white-space: nowrap" [pSelectableRow]="patient">
-                <td>
+                <td *ngIf="!isDoctor">
                     <span class="pi pi-circle" [class.pi-check-circle]="selectedPatient === patient"></span>
                 </td>
                 <td>{{ patient.patientId }}</td>
@@ -62,10 +67,10 @@
                         icon="{{ patient.status ? 'pi pi-check' : 'pi pi-minus-circle' }}" [rounded]="true">
                     </p-tag>
                 </td>
-                <td>{{ patient.createdOn | date: "dd/MMM/yyyy hh:mm:ss a" }}</td>
-                <td>{{ patient.createdBy || '-' }}</td>
-                <td>{{ patient.updatedOn | date: "dd/MMM/yyyy hh:mm:ss a" }}</td>
-                <td>{{ patient.updatedBy }}</td>
+                <td *ngIf="!isDoctor">{{ patient.createdOn | date: "dd/MMM/yyyy hh:mm:ss a" }}</td>
+                <td *ngIf="!isDoctor">{{ patient.createdBy || '-' }}</td>
+                <td *ngIf="!isDoctor">{{ patient.updatedOn | date: "dd/MMM/yyyy hh:mm:ss a" }}</td>
+                <td *ngIf="!isDoctor">{{ patient.updatedBy }}</td>
             </tr>
         </ng-template>
     </p-table>
