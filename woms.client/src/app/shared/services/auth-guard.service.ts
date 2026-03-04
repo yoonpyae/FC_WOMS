@@ -27,35 +27,46 @@ export class AuthGuardService implements CanActivate {
       this.router.navigate(['auth/login']);
       return false;
     }
-    // else {
-    //   if (!this.checkAuthorizedRoute(state.url)) {
-    //     this.router.navigate(['auth/access-denied']);
-    //     this.messageService.add({ key: 'globalMessage', severity: 'info', summary: "Access deined.", detail: "You don't have permission." });
-    //   }
-    // }
+
+    const allowed: string[] = next.data['roles'] || [];
+    const userrole = this.sharedService.getUserRole() ?? '';
+    if (allowed.length && !allowed.includes(userrole)) {
+      this.router.navigate(['auth/access-denied']);
+      this.messageService.add({
+        key: 'globalMessage',
+        severity: 'info',
+        summary: 'Access denied',
+        detail: 'You don\'t have permission.'
+      });
+      return false;
+    }
+
     return true;
   }
 
   checkAuthorizedRoute(url: string): boolean {
-    let userrole = this.sharedService.getUserRole();
-    let isValid: boolean = true;
-    NAVIGATION_MENU.forEach((v, i) => {
-      v.items.forEach((v1: any, i1: any) => {
-        if (v1.items !== undefined) {
-          v1.items.forEach((v2: any, i2: any) => {
-            if (v2.routerLink !== undefined) {
-              if (v2.routerLink[0] === url) {
-                isValid = v2.data.role.includes(userrole);
-              }
+    const userrole = this.sharedService.getUserRole() ?? '';
+    let isValid = true;
+
+    NAVIGATION_MENU.forEach((category) => {
+      category.items.forEach((item: any) => {
+        const checkItem = (menuItem: any) => {
+          if (menuItem.routerLink && menuItem.routerLink[0] === url) {
+            const allowed: string[] = (menuItem.data && menuItem.data.roles) || [];
+            isValid = allowed.length ? allowed.includes(userrole) : true;
+          }
+        };
+
+        if (item.items) {
+          item.items.forEach((sub: any) => {
+            if (sub.items) {
+              sub.items.forEach(checkItem);
+            } else {
+              checkItem(sub);
             }
           });
-        }
-        else {
-          if (v1.routerLink !== undefined) {
-            if (v1.routerLink[0] === url) {
-              isValid = v1.data.role.includes(userrole);;
-            }
-          }
+        } else {
+          checkItem(item);
         }
       });
     });
