@@ -57,6 +57,10 @@ import { ConsultationEntryModel } from '@core_models/master/prescription.model';
   styleUrl: './consultation.component.scss'
 })
 export class ConsultationComponent implements OnInit {
+  patientInfo: any = null;
+  appointmentInfo: any = null;
+  fetchingPatientInfo: boolean = false;
+
   consultations: ViConsultationModel[] = [];
   selectedConsultation!: ViConsultationModel;
 
@@ -178,13 +182,19 @@ export class ConsultationComponent implements OnInit {
     this.name = '';
     this.selectedStockItems = [];
 
+    this.patientInfo = null;
+    this.appointmentInfo = null;
+
     this.prescriptionsArray.clear();
-    this.addMedication(); // Add one default blank medication row
+    this.addMedication();
   }
 
   cancelForm(): void {
     this.showForm = false;
     this.consultationForm.reset();
+
+    this.patientInfo = null;
+    this.appointmentInfo = null;
   }
 
   saveConsultation(): void {
@@ -349,11 +359,44 @@ export class ConsultationComponent implements OnInit {
       this.name = patient.name;
       this.patientId = patient.patientId;
       this.consultationForm.patchValue({ patientId: patient.patientId });
+
+      // Trigger the new API call
+      this.fetchPatientExtraInfo(patient.patientId);
     } else {
       this.name = '';
       this.patientId = '';
-      this.consultationForm.patchValue({ patientId: '' });
+      this.consultationForm.patchValue({ patientId: '', ano: null });
+      this.patientInfo = null;
+      this.appointmentInfo = null;
     }
+  }
+
+  fetchPatientExtraInfo(patientId: string) {
+    const branchId = Number.parseInt(this.sharedService.getDefaultBranchId() ?? '0');
+    this.fetchingPatientInfo = true;
+
+    this.consultationService.getPatientInfo(patientId, branchId).subscribe({
+      next: (res: any) => {
+        this.patientInfo = res.data?.patient;
+        this.appointmentInfo = res.data?.appointment;
+
+        // If creating a new consultation and there is an active appointment, link the ANO!
+        if (!this.isEdit) {
+          if (this.appointmentInfo) {
+            this.consultationForm.patchValue({ ano: this.appointmentInfo.ano });
+          } else {
+            this.consultationForm.patchValue({ ano: null }); // Walk-in
+          }
+        }
+      },
+      error: (err: any) => {
+        this.loggerService.error(err);
+        this.fetchingPatientInfo = false;
+      },
+      complete: () => {
+        this.fetchingPatientInfo = false;
+      }
+    });
   }
   //#
 
