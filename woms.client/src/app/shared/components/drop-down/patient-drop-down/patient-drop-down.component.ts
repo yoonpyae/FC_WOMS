@@ -20,7 +20,7 @@ import { EntryComponent } from 'src/app/pages/master/patient/entry/entry.compone
     template: `
 <p-select [options]="patient" [(ngModel)]="selectedValue" [style]="{'width': '100%'}" optionLabel="patientId"
     dataKey="patientId" placeholder="Select Patient" [loading]="loading" [filter]="true" filterBy="name,phone"
-    [disabled]="!isEnabled" appendTo="body" (onChange)="onChanges($event)" >
+    [disabled]="!isEnabled" appendTo="body" (onChange)="onChanges($event)" [disabled]="disabled">
 
     <ng-template #selectedItem let-selectedOption>
         <div class="flex items-center gap-2" *ngIf="selectedOption">
@@ -69,7 +69,7 @@ import { EntryComponent } from 'src/app/pages/master/patient/entry/entry.compone
     '375px': '100vw',
     '320px': '100vw'}" [modal]="true" [style]="{width: '60vw', minWidth: '50vw', minHeight: '50vh'}"
     [draggable]="false" [resizable]="false">
-    <app-patient-entry (onSubmitted)="handlePatientEntrySubmitted($event)"></app-patient-entry>
+    <app-patient-entry (onSubmitted)="handlePatientEntrySubmitted(patientId)"></app-patient-entry>
 </p-dialog>`,
 
     providers: [
@@ -83,6 +83,7 @@ import { EntryComponent } from 'src/app/pages/master/patient/entry/entry.compone
 export class PatientDropDownComponent implements OnInit, OnDestroy {
     @Output() onValueChange = new EventEmitter<ViPatientModel>();
     @Input() isEnabled: boolean = true;
+    @Input() disabled: boolean = false;
 
     subscription!: Subscription;
     loading: boolean = false;
