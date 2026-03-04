@@ -32,6 +32,7 @@ import { PurchaseComponent } from './pages/stock/purchase/purchase.component';
 import { PharmacyCreateVoucherComponent } from './pages/pharmacy-voucher/create-voucher/create-voucher.component';
 import { PharmacyVoHistoryComponent } from './pages/pharmacy-voucher/history/history.component';
 import { ConsultationComponent } from './pages/master/consultation/consultation.component';
+import { PatientDetailComponent } from './pages/master/patient/detail/detail.component';
 
 export const routes: Routes = [
 	{ path: '', component: HomeComponent },
@@ -69,9 +70,12 @@ export const routes: Routes = [
 			},
 			{
 				path: 'patient',
-				component: PatientComponent,
 				canActivate: [AuthGuardService],
 				data: { title: 'Patient', roles: [UserRole.Receptionist, UserRole.SuperAdmin, UserRole.Doctor] },
+				children: [
+					{ path: '', component: PatientComponent },
+					{ path: 'detail/:id', component: PatientDetailComponent }
+				]
 			},
 			{
 				path: 'appointment',
