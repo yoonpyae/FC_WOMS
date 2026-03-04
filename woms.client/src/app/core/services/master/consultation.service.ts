@@ -28,8 +28,8 @@ export class ConsultationService {
     return this.httpClient.get<RootModel>(`${environment.main_url}/master/consultations?patientId=${patientId}&branchId=${branchId}`);
   }
 
-  getPatientInfo(patientId: string, branchId: number): Observable<RootModel> {
-    return this.httpClient.get<RootModel>(`${environment.main_url}/master/consultations/getpatient-info?patientId=${patientId}&branchId=${branchId}`);
+  getPatientInfo(patientId: string, branchId: number, doctorId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/consultations/getpatient-info?patientId=${patientId}&branchId=${branchId}&doctorId=${doctorId}`);
   }
 
   create(model: ConsultationEntryModel): Observable<RootModel> {
