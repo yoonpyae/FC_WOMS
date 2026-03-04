@@ -25,6 +25,7 @@ export interface ViAppointmentModel {
   dayOfWeek: null | string;
   startTime: null | string;
   endTime: null | string;
+  doctorId: number | null;
   doctorName: null | string;
   specialized: null | string;
   scheduleId: number;
