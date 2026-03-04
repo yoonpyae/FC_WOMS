@@ -62,4 +62,6 @@ public partial class ViAppointment
 
     [StringLength(256)]
     public string? DeletedBy { get; set; }
+
+    public long? DoctorId { get; set; }
 }
