@@ -373,19 +373,20 @@ export class ConsultationComponent implements OnInit {
 
   fetchPatientExtraInfo(patientId: string) {
     const branchId = Number.parseInt(this.sharedService.getDefaultBranchId() ?? '0');
+    const doctorId = this.currentDoctorId;
+
     this.fetchingPatientInfo = true;
 
-    this.consultationService.getPatientInfo(patientId, branchId).subscribe({
+    this.consultationService.getPatientInfo(patientId, branchId, doctorId).subscribe({
       next: (res: any) => {
         this.patientInfo = res.data?.patient;
         this.appointmentInfo = res.data?.appointment;
 
-        // If creating a new consultation and there is an active appointment, link the ANO!
         if (!this.isEdit) {
           if (this.appointmentInfo) {
             this.consultationForm.patchValue({ ano: this.appointmentInfo.ano });
           } else {
-            this.consultationForm.patchValue({ ano: null }); // Walk-in
+            this.consultationForm.patchValue({ ano: null });
           }
         }
       },
