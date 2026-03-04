@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-
-namespace WOMS.Server.Controllers.Master
+﻿namespace WOMS.Server.Controllers.Master
 {
     [Authorize]
     [Route("api/master/[controller]")]
@@ -13,15 +10,19 @@ namespace WOMS.Server.Controllers.Master
         [EndpointSummary("List All")]
         [EndpointDescription("Lists all prescriptions without deleted data.")]
         public async Task<IActionResult> Get(long branchId)
-            => ResponseHelper.OK_Result(
-                await repo.ViPrescriptions.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId), null);
+        {
+            return ResponseHelper.OK_Result(
+                        await repo.ViPrescriptions.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId), null);
+        }
 
         [HttpGet("{id:long}")]
         [EndpointSummary("Get By Id")]
         [EndpointDescription("Gets a prescription with specified id.")]
         public async Task<IActionResult> Get(long id, long branchId)
-            => ResponseHelper.OK_Result(
-                await repo.ViPrescriptions.GetFirstAsync(x => x.PrescriptionId == id && x.BranchId == branchId), null);
+        {
+            return ResponseHelper.OK_Result(
+                        await repo.ViPrescriptions.GetFirstAsync(x => x.PrescriptionId == id && x.BranchId == branchId), null);
+        }
 
         [HttpGet("auto-id")]
         [EndpointSummary("Get Auto Id")]
@@ -34,6 +35,18 @@ namespace WOMS.Server.Controllers.Master
             long maxId = lastRecord?.PrescriptionId ?? 0;
             maxId++;
             return ResponseHelper.OK_Result(maxId, null);
+        }
+
+        [HttpGet("{ConsultationId}")]
+        [EndpointSummary("Get By Consultation Id")]
+        [EndpointDescription("Gets prescriptions with specified consultation id.")]
+        public async Task<IActionResult> GetByConsultationId(string consultationId)
+        {
+            IReadOnlyList<ViPrescription> prescriptions = await repo.ViPrescriptions.GetAsync(x => x.ConsultationId == consultationId) ?? [];
+            return ResponseHelper.OK_Result(new
+            {
+                prescriptions
+            }, null);
         }
         #endregion
     }
