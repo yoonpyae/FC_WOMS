@@ -114,6 +114,11 @@ public partial class WOMSDbContext : DbContext
                     });
         });
 
+        modelBuilder.Entity<Branch>(entity =>
+        {
+            entity.Property(e => e.BranchId).ValueGeneratedNever();
+        });
+
         modelBuilder.Entity<Consultation>(entity =>
         {
             entity.HasKey(e => new { e.ConsultationId, e.BranchId }).HasName("PK__Consulta__5D014A98A4A2F895");
