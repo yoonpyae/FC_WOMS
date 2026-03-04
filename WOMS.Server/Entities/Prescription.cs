@@ -23,9 +23,11 @@ public partial class Prescription
     [StringLength(5)]
     public string ItemCode { get; set; } = null!;
 
-    public long? Dosage { get; set; }
+    [StringLength(50)]
+    public string? Dosage { get; set; }
 
-    public long? Frequency { get; set; }
+    [StringLength(20)]
+    public string? Frequency { get; set; }
 
     public long? Duration { get; set; }
 
