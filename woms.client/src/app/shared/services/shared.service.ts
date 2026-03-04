@@ -20,14 +20,6 @@ export class SharedService {
     return this.cookieService.get('default_branch');
   }
 
-   setDefaultClinicId(value: string): void {
-    this.cookieService.set('default_clinic', value);
-  }
-
-  getDefaultClinicId(): string | null {
-    return this.cookieService.get('default_clinic');
-  }
-
   //#region UserId
 
   setUserId(value: string): void {
