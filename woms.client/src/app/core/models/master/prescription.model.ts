@@ -1,3 +1,5 @@
+import { ViConsultationModel } from "./consultation.model";
+
 export interface PrescriptionModel {
     prescriptionId: number;
     consultationId: string;
@@ -25,8 +27,8 @@ export interface ViPrescriptionModel {
     doctorName: string | null;
     doctorId: number;
     itemCode: string;
-    dosage: number | null;
-    frequency: number | null;
+    dosage: string | null;
+    frequency: string | null;
     duration: number | null;
     quantity: number | null;
     instruction: string | null;
@@ -36,4 +38,9 @@ export interface ViPrescriptionModel {
     updatedBy: string | null;
     deletedOn: string | null;
     deletedBy: string | null;
+}
+
+export interface ConsultationEntryModel {
+    consultation: ViConsultationModel | any;
+    prescriptions: any[];
 }
