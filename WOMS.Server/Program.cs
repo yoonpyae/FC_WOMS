@@ -12,6 +12,11 @@ builder.Services.AddDbAndIdentityConfig(builder.Configuration);
 
 // JWT Auth Config
 builder.Services.AddJWTAuthConfig(builder.Configuration);
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdmin", p => p.RequireRole("SuperAdmin"));
+    options.AddPolicy("RequireManagerOrAdmin", p => p.RequireRole("Doctor", "SuperAdmin"));
+});
 
 // MISC Config
 builder.Services.AddMiscConfig();
