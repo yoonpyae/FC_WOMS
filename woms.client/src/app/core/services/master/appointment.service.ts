@@ -12,7 +12,7 @@ export class AppointmentService {
 
   constructor(private httpClient: HttpClient) { }
 
-  get(branchId: number):Observable<RootModel> {
+  get(branchId: number): Observable<RootModel> {
     return this.httpClient.get<RootModel>(`${environment.main_url}/master/appointments?branchId=${branchId}`);
   }
 
@@ -30,6 +30,10 @@ export class AppointmentService {
 
   getAutoId(branchId: number): Observable<RootModel> {
     return this.httpClient.get<RootModel>(`${environment.main_url}/master/appointments/auto-id?branchId=${branchId}`);
+  }
+
+  getByPatientId(patientId: string, branchId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/appointments?patientId=${patientId}&branchId=${branchId}`);
   }
 
   create(model: AppointmentModel): Observable<RootModel> {
