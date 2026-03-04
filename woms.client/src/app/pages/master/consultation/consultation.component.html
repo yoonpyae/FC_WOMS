@@ -105,8 +105,8 @@
         <p-button icon="pi pi-arrow-left" [rounded]="true" [text]="true" severity="secondary"
             (onClick)="cancelForm()"></p-button>
         <div>
-            <h2 class="text-2xl font-bold m-0">{{ isEdit ? 'Edit Consultation' : 'Create Prescription' }}</h2>
-            <p class="text-gray-500 m-0 text-sm">Create a new prescription for a patient.</p>
+            <h2 class="text-2xl font-bold m-0">{{ isEdit ? 'Edit Consultation' : 'Create Consultation' }}</h2>
+            <p class="text-gray-500 m-0 text-sm">Create a new consultation for a patient.</p>
         </div>
     </div>
 
@@ -115,11 +115,11 @@
         <div class="col-span-12 md:col-span-8 flex flex-col gap-6">
 
             <div class="card bg-white p-6 rounded-lg border border-gray-200">
-                <h3 class="text-lg font-bold mb-4">Prescription Details</h3>
+                <h3 class="text-lg font-bold mb-4">Consultation Details</h3>
 
                 <div class="grid grid-cols-12 gap-4 mb-4">
                     <div class="col-span-12 md:col-span-6 flex flex-col">
-                        <label class="text-sm font-semibold mb-2">Prescription Date</label>
+                        <label class="text-sm font-semibold mb-2">Consultation Date</label>
                         <p-date-picker formControlName="visitDate" [showIcon]="true" [dateFormat]="'yy-mm-dd'"
                             [showTime]="false" [style]="{ width: '100%' }"
                             [ngClass]="{'p-invalid': consultationForm.get('visitDate')?.invalid && (consultationForm.get('visitDate')?.touched || consultationForm.get('dob')?.dirty)}">
@@ -140,7 +140,7 @@
             </div>
 
             <div class="flex justify-between items-center">
-                <h3 class="text-lg font-bold m-0">Medications</h3>
+                <h3 class="text-lg font-bold m-0">Prescription</h3>
                 <p-button label="Add Medication" icon="pi pi-plus" size="small" severity="contrast"
                     (onClick)="addMedication()"></p-button>
             </div>
@@ -150,7 +150,7 @@
                     class="card bg-white p-6 rounded-lg border border-gray-200 relative">
 
                     <div class="flex justify-between items-center mb-4">
-                        <h4 class="font-bold text-md m-0">Medication #{{ i + 1 }}</h4>
+                        <h4 class="font-bold text-md m-0">Prescription #{{ i + 1 }}</h4>
                         <p-button icon="pi pi-trash" [text]="true" severity="danger"
                             *ngIf="prescriptionsArray.length > 1" (onClick)="removeMedication(i)"></p-button>
                     </div>
@@ -195,7 +195,7 @@
 
             <div class="flex justify-end gap-3 mt-4">
                 <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="cancelForm()"></p-button>
-                <p-button label="{{ isEdit ? 'Update' : 'Create Prescription' }}" severity="contrast"
+                <p-button label="{{ isEdit ? 'Update' : 'Create Consultation' }}" severity="contrast"
                     (onClick)="saveConsultation()" [loading]="isSubmitting"></p-button>
             </div>
         </div>
@@ -204,11 +204,50 @@
 
             <div class="card bg-white p-6 rounded-lg border border-gray-200">
                 <h3 class="text-lg font-bold mb-4">Patient Information</h3>
+
                 <div class="flex flex-col mb-4">
-                    <label class="text-sm font-semibold mb-2">Select a patient for this prescription.</label>
+                    <label class="text-sm font-semibold mb-2">Select a patient for this consultation.</label>
                     <app-patient-drop-down [(ngModel)]="selectedPatient" [ngModelOptions]="{ standalone: true }"
                         [disabled]="isEdit" (onValueChange)="onPatientSelected($event)">
                     </app-patient-drop-down>
+                </div>
+
+                <div *ngIf="fetchingPatientInfo" class="flex justify-center items-center py-6">
+                    <i class="pi pi-spin pi-spinner text-2xl text-blue-500"></i>
+                </div>
+
+                <div *ngIf="!fetchingPatientInfo && patientInfo"
+                    class="flex flex-col gap-4 mt-2 border-t border-gray-100 pt-4">
+
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-lg m-0">{{ patientInfo.name }}</h4>
+                            <p class="text-sm text-gray-500 mt-1">{{ patientInfo.patientId }}</p>
+                        </div>
+                        <p-tag [severity]="appointmentInfo ? 'info' : 'secondary'"
+                            [value]="appointmentInfo ? 'Appointment' : 'Walk-in'" [rounded]="true"></p-tag>
+                    </div>
+
+                    <div class="flex flex-col gap-2 text-sm text-gray-700 mt-1">
+                        <p><i class="pi pi-user mr-2 text-gray-400"></i> {{ patientInfo.gender || 'Unknown' }} • DOB: {{
+                            patientInfo.dob | date:'yyyy-MM-dd' }}</p>
+                        <p><i class="pi pi-phone mr-2 text-gray-400"></i> {{ patientInfo.phone || '-' }}</p>
+                    </div>
+
+                    <div *ngIf="appointmentInfo" class="bg-blue-50 p-4 rounded-lg border border-blue-100 mt-2">
+                        <h5 class="font-semibold text-blue-800 m-0 mb-3"><i
+                                class="pi pi-calendar-clock mr-2"></i>Scheduled Appointment</h5>
+                        <div class="flex flex-col gap-2 text-sm text-blue-900">
+                            <p><span class="opacity-75 w-16 inline-block">Time:</span> <strong>{{
+                                    appointmentInfo.appointmentDate + 'T' + appointmentInfo.startTime | date:'shortTime'
+                                    }}</strong></p>
+                            <p><span class="opacity-75 w-16 inline-block">Doctor:</span> <strong>{{
+                                    appointmentInfo.doctorName }}</strong></p>
+                            <p><span class="opacity-75 w-16 inline-block">Type:</span> <strong>{{
+                                    appointmentInfo.specialized || 'General' }}</strong></p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
