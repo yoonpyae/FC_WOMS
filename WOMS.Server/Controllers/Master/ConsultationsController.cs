@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using WOMS.Server.Models.Consultation_Prescription;
 
 namespace WOMS.Server.Controllers.Master
 {
@@ -15,31 +14,37 @@ namespace WOMS.Server.Controllers.Master
         [EndpointSummary("List All")]
         [EndpointDescription("Lists all consultations without deleted data.")]
         public async Task<IActionResult> Get(long branchId)
-            => ResponseHelper.OK_Result(
-                await repo.ViConsultations.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId), null);
+        {
+            return ResponseHelper.OK_Result(
+                        await repo.ViConsultations.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId), null);
+        }
 
         [HttpGet("{id:long}")]
         [EndpointSummary("Get By Id")]
         [EndpointDescription("Gets a consultation with specified id.")]
         public async Task<IActionResult> Get(long id, long branchId)
-            => ResponseHelper.OK_Result(
-                await repo.ViConsultations.GetFirstAsync(x => x.Ano == id && x.BranchId == branchId), null);
-
+        {
+            return ResponseHelper.OK_Result(
+                        await repo.ViConsultations.GetFirstAsync(x => x.Ano == id && x.BranchId == branchId), null);
+        }
 
         [HttpPost]
         [EndpointSummary("Create")]
-        [EndpointDescription("Creates a new consultation record.")]
-        public async Task<IActionResult> CreateConsultation(Consultation model)
+        [EndpointDescription("Creates a new consultation record with multiple prescriptions.")]
+        public async Task<IActionResult> CreateConsultation(ConsultationEntryModel payload)
         {
-            model.ConsultationId = idGenerateService.GetConsultationId(model.BranchId);
-            model.CreatedOn = DateTime.Now;
-            model.CreatedBy = User.Identity?.Name ?? string.Empty;
+            Consultation consultation = payload.Consultation;
+            List<Prescription> prescriptions = payload.Prescriptions;
 
-            // If the consultation is linked to an appointment, update its status
-            if (model.Ano != null)
+            // 1. Setup Consultation
+            consultation.ConsultationId = idGenerateService.GetConsultationId(consultation.BranchId);
+            consultation.CreatedOn = DateTime.Now;
+            consultation.CreatedBy = User.Identity?.Name ?? string.Empty;
+
+            if (consultation.Ano != null)
             {
-                var appointment = await repo.Appointments.GetFirstAsync(
-                    x => x.Ano == model.Ano && x.BranchId == model.BranchId);
+                Appointment? appointment = await repo.Appointments.GetFirstAsync(
+                    x => x.Ano == consultation.Ano && x.BranchId == consultation.BranchId);
 
                 if (appointment != null)
                 {
@@ -50,25 +55,54 @@ namespace WOMS.Server.Controllers.Master
                 }
             }
 
-            repo.Consultations.Create(model);
+            repo.Consultations.Create(consultation);
+
+            // 2. Setup Prescriptions
+            if (prescriptions != null && prescriptions.Any())
+            {
+                Prescription? lastRecord = await repo.Prescriptions.GetFirstAsync(
+                    x => x.BranchId == consultation.BranchId,
+                    q => q.OrderByDescending(x => x.PrescriptionId));
+
+                long currentMaxId = lastRecord?.PrescriptionId ?? 0;
+
+                foreach (Prescription p in prescriptions)
+                {
+                    currentMaxId++;
+                    p.PrescriptionId = currentMaxId;
+                    p.ConsultationId = consultation.ConsultationId;
+                    p.BranchId = consultation.BranchId;
+                    p.Date = consultation.VisitDate;
+                    p.CreatedOn = DateTime.Now;
+                    p.CreatedBy = User.Identity?.Name ?? string.Empty;
+
+                    repo.Prescriptions.Create(p);
+                }
+            }
+
             return await repo.SaveAsync()
                 ? ResponseHelper.Created_Result("/api/consultations", null,
-                    new DefaultResponseMessageModel("Successfully created new consultation record.", ""))
-                : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to create consultation record.", ""));
+                    new DefaultResponseMessageModel("Successfully created consultation and prescriptions.", ""))
+                : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to save records.", ""));
         }
 
         [HttpPut]
         [EndpointSummary("Update")]
-        [EndpointDescription("Updates an existing consultation record.")]
-        public async Task<IActionResult> UpdateConsultation(Consultation model)
+        [EndpointDescription("Updates an existing consultation record and syncs its prescriptions.")]
+        public async Task<IActionResult> UpdateConsultation(ConsultationEntryModel payload)
         {
+            Consultation model = payload.Consultation;
+            List<Prescription> incomingPrescriptions = payload.Prescriptions;
+
             Consultation? consultation = await repo.Consultations.GetFirstAsync(x => x.ConsultationId == model.ConsultationId && x.BranchId == model.BranchId);
             if (consultation == null)
+            {
                 return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Consultation record not found.", ""));
-            // Update fields
+            }
+
+            // 1. Update Consultation fields
             consultation.Ano = model.Ano;
             consultation.DoctorId = model.DoctorId;
-            consultation.PatientId = model.PatientId;
             consultation.Symptoms = model.Symptoms;
             consultation.Diagnosis = model.Diagnosis;
             consultation.Notes = model.Notes;
@@ -76,25 +110,99 @@ namespace WOMS.Server.Controllers.Master
             consultation.UpdatedOn = DateTime.Now;
             consultation.UpdatedBy = User.Identity?.Name ?? string.Empty;
             repo.Consultations.Update(consultation);
+
+            // 2. Handle Prescriptions Sync
+            // Fetch all existing active prescriptions for this consultation
+            var existingPrescriptions = await repo.Prescriptions.GetAsync(x => x.ConsultationId == model.ConsultationId && x.BranchId == model.BranchId && !x.DeletedOn.HasValue);
+
+            // A. Find Prescriptions to Delete (Removed from the frontend array)
+            var incomingItemCodes = incomingPrescriptions.Select(p => p.ItemCode).ToList();
+            var prescriptionsToDelete = existingPrescriptions.Where(e => !incomingItemCodes.Contains(e.ItemCode)).ToList();
+
+            foreach (var del in prescriptionsToDelete)
+            {
+                del.DeletedOn = DateTime.Now;
+                del.DeletedBy = User.Identity?.Name ?? string.Empty;
+                repo.Prescriptions.Update(del);
+            }
+
+            // Grab the highest PrescriptionId in case we need to add new ones
+            Prescription? lastRecord = await repo.Prescriptions.GetFirstAsync(
+                x => x.BranchId == model.BranchId,
+                q => q.OrderByDescending(x => x.PrescriptionId));
+            long currentMaxId = lastRecord?.PrescriptionId ?? 0;
+
+            // B. Find Prescriptions to Update or Add
+            foreach (var incoming in incomingPrescriptions)
+            {
+                // Check if the medication already exists in this consultation by ItemCode
+                var existing = existingPrescriptions.FirstOrDefault(e => e.ItemCode == incoming.ItemCode);
+
+                if (existing != null)
+                {
+                    // UPDATE existing medication
+                    existing.Dosage = incoming.Dosage;
+                    existing.Frequency = incoming.Frequency;
+                    existing.Duration = incoming.Duration;
+                    existing.Instruction = incoming.Instruction;
+                    existing.Quantity = incoming.Quantity;
+                    existing.UpdatedOn = DateTime.Now;
+                    existing.UpdatedBy = User.Identity?.Name ?? string.Empty;
+                    repo.Prescriptions.Update(existing);
+                }
+                else
+                {
+                    // ADD new medication
+                    currentMaxId++;
+                    incoming.PrescriptionId = currentMaxId;
+                    incoming.ConsultationId = model.ConsultationId;
+                    incoming.BranchId = model.BranchId;
+                    incoming.Date = consultation.VisitDate;
+                    incoming.CreatedOn = DateTime.Now;
+                    incoming.CreatedBy = User.Identity?.Name ?? string.Empty;
+                    repo.Prescriptions.Create(incoming);
+                }
+            }
+
+            // 3. Save everything in one transaction
             return await repo.SaveAsync()
-                ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully updated consultation record.", ""))
-                : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to update consultation record.", ""));
+                ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully updated consultation and prescriptions.", ""))
+                : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to update records.", ""));
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         [EndpointSummary("Delete")]
-        [EndpointDescription("Deletes a consultation record.")]
+        [EndpointDescription("Deletes a consultation record and its associated prescriptions.")]
         public async Task<IActionResult> Delete(string id)
         {
+            // 1. Soft-Delete Consultation
             Consultation? consultation = await repo.Consultations.GetFirstAsync(x => x.ConsultationId == id);
             if (consultation == null)
+            {
                 return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Consultation record not found.", ""));
+            }
+
             consultation.DeletedOn = DateTime.Now;
             consultation.DeletedBy = User.Identity?.Name ?? string.Empty;
             repo.Consultations.Update(consultation);
+
+            // 2. Soft-Delete Associated Prescriptions
+            var prescriptions = await repo.Prescriptions.GetAsync(x => x.ConsultationId == id && !x.DeletedOn.HasValue);
+
+            if (prescriptions != null && prescriptions.Any())
+            {
+                foreach (var p in prescriptions)
+                {
+                    p.DeletedOn = DateTime.Now;
+                    p.DeletedBy = User.Identity?.Name ?? string.Empty;
+                    repo.Prescriptions.Update(p);
+                }
+            }
+
+            // 3. Save changes
             return await repo.SaveAsync()
-                ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully deleted consultation record.", ""))
-                : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to delete consultation record.", ""));
+                ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully deleted consultation and prescriptions.", ""))
+                : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to delete records.", ""));
         }
         #endregion
     }
