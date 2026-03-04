@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ConsultationModel } from '@core_models/master/consultation.model';
+import { ConsultationEntryModel } from '@core_models/master/prescription.model';
 import { RootModel } from '@core_models/root.model';
 import { environment } from '@env/environment';
 import { Observable } from 'rxjs';
@@ -20,11 +20,15 @@ export class ConsultationService {
     return this.httpClient.get<RootModel>(`${environment.main_url}/master/consultations/${id}?BranchId=${branchId}`);
   }
 
-  create(model: ConsultationModel): Observable<RootModel> {
+  getPrescriptionByConsultationId(id: string): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/prescriptions/${id}`);
+  }
+
+  create(model: ConsultationEntryModel): Observable<RootModel> {
     return this.httpClient.post<RootModel>(`${environment.main_url}/master/consultations`, model);
   }
 
-  update(model: ConsultationModel): Observable<RootModel> {
+  update(model: ConsultationEntryModel): Observable<RootModel> {
     return this.httpClient.put<RootModel>(`${environment.main_url}/master/consultations`, model);
   }
 
