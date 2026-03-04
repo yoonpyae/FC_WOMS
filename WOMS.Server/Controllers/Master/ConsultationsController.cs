@@ -54,20 +54,31 @@ namespace WOMS.Server.Controllers.Master
 
         [HttpGet("getpatient-info")]
         [EndpointSummary("Get Patient Info")]
-        
-        public async Task<IActionResult> GetPatientInfo(string patientId, long branchId)
+        public async Task<IActionResult> GetPatientInfo(string patientId, long branchId, int doctorId)
         {
-            var app = await repo.ViAppointments.GetFirstAsync(x => x.PatientId == patientId && x.BranchId == branchId && x.AppointmentStatus == "Confirmed");
+            // Get today's date to ensure we don't grab future appointments!
+            var today = DateOnly.FromDateTime(DateTime.Today);
+
+            // CRITICAL FIX: Added DoctorId and AppointmentDate checks!
+            var app = await repo.ViAppointments.GetFirstAsync(x =>
+                x.PatientId == patientId &&
+                x.BranchId == branchId &&
+                x.DoctorId == doctorId &&
+                x.AppointmentStatus == "Confirmed" &&
+                x.AppointmentDate == today);
+
             var patient = await repo.Patients.GetFirstAsync(x => x.PatientId == patientId && x.BranchId == branchId);
+
+            // If app is null, it means they are a Walk-in for this specific doctor today.
             if (app == null)
             {
                 return ResponseHelper.OK_Result(new
                 {
                     Patient = patient,
-                    Appointment = app
-                }, new DefaultResponseMessageModel("Patient Is Here!", ""));
+                    Appointment = (object)null
+                }, new DefaultResponseMessageModel("Patient is a Walk-in.", ""));
             }
-            
+
             return ResponseHelper.OK_Result(new
             {
                 Patient = patient,
