@@ -22,6 +22,7 @@ import { ToastModule } from 'primeng/toast';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { EntryComponent } from './entry/entry.component';
 import { DoctorModel } from '@core_models/master/doctor.model';
+import { UserRole } from '@core_models/user-role';
 
 @Component({
   selector: 'app-patient',
@@ -51,6 +52,8 @@ import { DoctorModel } from '@core_models/master/doctor.model';
 export class PatientComponent implements OnInit {
   patients: ViPatientModel[] = [];
   selectedPatient!: ViPatientModel;
+
+  isDoctor: boolean = false;
 
   items!: MenuItem[] | undefined;
   loading: boolean = false;
@@ -89,6 +92,9 @@ export class PatientComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadData();
+
+    const currentUserRole = this.sharedService.getUserRole();
+    this.isDoctor = currentUserRole === UserRole.Doctor;
   }
 
   loadData() {
