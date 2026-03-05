@@ -171,9 +171,7 @@ public partial class WOMSDbContext : DbContext
 
         modelBuilder.Entity<Service>(entity =>
         {
-            entity.HasKey(e => e.ServiceId).HasName("PK_LabService");
-
-            entity.Property(e => e.ServiceId).ValueGeneratedNever();
+            entity.HasKey(e => new { e.ServiceId, e.BranchId }).HasName("PK_Service");
         });
 
         modelBuilder.Entity<State>(entity =>
@@ -215,7 +213,7 @@ public partial class WOMSDbContext : DbContext
 
         modelBuilder.Entity<ViOPDVoucherItem>(entity =>
         {
-            entity.ToView("VI_OPDVucherItem");
+            entity.ToView("VI_OPDVoucherItem");
         });
 
         modelBuilder.Entity<ViPatient>(entity =>
