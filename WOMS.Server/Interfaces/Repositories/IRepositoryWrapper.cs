@@ -29,7 +29,7 @@ namespace WOMS.Server.Interfaces.Repositories
         IPrescriptionRepo Prescriptions { get; }
         IServiceRepo Services { get; }
         IOPDVoucherRepo OPDVouchers { get; }
-        IOPDVoucherItemRepo OPDVoucherItemRepo { get; }
+        IOPDVoucherItemRepo OPDVoucherItems { get; }
 
         #endregion
 
