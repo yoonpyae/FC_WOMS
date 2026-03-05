@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using WOMS.Server.Models.OPD;
+﻿using WOMS.Server.Models.OPD;
 
 namespace WOMS.Server.Controllers.Master;
 
@@ -57,6 +55,7 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
         try
         {
             string vno= idGenerateService.GetOPDVNo(model.BranchId);
+            string vno = idGenerateService.GetOPDVNo(model.BranchId);
 
             bool isFullyPaid = model.LeftAmount == 0 && model.PaidAmount == model.TotalAmount;
 
@@ -118,10 +117,12 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
         try
         {
             // 1. Fetch the existing voucher (Ensure it matches the branch)
-            var existingVoucher = await repo.OPDVouchers.GetFirstAsync(x => x.Opdvno == vno && x.BranchId == model.BranchId);
+            OPDVoucher? existingVoucher = await repo.OPDVouchers.GetFirstAsync(x => x.Opdvno == vno && x.BranchId == model.BranchId);
 
             if (existingVoucher == null)
+            {
                 return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Voucher not found.", ""));
+            }
 
             bool isFullyPaid = model.LeftAmount == 0 && model.PaidAmount == model.TotalAmount;
 
@@ -142,10 +143,10 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
             repo.OPDVouchers.Update(existingVoucher);
 
             // 3. Handle Items: Remove old items
-            var existingItems = await repo.OPDVoucherItems.GetAsync(x => x.Opdvno == vno);
+            IReadOnlyList<OPDVoucherItem>? existingItems = await repo.OPDVoucherItems.GetAsync(x => x.Opdvno == vno);
             if (existingItems != null)
             {
-                foreach (var item in existingItems)
+                foreach (OPDVoucherItem item in existingItems)
                 {
                     repo.OPDVoucherItems.Delete(item);
                 }
@@ -191,10 +192,12 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
         try
         {
             // 1. Fetch existing voucher (require branchId for security)
-            var existingVoucher = await repo.OPDVouchers.GetFirstAsync(x => x.Opdvno == vno && x.BranchId == branchId);
+            OPDVoucher? existingVoucher = await repo.OPDVouchers.GetFirstAsync(x => x.Opdvno == vno && x.BranchId == branchId);
 
             if (existingVoucher == null)
+            {
                 return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Voucher not found.", ""));
+            }
 
             // 2. Apply Soft Delete fields
             existingVoucher.DeletedOn = DateTime.UtcNow;
