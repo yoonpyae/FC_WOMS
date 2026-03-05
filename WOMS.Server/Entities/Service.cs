@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WOMS.Server.Entities;
 
+[PrimaryKey("ServiceId", "BranchId")]
 [Table("Service")]
 public partial class Service
 {
@@ -36,4 +37,7 @@ public partial class Service
     public string? DeletedBy { get; set; }
 
     public bool IsActive { get; set; }
+
+    [Key]
+    public long BranchId { get; set; }
 }
