@@ -54,7 +54,6 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
     {
         try
         {
-            string vno= idGenerateService.GetOPDVNo(model.BranchId);
             string vno = idGenerateService.GetOPDVNo(model.BranchId);
 
             bool isFullyPaid = model.LeftAmount == 0 && model.PaidAmount == model.TotalAmount;
