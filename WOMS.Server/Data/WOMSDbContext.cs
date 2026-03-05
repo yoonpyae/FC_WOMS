@@ -36,9 +36,9 @@ public partial class WOMSDbContext : DbContext
 
     public virtual DbSet<MainStock> MainStocks { get; set; }
 
-    public virtual DbSet<Opdvoucher> Opdvouchers { get; set; }
+    public virtual DbSet<OPDVoucher> OPDVouchers { get; set; }
 
-    public virtual DbSet<OpdvoucherItem> OpdvoucherItems { get; set; }
+    public virtual DbSet<OPDVoucherItem> OPDVoucherItems { get; set; }
 
     public virtual DbSet<PacketType> PacketTypes { get; set; }
 
@@ -71,6 +71,10 @@ public partial class WOMSDbContext : DbContext
     public virtual DbSet<ViConsultation> ViConsultations { get; set; }
 
     public virtual DbSet<ViMainStock> ViMainStocks { get; set; }
+
+    public virtual DbSet<ViOPDVoucher> ViOPDVouchers { get; set; }
+
+    public virtual DbSet<ViOPDVoucherItem> ViOPDVoucherItems { get; set; }
 
     public virtual DbSet<ViPatient> ViPatients { get; set; }
 
@@ -140,7 +144,7 @@ public partial class WOMSDbContext : DbContext
             entity.Property(e => e.BranchId).HasDefaultValue(1L);
         });
 
-        modelBuilder.Entity<Opdvoucher>(entity =>
+        modelBuilder.Entity<OPDVoucher>(entity =>
         {
             entity.Property(e => e.Status).IsFixedLength();
         });
@@ -200,6 +204,18 @@ public partial class WOMSDbContext : DbContext
         modelBuilder.Entity<ViMainStock>(entity =>
         {
             entity.ToView("VI_MainStock");
+        });
+
+        modelBuilder.Entity<ViOPDVoucher>(entity =>
+        {
+            entity.ToView("VI_OPDVoucher");
+
+            entity.Property(e => e.Status).IsFixedLength();
+        });
+
+        modelBuilder.Entity<ViOPDVoucherItem>(entity =>
+        {
+            entity.ToView("VI_OPDVucherItem");
         });
 
         modelBuilder.Entity<ViPatient>(entity =>
