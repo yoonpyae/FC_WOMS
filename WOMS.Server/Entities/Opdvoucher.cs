@@ -19,9 +19,6 @@ public partial class OPDVoucher
     public long BranchId { get; set; }
 
     [StringLength(20)]
-    public string? ConsultationId { get; set; }
-
-    [StringLength(20)]
     public string? PatientId { get; set; }
 
     [Column("VDate", TypeName = "datetime")]
