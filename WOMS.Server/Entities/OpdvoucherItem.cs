@@ -8,7 +8,7 @@ namespace WOMS.Server.Entities;
 
 [PrimaryKey("Opdvno", "ServiceId", "ConsultationId")]
 [Table("OPDVoucherItem")]
-public partial class OpdvoucherItem
+public partial class OPDVoucherItem
 {
     [Key]
     [Column("OPDVNo")]
