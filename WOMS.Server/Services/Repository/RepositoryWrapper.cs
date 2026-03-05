@@ -262,7 +262,7 @@ namespace WOMS.Server.Services.Repository
             }
         }
 
-        public IOPDVoucherItemRepo OPDVoucherItemRepo
+        public IOPDVoucherItemRepo OPDVoucherItems
         {
             get
             {
