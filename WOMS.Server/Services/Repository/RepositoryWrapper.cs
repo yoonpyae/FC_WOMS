@@ -37,6 +37,9 @@ namespace WOMS.Server.Services.Repository
         private IAppointmentRepo? _appointment;
         private IConsultationRepo? _consultation;
         private IPrescriptionRepo? _prescription;
+        private IServiceRepo? _service;
+        private IOPDVoucherRepo? _opdVoucher;
+        private IOPDVoucherItemRepo? _opdVoucherItem;
 
         #endregion
 
@@ -51,6 +54,8 @@ namespace WOMS.Server.Services.Repository
         private IVISupplierRepo? _viSupplier;
         private IViConsultationRepo? _viConsultation;
         private IViPrescriptionRepo? _viPrescription;
+        private IViOPDVoucherRepo? _viOPDVoucher;
+        private IViOPDVoucherItemRepo? _viOPDVoucherItem;
 
         #endregion
 
@@ -239,6 +244,33 @@ namespace WOMS.Server.Services.Repository
             }
         }
 
+        public IServiceRepo Services
+        {
+            get
+            {
+                _service ??= new ServiceRepo(Context);
+                return _service;
+            }
+        }
+
+        public IOPDVoucherRepo OPDVouchers
+        {
+            get
+            {
+                _opdVoucher ??= new OPDVoucherRepo(Context);
+                return _opdVoucher;
+            }
+        }
+
+        public IOPDVoucherItemRepo OPDVoucherItemRepo
+        {
+            get
+            {
+                _opdVoucherItem ??= new OPDVoucherItemRepo(Context);
+                return _opdVoucherItem;
+            }
+        }
+
         #endregion
 
         #region View Properties
@@ -330,6 +362,24 @@ namespace WOMS.Server.Services.Repository
             {
                 _viPrescription ??= new ViPrescriptionRepo(Context);
                 return _viPrescription;
+            }
+        }
+
+        public IViOPDVoucherRepo ViOPDVouchers
+        {
+            get
+            {
+                _viOPDVoucher ??= new ViOPDVoucherRepo(Context);
+                return _viOPDVoucher;
+            }
+        }
+
+        public IViOPDVoucherItemRepo ViOPDVoucherItems
+        {
+            get
+            {
+                _viOPDVoucherItem ??= new ViOPDVoucherItemRepo(Context);
+                return _viOPDVoucherItem;
             }
         }
         #endregion
