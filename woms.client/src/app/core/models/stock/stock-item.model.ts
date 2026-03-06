@@ -11,4 +11,5 @@ export interface StockItemModel {
     deletedBy: string | null;
     status: boolean;
     remark: string | null;
+    branchId: number;
 }
