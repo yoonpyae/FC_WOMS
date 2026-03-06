@@ -142,7 +142,8 @@ export class MainStockComponent implements OnInit {
 
   //#region getPacketType
   getPackettype(): void {
-    this.packetTypeService.get().subscribe({
+    const branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
+    this.packetTypeService.get(branchId).subscribe({
       next: (res) => {
         this.packetTypes = res.data as PacketTypeModel[];
         if (this.isEdit) {
