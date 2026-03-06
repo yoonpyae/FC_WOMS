@@ -34,6 +34,8 @@ import { PharmacyVoHistoryComponent } from './pages/pharmacy-voucher/history/his
 import { ConsultationComponent } from './pages/master/consultation/consultation.component';
 import { PatientDetailComponent } from './pages/master/patient/detail/detail.component';
 import { EntryComponent } from './pages/stock/purchase/entry/entry.component';
+import { ServiceComponent } from './pages/master/service/service.component';
+import { title } from 'process';
 
 export const routes: Routes = [
 	{ path: '', component: HomeComponent },
@@ -94,6 +96,12 @@ export const routes: Routes = [
 					{ path: 'detail/:id', component: ConsultationComponent }
 				]
 			},
+			{
+				path: 'service',
+				component: ServiceComponent,
+				canActivate: [AuthGuardService],
+				data: { title: 'Service', roles: [UserRole.SuperAdmin] },
+			},
 
 			// --- STOCK MANAGEMENT ---
 			{
@@ -113,10 +121,7 @@ export const routes: Routes = [
 				path: 'purchase',
 				canActivate: [AuthGuardService],
 				data: { title: 'Purchases', roles: [UserRole.Pharmacist, UserRole.SuperAdmin] },
-				children: [
-					{ path: 'create-voucher', component: EntryComponent, data: { title: 'Create Purchase Voucher' } },
-					{ path: 'histories', component: PurchaseComponent, data: { title: 'Purchase History' } },
-				]
+				component: PurchaseComponent
 			},
 			{
 				path: 'pharmacy-voucher',
