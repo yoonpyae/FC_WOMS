@@ -10,4 +10,5 @@ export interface PacketTypeModel {
     deletedBy: null | string;
     status: boolean;
     remark: null | string;
+    branchId: number;
 }
