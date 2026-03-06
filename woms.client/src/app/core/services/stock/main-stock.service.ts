@@ -18,8 +18,8 @@ export class MainStockService {
     );
   }
 
-  getByCode(code: string): Observable<RootModel> {
-    return this.httpClient.get<RootModel>(`${environment.main_url}/stock/mainstocks/code?code=${code}`);
+  getByCode(code: string, branchId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/stock/mainstocks/code?code=${code}&branchId=${branchId}`);
   }
 
   getByActive(branchId: number): Observable<RootModel> {
