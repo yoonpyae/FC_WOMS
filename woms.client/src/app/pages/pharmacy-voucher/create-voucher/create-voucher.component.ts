@@ -117,7 +117,7 @@ export class PharmacyCreateVoucherComponent implements OnInit {
     patientName: ['', Validators.required],
     referDoctorId: [null, Validators.required],
     totalAmount: [0, Validators.required],
-    discountAmount: [0, Validators.required],
+    discountAmount: [0],
     paidAmount: [0, Validators.required],
     leftAmount: [0, Validators.required],
     netAmount: [0, Validators.required],
@@ -290,7 +290,7 @@ export class PharmacyCreateVoucherComponent implements OnInit {
     if (this.selectedDoctor) {
       this.pharmacyVoucherForm.get('referDoctorId')?.setValue(this.selectedDoctor.doctorId);
     } else {
-      this.pharmacyVoucherForm.get('referDoctorId')?.setValue(null);
+      this.pharmacyVoucherForm.get('referreferDoctorId')?.setValue(null);
     }
   }
   //#endregion
@@ -312,7 +312,7 @@ export class PharmacyCreateVoucherComponent implements OnInit {
   }
 
   onStockItemChange(event: any): void {
-    this.loggerService.info("Pharmacy-Stock Item Code Change");
+    this.loggerService.info("Stock Item Code Change");
     if (this.selectedMainStock) {
       this.pharmacyVoucherForm.controls['itemCode'].setValue(this.selectedMainStock.itemCode);
 
@@ -347,6 +347,8 @@ export class PharmacyCreateVoucherComponent implements OnInit {
       patientName: this.name,
       BranchId: branchId
     });
+
+    console.log(this.pharmacyVoucher.values);
 
     if (this.pharmacyVoucherForm.invalid) {
       this.messageService.add({
