@@ -19,7 +19,7 @@ export interface PurchaseEntryModel {
     updatedBy: string | null;
     deletedOn: string | null;
     deletedBy: string | null;
-    status: boolean;
+    status: string | null;
     remark: string | null;
     detail: PurchaseEntryDetailModel[];
 }
