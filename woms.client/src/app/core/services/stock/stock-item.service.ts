@@ -13,16 +13,16 @@ export class StockItemService {
 
   constructor(private httpClient: HttpClient) { }
 
-  get(): Observable<RootModel> {
-    return this.httpClient.get<RootModel>(`${environment.main_url}/stock/stockitems`);
+  get(branchId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/stock/stockitems?branchId=${branchId}`);
   }
 
   getByAutoId(name: string): Observable<RootModel> {
     return this.httpClient.get<RootModel>(`${environment.main_url}/stock/stockitems/auto-id?Name=${name}`)
   }
 
-  getByItemCode(code: string, name: string): Observable<RootModel> {
-    return this.httpClient.get<RootModel>(`${environment.main_url}/stock/stockitems/itemcode?itemCode=${code}&itemName=${name}`);
+  getByItemCode(code: string, name: string, branchId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/stock/stockitems/itemcode?itemCode=${code}&itemName=${name}&branchId=${branchId}`);
   }
 
   create(model: StockItemModel): Observable<RootModel> {
