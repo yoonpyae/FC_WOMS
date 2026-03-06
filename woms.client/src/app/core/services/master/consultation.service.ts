@@ -12,8 +12,8 @@ export class ConsultationService {
 
   constructor(private httpClient: HttpClient) { }
 
-  get(branchId: number): Observable<RootModel> {
-    return this.httpClient.get<RootModel>(`${environment.main_url}/master/consultations?branchId=${branchId}`);
+  get(branchId: number, doctorId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/consultations?branchId=${branchId}&doctorId=${doctorId}`);
   }
 
   getById(id: string, branchId: number): Observable<RootModel> {
@@ -24,8 +24,8 @@ export class ConsultationService {
     return this.httpClient.get<RootModel>(`${environment.main_url}/master/prescriptions/${id}`);
   }
 
-  getByPatientId(patientId: string, branchId: number): Observable<RootModel> {
-    return this.httpClient.get<RootModel>(`${environment.main_url}/master/consultations?patientId=${patientId}&branchId=${branchId}`);
+  getByPatientId(patientId: string, branchId: number, doctorId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/consultations/${patientId}?branchId=${branchId}&doctorId=${doctorId}`);
   }
 
   getPatientInfo(patientId: string, branchId: number, doctorId: number): Observable<RootModel> {
