@@ -1,0 +1,138 @@
+<!-- #region OPDVoucher Table Component -->
+<div class="card">
+    <p-table #dt1 [value]="opdVouchers" [paginator]="true" [rows]="20" sortField="createdOn" [sortOrder]="-1"
+        [loading]="loading" styleClass="p-datatable-striped" [showCurrentPageReport]="true"
+        [globalFilterFields]="['opdvno','patientName','status','doctorName']" [tableStyle]="{ 'min-width': '50rem' }"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [rowsPerPageOptions]="[20, 50, 100]" selectionMode="single" [(selection)]="selectedOPDVoucher" dataKey="opdvno">
+
+        <!-- Caption -->
+        <ng-template #caption>
+            <div class="grid grid-cols-12 mb-4 gap-4">
+
+                <div class="col-span-12 md:col-span-8">
+                    <div class="flex flex-col sm:flex-row gap-3">
+
+                        <div class="w-full sm:w-auto">
+                            <p-splitButton label="Create" icon="pi pi-plus" [model]="items"
+                                (onClick)="modalVisible = true" styleClass="p-button-primary w-full"
+                                [style]="{ width: '100%' }">
+                            </p-splitButton>
+                        </div>
+
+                        <div class="w-full sm:w-auto ">
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <p-datepicker [(ngModel)]="startDate" appendTo="body" [showIcon]="true"
+                                    placeholder="Start Date" dateFormat="dd/MM/yy" [readonlyInput]="true"
+                                    styleClass="w-full">
+                                </p-datepicker>
+                                <p-datepicker [(ngModel)]="endDate" (ngModelChange)="onEndDateChange($event)"
+                                    [showIcon]="true" appendTo="body" placeholder="End Date" dateFormat="dd/MM/yy"
+                                    [readonlyInput]="true" styleClass="w-full">
+                                </p-datepicker>
+                            </div>
+                        </div>
+
+                        <div class="w-full sm:w-auto">
+                            <p-button label="View" icon="pi pi-eye" (onClick)="loadData()" styleClass="w-full">
+                            </p-button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-12 md:col-span-4">
+                    <div class="grid grid-cols-1">
+                        <p-iconField iconPosition="left" class="w-full md:w-auto md:ml-auto">
+                            <p-inputIcon class="pi pi-search"></p-inputIcon>
+                            <input #search pInputText type="text" (input)="dt1.filterGlobal(search.value, 'contains')"
+                                placeholder="Search keyword" class="w-full md:w-[17rem]" />
+                        </p-iconField>
+                    </div>
+                </div>
+
+            </div>
+        </ng-template>
+
+        <ng-template #header>
+            <tr class="whitespace-nowrap">
+                <th style="width: 5rem"></th>
+                <th pSortableColumn="opdvno">OPDVno <p-sortIcon field="opdvno"></p-sortIcon></th>
+                <th pSortableColumn="vdate">Date <p-sortIcon field="vdate"></p-sortIcon></th>
+                <th pSortableColumn="patientId">Patient ID <p-sortIcon field="patientId"></p-sortIcon></th>
+                <th pSortableColumn="patientName">Patient Name <p-sortIcon field="patientName"></p-sortIcon></th>
+                <th pSortableColumn="doctorName">Doctor <p-sortIcon field="doctorName"></p-sortIcon></th>
+                <th pSortableColumn="totalAmount" class="text-right">Total <p-sortIcon field="totalAmount"></p-sortIcon>
+                </th>
+                <th pSortableColumn="discountAmount" class="text-right">Discount <p-sortIcon
+                        field="discountAmount"></p-sortIcon></th>
+                <th pSortableColumn="paidAmount" class="text-right">Paid <p-sortIcon field="paidAmount"></p-sortIcon>
+                </th>
+                <th pSortableColumn="leftAmount" class="text-right">Left <p-sortIcon field="leftAmount"></p-sortIcon>
+                </th>
+                <th pSortableColumn="paymentType">Payment <p-sortIcon field="paymentType"></p-sortIcon></th>
+                <th pSortableColumn="status">Status <p-sortIcon field="status"></p-sortIcon></th>
+                <th pSortableColumn="createdOn">Created On <p-sortIcon field="createdOn"></p-sortIcon></th>
+                <th pSortableColumn="createdBy">Created By <p-sortIcon field="createdBy"></p-sortIcon></th>
+                <th pSortableColumn="updatedOn">Updated On <p-sortIcon field="updatedOn"></p-sortIcon></th>
+                <th pSortableColumn="updatedBy">Updated By <p-sortIcon field="updatedBy"></p-sortIcon></th>
+            </tr>
+        </ng-template>
+
+        <ng-template #body let-opdVoucher let-expanded="expanded">
+            <tr style="white-space: nowrap" [pSelectableRow]="opdVoucher"
+                class="hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors">
+                <td>
+                    <span class="pi pi-circle" [class.pi-check-circle]="selectedOPDVoucher === opdVoucher"></span>
+                </td>
+                <td>{{ opdVoucher.opdvno }}</td>
+                <td>{{ opdVoucher.vdate | date: "dd/MMM/yyyy" }}</td>
+                <td>{{ opdVoucher.patientId }}</td>
+                <td>{{ opdVoucher.patientName }}</td>
+                <td>{{ opdVoucher.doctorName }}</td>
+                <td class="text-right">{{ opdVoucher.totalAmount | number: "1.0-0" }}</td>
+                <td class="text-right">{{ opdVoucher.discountAmount | number: "1.0-0" }}</td>
+                <td class="text-right">{{ opdVoucher.paidAmount | number: "1.0-0" }}</td>
+                <td class="text-right">{{ opdVoucher.leftAmount | number: "1.0-0" }}</td>
+                <td>
+                    <p-tag [value]="opdVoucher.paymentType"
+                        [severity]="opdVoucher.paymentType === 'Cash' ? 'success' : 'info'" [icon]="
+                            opdVoucher.paymentType === 'Cash' ? 'pi pi-money-bill' :
+                            opdVoucher.paymentType === 'KBZPay' ? 'pi pi-wallet' :
+                            opdVoucher.paymentType === 'AYA Pay' ? 'pi pi-credit-card' :
+                            opdVoucher.paymentType === 'Wave Money' ? 'pi pi-mobile' :
+                            opdVoucher.paymentType === 'Bank Transfer' ? 'pi pi-building' : ''
+                        " [rounded]="true">
+                    </p-tag>
+                </td>
+                <td>
+                    <p-tag [value]="opdVoucher.status" [severity]="
+                        opdVoucher.status === 'Open' ? 'warning' :
+                        opdVoucher.status === 'Closed' ? 'success' :
+                        opdVoucher.status === 'Cancelled' ? 'danger' : 'info'
+                    " [rounded]="true">
+                    </p-tag>
+                </td>
+                <td>{{ opdVoucher.createdOn | date: "dd/MMM/yyyy hh:mm:ss a" }}</td>
+                <td>{{ opdVoucher.createdBy || '-' }}</td>
+                <td>{{ opdVoucher.updatedOn | date: "dd/MMM/yyyy hh:mm:ss a" }}</td>
+                <td>{{ opdVoucher.updatedBy }}</td>
+            </tr>
+        </ng-template>
+
+
+    </p-table>
+</div>
+<!-- #endregion -->
+ 
+<p-confirmDialog [breakpoints]="{
+    '1920px': '30vw',
+    '1440px': '60vw',
+    '1024px': '100vw',
+    '768px': '100vw',
+    '425px': '150vw',
+    '375px': '100vw',
+    '320px': '100vw',
+  }" [style]="{ 'min-width': '30vw' }" key="OPDDeleteDialog" position="bottom"
+    rejectButtonStyleClass="p-button-outlined"></p-confirmDialog>
+
+<p-confirmDialog></p-confirmDialog>

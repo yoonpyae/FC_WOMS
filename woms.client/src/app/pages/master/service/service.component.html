@@ -1,0 +1,142 @@
+<div class="card">
+    <p-table #dt1 [value]="services" [paginator]="true" [rows]="20" [loading]="loading" styleClass="p-datatable-striped"
+        sortField="createdOn" [sortOrder]="-1" [showCurrentPageReport]="true"
+        [globalFilterFields]="['serviceName', 'fee']" [tableStyle]="{ 'min-width': '50rem' }"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [rowsPerPageOptions]="[20, 50, 100]" selectionMode="single" [(selection)]="selectedService" dataKey="serviceId">
+        <ng-template #caption>
+            <div class="grid grid-cols-12 mb-4">
+                <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
+                    <p-toast></p-toast>
+                    <p-splitButton label="Create" icon="pi pi-plus" [model]="items"
+                        (onClick)="create()"></p-splitButton>
+                </div>
+                <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
+                    <p-iconfield iconPosition="left" class="ml-auto">
+                        <p-inputicon>
+                            <i class="pi pi-search"></i>
+                        </p-inputicon>
+                        <input #search pInputText type="text" (input)="dt1.filterGlobal(search.value, 'contains')"
+                            placeholder="Search keyword" [style]="{ width: '100%' }" />
+                    </p-iconfield>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template #header>
+            <tr style="white-space: nowrap">
+                <th pFrozenColumn [style]="{ width: '10px' }">#</th>
+                <th pSortableColumn="serviceId">
+                    Id
+                    <p-sortIcon field="serviceId"></p-sortIcon>
+                </th>
+                <th pSortableColumn="serviceName">
+                    Name
+                    <p-sortIcon field="serviceName"></p-sortIcon>
+                </th>
+                <th pSortableColumn="fee">
+                    Fee
+                    <p-sortIcon field="fee"></p-sortIcon>
+                </th>
+                <th pSortableColumn="isActive">
+                    Is Fixed
+                    <p-sortIcon field="isActive"></p-sortIcon>
+                </th>
+                <th pSortableColumn="createdOn">
+                    Created On
+                    <p-sortIcon field="createdOn"></p-sortIcon>
+                </th>
+                <th pSortableColumn="createdBy">
+                    Created By
+                    <p-sortIcon field="createdBy"></p-sortIcon>
+                </th>
+                <th pSortableColumn="updatedOn">
+                    Updated On
+                    <p-sortIcon field="updatedOn"></p-sortIcon>
+                </th>
+                <th pSortableColumn="updatedBy">
+                    Updated By
+                    <p-sortIcon field="updatedBy"></p-sortIcon>
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template #body let-service>
+            <tr style="white-space: nowrap" [pSelectableRow]="service">
+                <td>
+                    <span class="pi pi-circle" [class.pi-check-circle]="selectedService === service"></span>
+                </td>
+                <td>{{ service.serviceId }}</td>
+                <td>{{ service.serviceName }}</td>
+                <td style="text-align: right">
+                    {{ service.fee | number: "1.0-0" }}
+                </td>
+                <td>
+                    <p-tag value="{{ service.isActive ? 'Active' : 'Inactive' }}"
+                        [severity]="service.isActive ? 'success' : 'info'" icon="{{
+              service.isActive ? 'pi pi-check' : 'pi pi-minus-circle'
+            }}" [rounded]="true"></p-tag>
+                </td>
+                <td>{{ service.createdOn | date: "dd/MMM/yyyy hh:mm:ss a" }}</td>
+                <td>{{ service.createdBy }}</td>
+                <td>{{ service.updatedOn | date: "dd/MMM/yyyy hh:mm:ss a" }}</td>
+                <td>{{ service.updatedBy }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog header="{{ isEdit ? 'Edit Service' : 'Create Service' }}" [(visible)]="modalVisible"
+    (onHide)="clearSelection()" [breakpoints]="{
+    '1920px': '30vw',
+    '1440px': '30vw',
+    '1024px': '30vw',
+    '768px': '80vw',
+    '425px': '100vw',
+    '375px': '100vw',
+    '320px': '100vw'}" [modal]="true" [style]="{ 'min-width': '30vw' }" [draggable]="false" [resizable]="false">
+    <form [formGroup]="serviceForm" (submit)="submit()">
+        <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-2">
+                <label>Name</label>
+                <input formControlName="serviceName" pInputText placeholder="Enter Name..." required />
+                <small *ngIf="
+            serviceForm.controls['serviceName'].invalid &&
+            serviceForm.get('serviceName')?.dirty
+          " class="p-text text-sm text-red-500">
+                    OPD Service is required.
+                </small>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label>Fee</label>
+                <input formControlName="fee" pInputText type="number" required min="0"
+                    (keypress)="preventNegativeInput($event)" />
+                <small *ngIf="
+            serviceForm.controls['fee'].invalid &&
+            serviceForm.get('fee')?.dirty
+          " class="p-text text-sm text-red-500">
+                    Fee is required.
+                </small>
+            </div>
+            <div class="flex justify-between">
+                <div class="flex gap-2">
+                    <p-toggle-switch formControlName="isActive"></p-toggle-switch>
+                    <span class="text-md font-medium mt-1">Is Active</span>
+                </div>
+            </div>
+            <div class="flex flex-col mb-2 gap-2">
+                <p-button icon="pi pi-check" label="{{ isEdit ? 'Update' : 'Save' }}" type="submit"
+                    [loading]="isSubmitting" [severity]="isEdit ? 'info' : 'success'"></p-button>
+            </div>
+        </div>
+    </form>
+</p-dialog>
+
+<p-confirmDialog [breakpoints]="{
+    '1920px': '30vw',
+    '1440px': '60vw',
+    '1024px': '100vw',
+    '768px': '100vw',
+    '425px': '150vw',
+    '375px': '100vw',
+    '320px': '100vw',
+  }" [style]="{ width: '30vw' }" key="ServiceDeleteDialog" position="bottom"
+    rejectButtonStyleClass="p-button-outlined"></p-confirmDialog>
