@@ -65,7 +65,8 @@ public partial class ViPurchase
     [StringLength(256)]
     public string? DeletedBy { get; set; }
 
-    public bool? Status { get; set; }
+    [StringLength(10)]
+    public string? Status { get; set; }
 
     public string? Remark { get; set; }
 }
