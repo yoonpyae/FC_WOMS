@@ -23,8 +23,6 @@ public partial class ViMainStock
     [StringLength(200)]
     public string? TypeName { get; set; }
 
-    public long ClinicId { get; set; }
-
     public long BranchId { get; set; }
 
     public double PurchasePrice { get; set; }
