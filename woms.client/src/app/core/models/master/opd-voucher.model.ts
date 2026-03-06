@@ -30,7 +30,6 @@ export interface OPDVoucherItemModel {
     amount?: number | null;
 }
 
-// The combined payload you will send to your Create/Update API
 export interface OPDVoucherEntryModel extends OPDVoucherModel {
     items: OPDVoucherItemModel[];
 }
