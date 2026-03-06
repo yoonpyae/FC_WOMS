@@ -95,7 +95,8 @@ export class PacketTypeComponent implements OnInit {
 
   loadData(): void {
     this.loading = true;
-    this.packetTypeService.get().subscribe({
+    const branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
+    this.packetTypeService.get(branchId).subscribe({
       next: res => {
         this.packetTypes = res.data as PacketTypeModel[];
         this.loading = false;
@@ -115,12 +116,12 @@ export class PacketTypeComponent implements OnInit {
   //#region CRUD
   create(): void {
     this.isEdit = false;
-    this.packetTypeService.getByAutoCode().subscribe({
+    const branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
+    this.packetTypeService.getByAutoCode(branchId).subscribe({
       next: res => {
         this.packetTypeForm.reset();
         this.packetTypeForm.controls['typeCode'].setValue(res.data as number);
         this.packetTypeForm.controls['status'].setValue(false);
-
         this.isEdit = false;
         this.modalVisible = true;
       }
@@ -225,6 +226,10 @@ export class PacketTypeComponent implements OnInit {
   submit(): void {
     if (this.packetTypeForm.valid) {
       this.isSubmitting = true;
+      let model = this.packetTypeForm.value as PacketTypeModel;
+
+      model.branchId = Number.parseInt((this.sharedService.getDefaultBranchId() ?? '0'));
+
       this.loggerService.info(this.selectedPacketType);
       if (!this.isEdit) {
         this.packetTypeService.create(this.packetTypeForm.value).subscribe({
