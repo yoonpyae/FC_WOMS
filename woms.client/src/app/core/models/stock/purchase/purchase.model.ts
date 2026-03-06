@@ -17,7 +17,7 @@ export interface PurchaseModel {
     updatedBy: string | null;
     deletedOn: string | null;
     deletedBy: string | null;
-    status: boolean;
+    status: string | null;
     remark: string | null;
 }
 
@@ -43,7 +43,7 @@ export interface ViPurchaseModel {
     updatedBy: string | null;
     deletedOn: string | null;
     deletedBy: string | null;
-    status: boolean;
+    status: string;
     remark: null;
 }
 
