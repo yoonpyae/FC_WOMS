@@ -171,7 +171,7 @@ public partial class WOMSDbContext : DbContext
 
         modelBuilder.Entity<Service>(entity =>
         {
-            entity.HasKey(e => new { e.ServiceId, e.BranchId }).HasName("PK_Service");
+            entity.HasKey(e => new { e.ServiceId, e.BranchId }).HasName("PK_LabService");
         });
 
         modelBuilder.Entity<State>(entity =>
