@@ -192,7 +192,7 @@ export class EntryComponent implements OnInit {
       updatedBy: null,
       deletedOn: null,
       deletedBy: null,
-      status: true,
+      status: null,
       remark: model.remark || null,
       detail: this.purchaseDetails.map(item => ({
         purchaseVno: "",
@@ -327,7 +327,8 @@ export class EntryComponent implements OnInit {
   }
 
   getMainStockItemByCode(code: string): void {
-    this.mainStockService.getByCode(code).subscribe({
+    let branchId = Number.parseInt(this.shareService.getDefaultBranchId() ?? '0');
+    this.mainStockService.getByCode(code, branchId).subscribe({
       next: (res) => {
         this.currentMainStock = res.data as MainStockModel;
         this.typeCode = this.currentMainStock.typeCode;
