@@ -106,9 +106,8 @@
 
                 <!-- Status -->
                 <td>
-                    <p-tag [value]="purchase.status ? 'Active' : 'Inactive'"
-                        [severity]="purchase.status ? 'success' : 'danger'"
-                        [icon]="purchase.status ? 'pi pi-check' : 'pi pi-minus-circle'" [rounded]="true">
+                    <p-tag [value]="purchase.status" [severity]="getStatusSeverity(purchase.status)"
+                        [icon]="getStatusIcon(purchase.status)" [rounded]="true">
                     </p-tag>
                 </td>
 
