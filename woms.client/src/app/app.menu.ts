@@ -48,10 +48,7 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
         label: 'Service',
         icon: 'pi pi-fw pi-briefcase',
         data: { roles: [UserRole.SuperAdmin] },
-        items: [
-          { label: 'OPD Service', routerLink: ['/opd/opd-service'] },
-          { label: 'OPD Doctor Attach', routerLink: ['/opd/opd-doctor-attach'] },
-        ]
+        routerLink: ['/service']
       }
     ]
   },
@@ -71,7 +68,6 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
         items: [
           { label: 'Packet Type', routerLink: ['/stock/packet-types'] },
           { label: 'Stock Item', routerLink: ['/stock/stock-items'] },
-          { label: 'Purchase', routerLink: ['/stock/purchases'] },
           { label: 'Main Stock', routerLink: ['/stock/main-stocks'] },
         ]
       }
@@ -81,11 +77,20 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
     label: 'Vouchers & Billing',
     items: [
       {
+        label: 'Purchase',
+        icon: 'pi pi-fw pi-receipt',
+        data: { roles: [UserRole.Pharmacist, UserRole.SuperAdmin] },
+        items: [
+          { label: 'Create Purchase', routerLink: ['/purchase/create-voucher'] },
+          { label: 'History', routerLink: ['/purchase/histories'] }
+        ]
+      },
+      {
         label: 'Pharmacy Voucher',
         icon: 'pi pi-fw pi-receipt',
         data: { roles: [UserRole.Pharmacist, UserRole.SuperAdmin] },
         items: [
-          { label: 'Create Voucher', routerLink: ['/pharmacy-voucher/create-vouchers'] },
+          { label: 'Create Voucher', routerLink: ['/pharmacy-voucher/create-voucher'] },
           { label: 'History', routerLink: ['/pharmacy-voucher/histories'] }
         ]
       },
@@ -94,7 +99,7 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
         icon: 'pi pi-fw pi-receipt',
         data: { roles: [UserRole.Receptionist, UserRole.SuperAdmin] },
         items: [
-          { label: 'Create Voucher', routerLink: ['/opd-voucher/create-vouchers'] },
+          { label: 'Create Voucher', routerLink: ['/opd-voucher/create-voucher'] },
           { label: 'History', routerLink: ['/opd-voucher/histories'] }
         ]
       }
