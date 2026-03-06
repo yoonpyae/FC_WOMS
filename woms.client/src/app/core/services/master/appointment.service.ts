@@ -32,8 +32,8 @@ export class AppointmentService {
     return this.httpClient.get<RootModel>(`${environment.main_url}/master/appointments/auto-id?branchId=${branchId}`);
   }
 
-  getByPatientId(patientId: string, branchId: number): Observable<RootModel> {
-    return this.httpClient.get<RootModel>(`${environment.main_url}/master/appointments?patientId=${patientId}&branchId=${branchId}`);
+  getByPatientId(patientId: string, branchId: number, doctorId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/appointments/${patientId}?branchId=${branchId}&doctorId=${doctorId}`);
   }
 
   create(model: AppointmentModel): Observable<RootModel> {
