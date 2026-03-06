@@ -108,7 +108,7 @@ export class SupplierComponent implements OnInit {
       validators: [Validators.required, Validators.pattern("^(0(1|9)[0-9]{7,9})$")]
     }),
     email: new FormControl('', { validators: [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")] }),
-    balance: [0, [Validators.required, Validators.min(0)]],
+    balance: [0],
     createdOn: [''],
     createdBy: [''],
     updatedOn: [''],
@@ -307,6 +307,17 @@ export class SupplierComponent implements OnInit {
   }
 
   submit(): void {
+    console.log('Form Errors:', this.supplierForm.errors);
+    console.log('Form Status:', this.supplierForm.status);
+
+    // This will list every control and why it is failing:
+    Object.keys(this.supplierForm.controls).forEach(key => {
+      const controlErrors = this.supplierForm.get(key)?.errors;
+      if (controlErrors != null) {
+        console.log('Key control: ' + key + ', errors: ', controlErrors);
+      }
+    });
+
     if (this.supplierForm.valid) {
       let model = this.supplierForm.value as SupplierModel;
       model.branchId = Number.parseInt((this.sharedService.getDefaultBranchId() ?? '0'));
