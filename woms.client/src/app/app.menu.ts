@@ -80,10 +80,7 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
         label: 'Purchase',
         icon: 'pi pi-fw pi-receipt',
         data: { roles: [UserRole.Pharmacist, UserRole.SuperAdmin] },
-        items: [
-          { label: 'Create Purchase', routerLink: ['/purchase/create-voucher'] },
-          { label: 'History', routerLink: ['/purchase/histories'] }
-        ]
+        routerLink: ['/purchase']
       },
       {
         label: 'Pharmacy Voucher',
