@@ -195,6 +195,7 @@ export class AppointmentComponent implements OnInit {
         },
         complete: () => {
           this.isSubmitting = false;
+          this.loadData();
         }
       })
     } else {
