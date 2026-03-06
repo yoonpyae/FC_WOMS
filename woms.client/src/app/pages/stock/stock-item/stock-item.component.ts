@@ -87,6 +87,7 @@ export class StockItemComponent implements OnInit {
   //#region formBuilder
   private formBuilder = inject(FormBuilder);
   public stockItemForm: FormGroup = this.formBuilder.group({
+    branchId: [0],
     itemCode: [''],
     itemName: ['', Validators.required],
     typeCode: [0, Validators.required],
@@ -102,8 +103,9 @@ export class StockItemComponent implements OnInit {
   }
 
   loadData(): void {
+    const branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
     this.loading = true;
-    this.stockItemService.get().subscribe({
+    this.stockItemService.get(branchId).subscribe({
       next: res => {
         this.stockItems = res.data as StockItemModel[];
         this.loading = false;
@@ -125,6 +127,8 @@ export class StockItemComponent implements OnInit {
   create(): void {
     this.isEdit = false;
     this.stockItemForm.reset();
+    const branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
+    this.stockItemForm.controls['branchId'].setValue(branchId);
     this.stockItemForm.controls['status'].setValue(false);
 
     this.selectedPacketType = null as any;
@@ -138,7 +142,7 @@ export class StockItemComponent implements OnInit {
     this.stockItemForm.reset();
     if (this.selectedStockItem) {
       this.loggerService.info(this.selectedStockItem);
-
+      this.stockItemForm.controls['branchId'].setValue(this.selectedStockItem.branchId);
       this.stockItemForm.controls['itemCode'].setValue(this.selectedStockItem.itemCode);
       this.stockItemForm.controls['itemName'].setValue(this.selectedStockItem.itemName);
       this.stockItemForm.controls['chemicalName'].setValue(this.selectedStockItem.chemicalName);
@@ -188,7 +192,8 @@ export class StockItemComponent implements OnInit {
 
   // #region getTypeCodeChange
   getTypeCodeChange(): void {
-    this.packetTypeService.get().subscribe({
+    const branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
+    this.packetTypeService.get(branchId).subscribe({
       next: (res) => {
         this.packetTypes = res.data as PacketTypeModel[];
         if (this.isEdit) {
@@ -256,12 +261,13 @@ export class StockItemComponent implements OnInit {
       this.isSubmitting = true;
       if (!this.isEdit) {
         let itemName = this.stockItemForm.controls['itemName'].value;
+        let branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
 
         this.stockItemService.getByAutoId(itemName).subscribe({
           next: res => {
             const itemCode = res.data as string;
             this.stockItemForm.controls['itemCode'].setValue(itemCode);
-            this.stockItemService.getByItemCode(itemCode, itemName).subscribe({
+            this.stockItemService.getByItemCode(itemCode, itemName, branchId).subscribe({
               next: () => {
                 this.stockItemService.create(this.stockItemForm.value).subscribe({
                   next: res => {
