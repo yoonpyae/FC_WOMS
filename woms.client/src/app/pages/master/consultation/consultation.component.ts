@@ -153,8 +153,9 @@ export class ConsultationComponent implements OnInit {
   // --- Data Operations ---
   loadData(): void {
     let branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
+    let doctorId = Number.parseInt((this.sharedService.getUserId() ?? "0"));
     this.loading = true;
-    this.consultationService.get(branchId).subscribe({
+    this.consultationService.get(branchId, doctorId).subscribe({
       next: res => {
         this.consultations = res.data as ViConsultationModel[];
       },
