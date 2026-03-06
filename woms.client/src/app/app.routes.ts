@@ -16,7 +16,7 @@ import { DoctorComponent } from './pages/master/doctor/doctor.component';
 import { DetailComponent as DoctorDetailComponent } from './pages/master/doctor/detail/detail.component';
 import { PatientComponent } from './pages/master/patient/patient.component';
 import { AppointmentComponent } from './pages/master/appointment/appointment.component';
-// import { OpdServiceComponent } from './pages/master/opd-service/opd-service.component';
+import { OpdVoucherComponent } from './pages/master/opd-voucher/opd-voucher.component';
 // import { OpdDoctorAttachComponent } from './pages/opd/opd-doctor-attach/opd-doctor-attach.component';
 
 // Stock Management
@@ -33,6 +33,7 @@ import { PharmacyCreateVoucherComponent } from './pages/pharmacy-voucher/create-
 import { PharmacyVoHistoryComponent } from './pages/pharmacy-voucher/history/history.component';
 import { ConsultationComponent } from './pages/master/consultation/consultation.component';
 import { PatientDetailComponent } from './pages/master/patient/detail/detail.component';
+import { EntryComponent } from './pages/stock/purchase/entry/entry.component';
 
 export const routes: Routes = [
 	{ path: '', component: HomeComponent },
@@ -93,15 +94,6 @@ export const routes: Routes = [
 					{ path: 'detail/:id', component: ConsultationComponent }
 				]
 			},
-			{
-				path: 'opd',
-				canActivate: [AuthGuardService],
-				data: { title: 'OPD' },
-				children: [
-					// { path: 'opd-service', component: OpdServiceComponent, data: { title: 'OPD Service' } },
-					// { path: 'opd-doctor-attach', component: OpdDoctorAttachComponent, data: { title: 'OPD Doctor Attach' } },
-				]
-			},
 
 			// --- STOCK MANAGEMENT ---
 			{
@@ -112,19 +104,27 @@ export const routes: Routes = [
 					{ path: 'supplier', component: SupplierComponent, data: { title: 'Supplier' } },
 					{ path: 'packet-types', component: PacketTypeComponent, data: { title: 'Packet Type' } },
 					{ path: 'stock-items', component: StockItemComponent, data: { title: 'Stock Item' } },
-					{ path: 'purchases', component: PurchaseComponent, data: { title: 'Purchases' } },
 					{ path: 'main-stocks', component: MainStockComponent, data: { title: 'Main Stock' } }
 				]
 			},
 
 			// --- VOUCHERS & BILLING ---
 			{
+				path: 'purchase',
+				canActivate: [AuthGuardService],
+				data: { title: 'Purchases', roles: [UserRole.Pharmacist, UserRole.SuperAdmin] },
+				children: [
+					{ path: 'create-voucher', component: EntryComponent, data: { title: 'Create Purchase Voucher' } },
+					{ path: 'histories', component: PurchaseComponent, data: { title: 'Purchase History' } },
+				]
+			},
+			{
 				path: 'pharmacy-voucher',
 				canActivate: [AuthGuardService],
 				data: { title: 'Pharmacy Voucher', roles: [UserRole.Pharmacist, UserRole.SuperAdmin] },
 				children: [
-					{ path: 'create-vouchers', component: PharmacyCreateVoucherComponent, data: { title: 'Create Voucher' } },
-					{ path: 'histories', component: PharmacyVoHistoryComponent, data: { title: 'History' } },
+					{ path: 'create-voucher', component: PharmacyCreateVoucherComponent, data: { title: 'Create Voucher' } },
+					{ path: 'histories', component: PharmacyVoHistoryComponent, data: { title: 'Pharmacy History' } },
 				]
 			},
 			{
@@ -132,9 +132,8 @@ export const routes: Routes = [
 				canActivate: [AuthGuardService],
 				data: { title: 'OPD Voucher', roles: [UserRole.Receptionist, UserRole.SuperAdmin] },
 				children: [
-					// TODO: Import and attach your OPD Voucher components here once created
+					{ path: 'histories', component: OpdVoucherComponent, data: { title: 'OPD Service' } },
 					// { path: 'create-vouchers', component: YourOpdVoucherCreateComponent },
-					// { path: 'histories', component: YourOpdVoucherHistoryComponent },
 				]
 			},
 
