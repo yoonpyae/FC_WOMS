@@ -393,4 +393,30 @@ export class PurchaseComponent implements OnInit {
     const now = new Date();
     return exp < now;
   }
+
+  getStatusSeverity(status: string): 'success' | 'warn' | 'danger' | 'info' {
+    switch (status?.toLowerCase()) {
+      case 'paid':
+        return 'success';
+      case 'credit':
+        return 'danger';
+      case 'partial':
+        return 'warn';
+      default:
+        return 'info';
+    }
+  }
+
+  getStatusIcon(status: string): string {
+    switch (status?.toLowerCase()) {
+      case 'paid':
+        return 'pi pi-check-circle';
+      case 'credit':
+        return 'pi pi-exclamation-circle';
+      case 'partial':
+        return 'pi pi-clock';
+      default:
+        return 'pi pi-question-circle';
+    }
+  }
 }
