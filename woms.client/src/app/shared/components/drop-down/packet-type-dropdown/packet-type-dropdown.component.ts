@@ -73,7 +73,8 @@ export class PacketTypeDropdownComponent implements OnInit, OnDestroy {
 
   public loadData(): void {
     this.loading = true;
-    this.packetTypeService.get().subscribe({
+    const branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
+    this.packetTypeService.get(branchId).subscribe({
       next: (res) => {
         this.packetTypes = res.data as PacketTypeModel[];
       },
