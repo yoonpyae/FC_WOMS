@@ -10,10 +10,10 @@
         [HttpGet]
         [EndpointSummary("List")]
         [EndpointDescription("List all Packet Types")]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(long branchId)
         {
             return ResponseHelper.OK_Result(
-                await repo.PacketTypes.GetAsync(x => !x.DeletedOn.HasValue), null);
+                await repo.PacketTypes.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId), null);
         }
 
         [HttpGet("auto-code")]
@@ -52,7 +52,9 @@
         [EndpointDescription("Update Packet Type")]
         public async Task<IActionResult> Edit(PacketType model)
         {
-            PacketType? packetType = await repo.PacketTypes.GetFirstAsync(x => x.TypeCode == model.TypeCode);
+            PacketType? packetType = await repo.PacketTypes.GetFirstAsync(x =>
+                    x.TypeCode == model.TypeCode &&
+                    x.BranchId == model.BranchId);
 
             if (packetType == null)
             {

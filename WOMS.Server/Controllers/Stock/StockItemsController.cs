@@ -12,17 +12,17 @@ public class StockItemsController(
     [HttpGet]
     [EndpointSummary("List")]
     [EndpointDescription("Lists all stock item without deleted data.")]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get(long branchId)
     {
-        return ResponseHelper.OK_Result(await repo.StockItems.GetAsync(x => !x.DeletedOn.HasValue), null);
+        return ResponseHelper.OK_Result(await repo.StockItems.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId), null);
     }
 
     [HttpGet("itemCode")]
     [EndpointSummary("Get By Code")]
     [EndpointDescription("Gets a stock item with specified code and validates name.")]
-    public async Task<IActionResult> GetByCode(string itemCode, string itemName)
+    public async Task<IActionResult> GetByCode(string itemCode, string itemName, long branchId)
     {
-        bool validItem = await repo.StockItems.AnyAsync(x => x.ItemCode == itemCode && x.ItemName != itemName);
+        bool validItem = await repo.StockItems.AnyAsync(x => x.ItemCode == itemCode && x.ItemName != itemName && x.BranchId == branchId);
         return validItem
             ? ResponseHelper.Bad_Request(false,
                 new DefaultResponseMessageModel("Item name is already used for another item code.", ""))

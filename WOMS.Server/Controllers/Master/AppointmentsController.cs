@@ -68,9 +68,9 @@ public class AppointmentsController(IRepositoryWrapper repo) : ControllerBase
     [HttpGet("{patientId}")]
     [EndpointSummary("Get By Patient Id")]
     [EndpointDescription("Gets an Appointment with specified patient id.")]
-    public async Task<IActionResult> GetByPatientId(string patientId, long branchId)
+    public async Task<IActionResult> GetByPatientId(string patientId, long branchId, long doctorId)
         => ResponseHelper.OK_Result(
-            await repo.Appointments.GetAsync(x => x.PatientId == patientId && x.BranchId == branchId), null);
+            await repo.ViAppointments.GetAsync(x => x.PatientId == patientId && x.BranchId == branchId && x.DoctorId==doctorId), null);
 
     [HttpPost]
     [ValidateModel]

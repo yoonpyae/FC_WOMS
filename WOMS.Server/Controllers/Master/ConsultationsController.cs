@@ -13,16 +13,16 @@ namespace WOMS.Server.Controllers.Master
         [HttpGet]
         [EndpointSummary("List All")]
         [EndpointDescription("Lists all consultations without deleted data.")]
-        public async Task<IActionResult> Get(long branchId)
+        public async Task<IActionResult> Get(long branchId, long doctorId)
         {
             return ResponseHelper.OK_Result(
-                        await repo.ViConsultations.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId), null);
+                        await repo.ViConsultations.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId && x.DoctorId==doctorId), null);
         }
 
         [HttpGet("{id:long}")]
         [EndpointSummary("Get By Id")]
         [EndpointDescription("Gets a consultation with specified id.")]
-        public async Task<IActionResult> Get(long id, long branchId)
+        public async Task<IActionResult> GetById(long id, long branchId)
         {
             return ResponseHelper.OK_Result(
                         await repo.ViConsultations.GetFirstAsync(x => x.Ano == id && x.BranchId == branchId), null);
@@ -31,9 +31,9 @@ namespace WOMS.Server.Controllers.Master
         [HttpGet("{patientId}")]
         [EndpointSummary("Get By Patient Id")]
         [EndpointDescription("Gets consultations and prescriptions with specified patient id.")]
-        public async Task<IActionResult> Get(string patientId, long branchId)
+        public async Task<IActionResult> Get(string patientId, long branchId, long doctorId)
         {
-            var consultations = await repo.ViConsultations.GetAsync(x => x.PatientId == patientId && x.BranchId == branchId);
+            var consultations = await repo.ViConsultations.GetAsync(x => x.PatientId == patientId && x.BranchId == branchId && x.DoctorId==doctorId);
 
             if (consultations == null || !consultations.Any())
             {

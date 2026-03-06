@@ -38,7 +38,7 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
         return ResponseHelper.OK_Result(vouchers, null);
     }
 
-    [HttpGet("{vno}")]
+    [HttpGet("details/{vno}")]
     [EndpointSummary("Detail")]
     [EndpointDescription("Lists all voucher details for a specific OPD voucher using its Vno.")]
     public async Task<IActionResult> GetDetails(string vno)
@@ -70,7 +70,7 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
                 PaidAmount = model.PaidAmount,
                 LeftAmount = model.LeftAmount,
                 PaymentType = model.PaymentType,
-                CreatedOn = DateTime.UtcNow,
+                CreatedOn = DateTime.Now,
                 CreatedBy = User.Identity?.Name,
                 Status = isFullyPaid ? "Paid" : "Unpaid",
                 Remark = model.Remark,
@@ -108,15 +108,15 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
         }
     }
 
-    [HttpPut("{vno}")]
+    [HttpPut]
     [EndpointSummary("Update")]
     [EndpointDescription("Updates an existing OPD voucher and its items.")]
-    public async Task<IActionResult> UpdateOPDVoucher(string vno, [FromBody] OPDVoucherEntryModel model)
+    public async Task<IActionResult> UpdateOPDVoucher(OPDVoucherEntryModel model)
     {
         try
         {
             // 1. Fetch the existing voucher (Ensure it matches the branch)
-            OPDVoucher? existingVoucher = await repo.OPDVouchers.GetFirstAsync(x => x.Opdvno == vno && x.BranchId == model.BranchId);
+            OPDVoucher? existingVoucher = await repo.OPDVouchers.GetFirstAsync(x => x.Opdvno == model.Opdvno && x.BranchId == model.BranchId);
 
             if (existingVoucher == null)
             {
@@ -135,14 +135,14 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
             existingVoucher.LeftAmount = model.LeftAmount;
             existingVoucher.PaymentType = model.PaymentType;
             existingVoucher.Remark = model.Remark;
-            existingVoucher.UpdatedOn = DateTime.UtcNow;
+            existingVoucher.UpdatedOn = DateTime.Now;
             existingVoucher.UpdatedBy = User.Identity?.Name;
             existingVoucher.Status = isFullyPaid ? "Paid" : "Unpaid";
 
             repo.OPDVouchers.Update(existingVoucher);
 
             // 3. Handle Items: Remove old items
-            IReadOnlyList<OPDVoucherItem>? existingItems = await repo.OPDVoucherItems.GetAsync(x => x.Opdvno == vno);
+            IReadOnlyList<OPDVoucherItem>? existingItems = await repo.OPDVoucherItems.GetAsync(x => x.Opdvno == model.Opdvno);
             if (existingItems != null)
             {
                 foreach (OPDVoucherItem item in existingItems)
@@ -158,7 +158,7 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
                 {
                     OPDVoucherItem voucherItem = new()
                     {
-                        Opdvno = vno,
+                        Opdvno = item.Opdvno,
                         ServiceId = item.ServiceId,
                         ConsultationId = item.ConsultationId,
                         Quantity = item.Quantity,

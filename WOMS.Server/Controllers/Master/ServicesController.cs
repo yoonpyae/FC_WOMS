@@ -52,12 +52,12 @@ public class ServicesController(IRepositoryWrapper repo) : ControllerBase
         #endregion
     }
 
-    [HttpPut("{id:long}")]
+    [HttpPut]
     [EndpointSummary("Update")]
     [EndpointDescription("Updates a service with specified id.")]
-    public async Task<IActionResult> Update(long id, Service model)
+    public async Task<IActionResult> Update(Service model)
     {
-        Service? existingService = await repo.Services.GetFirstAsync(x => x.ServiceId == id && x.BranchId == model.BranchId);
+        Service? existingService = await repo.Services.GetFirstAsync(x => x.ServiceId == model.ServiceId && x.BranchId == model.BranchId);
         if (existingService is null)
             return ResponseHelper.NotFound_Request(null,
                 new DefaultResponseMessageModel("Unable to find Service", ""));

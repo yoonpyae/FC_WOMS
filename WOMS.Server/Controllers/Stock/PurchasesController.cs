@@ -17,10 +17,13 @@ public class PurchasesController(
     [EndpointDescription("Lists all purchases without deleted data, filtered by date range.")]
     public async Task<IActionResult> Get(long BranchId, DateOnly startDate, DateOnly endDate)
     {
-        IReadOnlyList<ViPurchase> purchases = await repo.ViPurchases.GetAsync(
-            x => x.BranchId == BranchId && !x.DeletedOn.HasValue &&
-            (x.PurchaseDate >= startDate.ToDateTime(TimeOnly.MinValue)) &&
-            (x.PurchaseDate <= endDate.ToDateTime(TimeOnly.MaxValue))) ?? [];
+        IReadOnlyList<ViPurchase>? purchases = await repo.ViPurchases.GetAsync(
+        x => x.BranchId == BranchId &&
+             !x.DeletedOn.HasValue &&
+             x.PurchaseDate.HasValue &&
+             DateOnly.FromDateTime(x.PurchaseDate.Value.Date) >= startDate &&
+             DateOnly.FromDateTime(x.PurchaseDate.Value.Date) <= endDate
+    );
         IReadOnlyList<ViPurchaseDetail> purchaseDetails = await repo.ViPurchaseDetails.GetAsync(x => x.BranchId == BranchId) ?? [];
 
         List<PurchaseListModel> records = [];
@@ -50,7 +53,8 @@ public class PurchasesController(
         {
             string purchaseVno = idGenerateService.GetPurchaseVno(model.BranchId);
 
-            bool isFullyPaid = model.LeftAmount == 0 && model.PayAmount == model.NetAmount;
+            string calculatedStatus = model.LeftAmount == 0 ? "Paid" : "Credit";
+            bool isFullyPaid = model.LeftAmount == 0 && model.PayAmount >= model.NetAmount;
 
             Purchase voucher = new()
             {
@@ -60,14 +64,14 @@ public class PurchasesController(
                 ManualVno = model.ManualVno,
                 SupplierId = model.SupplierId,
                 BranchId = model.BranchId,
-                PurchaseDate = model.PurchaseDate,
+                PurchaseDate = DateTime.Now,
                 TotalAmount = model.TotalAmount,
                 DiscountAmount = model.DiscountAmount,
                 NetAmount = model.NetAmount,
                 PayAmount = model.PayAmount,
                 LeftAmount = model.LeftAmount,
                 PaymentType = model.PaymentType,
-                Status = model.Status,
+                Status = calculatedStatus,
                 Remark = model.Remark,
                 PaidDate = isFullyPaid ? DateTime.Now : null
             };
@@ -110,7 +114,7 @@ public class PurchasesController(
                     TypeCode = item.TypeCode,
                     Qty = item.Qty,
                     Price = item.Price,
-                    Amount= item.Amount,
+                    Amount = item.Amount,
                     ExpireDate = item.ExpireDate
                 };
                 repo.PurchaseDetails.Create(itemDetail);
@@ -157,6 +161,12 @@ public class PurchasesController(
             purchase.LeftAmount -= model.PayAmount.Value;
 
             purchase.PayAmount = (purchase.PayAmount ?? 0) + model.PayAmount.Value;
+
+            if (purchase.LeftAmount <= 0)
+            {
+                purchase.Status = "Paid";
+                purchase.PaidDate = DateTime.Now;
+            }
         }
 
         if (purchase.LeftAmount == 0 && purchase.PayAmount == purchase.NetAmount)
