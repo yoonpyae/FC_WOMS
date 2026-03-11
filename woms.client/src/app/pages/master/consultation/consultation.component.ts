@@ -74,7 +74,7 @@ export class ConsultationComponent implements OnInit {
 
   // cached id of currently logged in doctor (derived from user cookie)
   private get currentDoctorId(): number {
-    const id = this.sharedService.getUserId();
+    const id = this.sharedService.getDoctorId();
     return id ? Number.parseInt(id) : 0;
   }
 
