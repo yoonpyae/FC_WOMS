@@ -101,6 +101,7 @@ export class DoctorComponent implements OnInit {
   public doctorForm: FormGroup = this.formBuilder.group({
     doctorId: [0],
     branchId: [0],
+    id: [''],
     name: ['', Validators.required],
     degree: ['', Validators.required],
     specialized: ['', Validators.required],
@@ -144,21 +145,20 @@ export class DoctorComponent implements OnInit {
 
   create(): void {
     let branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
-    this.doctorService.getAutoId(branchId).subscribe({
-      next: (res) => {
-        this.doctorForm.reset();
-        this.doctorForm.controls['consultantFee'].setValue(0);
-        this.doctorForm.controls['ecgfee'].setValue(0);
-        this.doctorForm.controls['xrayFee'].setValue(0);
-        this.doctorForm.controls['ultrasoundFee'].setValue(0);
-        this.doctorForm.controls['ultrasoundFee'].setValue(0);
-        this.doctorForm.controls['doctorId'].setValue(res.data as number);
-        this.doctorForm.controls['branchId'].setValue(branchId);
-        this.doctorForm.controls['status'].setValue(false);
-        this.isEdit = false;
-        this.modalVisible = true;
-      }
+    this.doctorForm.reset();
+    this.doctorForm.patchValue({
+      doctorId: 0,
+      id: '',
+      branchId: branchId,
+      status: true,
+      consultantFee: 0,
+      ecgfee: 0,
+      xrayFee: 0,
+      ultrasoundFee: 0
     });
+
+    this.isEdit = false;
+    this.modalVisible = true;
 
   }
 
@@ -166,21 +166,7 @@ export class DoctorComponent implements OnInit {
     this.isEdit = true;
     this.doctorForm.reset();
     if (this.selectedDoctor) {
-      this.loggerService.info(this.selectedDoctor);
-
-      this.doctorForm.controls['doctorId'].setValue(this.selectedDoctor.doctorId);
-      this.doctorForm.controls['branchId'].setValue(this.selectedDoctor.branchId);
-      this.doctorForm.controls['name'].setValue(this.selectedDoctor.name);
-      this.doctorForm.controls['degree'].setValue(this.selectedDoctor.degree);
-      this.doctorForm.controls['specialized'].setValue(this.selectedDoctor.specialized);
-      this.doctorForm.controls['photo'].setValue(this.selectedDoctor.photo);
-      this.doctorForm.controls['sign'].setValue(this.selectedDoctor.sign);
-      this.doctorForm.controls['consultantFee'].setValue(this.selectedDoctor.consultantFee);
-      this.doctorForm.controls['ecgfee'].setValue(this.selectedDoctor.ecgfee);
-      this.doctorForm.controls['xrayFee'].setValue(this.selectedDoctor.xrayFee);
-      this.doctorForm.controls['ultrasoundFee'].setValue(this.selectedDoctor.ultrasoundFee);
-
-      this.doctorForm.controls['status'].setValue(this.selectedDoctor.status);
+      this.doctorForm.patchValue(this.selectedDoctor); 
       this.modalVisible = true;
     } else {
       this.modalVisible = false;

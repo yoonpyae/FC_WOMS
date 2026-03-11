@@ -33,7 +33,7 @@ export class AuthService {
     const body = {
       username: username,
       password: password,
-    }
+    };
     return this.http.post<RootModel>(url, body);
   }
 
@@ -42,8 +42,8 @@ export class AuthService {
     const body = {
       access_token: window.localStorage.getItem('access_token'),
       refresh_token: window.localStorage.getItem('refresh_token')
-    }
-    return this.http.post<RootModel>(url, JSON.stringify(body));
+    };
+    return this.http.post<RootModel>(url, body);
   }
 
   isHasToken(): boolean {
@@ -69,6 +69,7 @@ export class AuthService {
     this.cookieService.delete('username');
     this.cookieService.delete('userrole');
     this.cookieService.delete('userId');
+    this.cookieService.delete('doctorId');
 
     window.localStorage.removeItem('access_token');
     window.localStorage.removeItem('refresh_token');

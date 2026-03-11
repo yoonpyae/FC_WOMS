@@ -53,7 +53,11 @@ public partial class AspNetUser
     [InverseProperty("User")]
     public virtual ICollection<AspNetUserToken> AspNetUserTokens { get; set; } = new List<AspNetUserToken>();
 
+    [InverseProperty("IdNavigation")]
+    public virtual ICollection<Doctor> Doctors { get; set; } = new List<Doctor>();
+
     [ForeignKey("UserId")]
-    [InverseProperty("Users")]
-    public virtual ICollection<AspNetRole> Roles { get; set; } = new List<AspNetRole>();
+    [InverseProperty("User")]
+    [System.Text.Json.Serialization.JsonIgnore]
+    public virtual ICollection<AspNetUserRole> AspNetUserRoles { get; set; } = new List<AspNetUserRole>();
 }

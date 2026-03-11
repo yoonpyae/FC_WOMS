@@ -31,7 +31,9 @@ export class SharedService {
   }
 
   //#endregion
-
+  getDoctorId(): string {
+    return this.cookieService.get('doctorId');
+  }
   //#region UserName
 
   setUserName(value: string): void {

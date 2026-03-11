@@ -4,7 +4,7 @@ namespace WOMS.Server.Controllers.Master;
 [Route("api/master/[controller]")]
 [ApiController]
 public class DoctorsController(
-  IRepositoryWrapper repo,
+    IRepositoryWrapper repo,
     IFileService fileService,
     IConfiguration config) : ControllerBase
 {
@@ -15,41 +15,72 @@ public class DoctorsController(
     [EndpointSummary("List")]
     [EndpointDescription("List all Doctor without deleted data")]
     public async Task<IActionResult> Get(long branchId)
-        => ResponseHelper.OK_Result(
-            await repo.Doctors.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId),
-            null);
+    {
+        var doctors = await repo.Doctors.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId);
+
+        // Projecting to a new list to avoid circular references
+        var result = doctors.Select(x => new {
+            x.DoctorId,
+            x.Id, // The string GUID linked to AspNetUsers
+            x.BranchId,
+            x.Name,
+            x.Degree,
+            x.Specialized,
+            x.ConsultantFee,
+            x.Ecgfee,
+            x.XrayFee,
+            x.UltrasoundFee,
+            x.Status,
+            x.CreatedOn,
+            x.CreatedBy
+        });
+
+        return ResponseHelper.OK_Result(result, null);
+    }
 
     [HttpGet("active")]
     [EndpointSummary("List Active Doctors")]
     [EndpointDescription("List all Doctors with Status true and not deleted")]
     public async Task<IActionResult> GetActive(long branchId)
     {
-        IReadOnlyList<Doctor>? doctors = await repo.Doctors.GetAsync(
+        var doctors = await repo.Doctors.GetAsync(
             x => !x.DeletedOn.HasValue && x.BranchId == branchId && x.Status == true
         );
-        return ResponseHelper.OK_Result(doctors, null);
+
+        var result = doctors.Select(x => new {
+            x.DoctorId,
+            x.Id, //
+            x.Name,
+            x.Specialized,
+            x.Status
+        });
+
+        return ResponseHelper.OK_Result(result, null);
     }
 
     [HttpGet("{id:long}")]
     [EndpointSummary("Get By Id")]
     [EndpointDescription("Get Doctor by Id")]
     public async Task<IActionResult> Get(long branchId, long id)
-        => ResponseHelper.OK_Result(
-            await repo.Doctors.GetFirstAsync(x => x.DoctorId == id && x.BranchId == branchId),
-            null);
-
-    [HttpGet("auto-id")]
-    [EndpointSummary("Get Auto Id")]
-    [EndpointDescription("Get an Doctors max Id")]
-    public async Task<IActionResult> GetAutoId(long branchId)
     {
-        Doctor? lastRecord =
-            await repo.Doctors.GetFirstAsync(x => x.BranchId == branchId,
-                q => q.OrderByDescending(x => x.DoctorId));
+        var doctor = await repo.Doctors.GetFirstAsync(x => x.DoctorId == id && x.BranchId == branchId);
 
-        long maxId = lastRecord?.DoctorId ?? 0;
-        maxId++;
-        return ResponseHelper.OK_Result(maxId, null);
+        // Returning only specific fields to avoid the infinite Roles loop
+        var result = new
+        {
+            doctor.DoctorId,
+            doctor.Id,
+            doctor.Name,
+            doctor.Degree,
+            doctor.Specialized,
+            doctor.ConsultantFee,
+            doctor.Ecgfee,
+            doctor.XrayFee,
+            doctor.UltrasoundFee,
+            doctor.Status
+        };
+
+        return ResponseHelper.OK_Result(result, null);
     }
 
     [HttpPost]
@@ -58,15 +89,49 @@ public class DoctorsController(
     [EndpointDescription("Create a new Doctors")]
     public async Task<IActionResult> Create(Doctor model)
     {
+        Doctor? lastRecord = await repo.Doctors.GetFirstAsync(x => x.BranchId == model.BranchId, q => q.OrderByDescending(x => x.DoctorId)); 
+        model.DoctorId = (lastRecord?.DoctorId ?? 0) + 1; 
+        string userName = model.Name.Replace(" ", "").ToLower() + model.DoctorId;
+        string email = $"{userName}@gmail.com"; 
+        string identityUserId = Guid.NewGuid().ToString();
+        var newUser = new AspNetUser
+        {
+            Id = identityUserId,
+            UserName = userName,
+            NormalizedUserName = userName.ToUpper(),
+            Email = $"{userName}@gmail.com",
+            NormalizedEmail = $"{userName}@gmail.com".ToUpper(),
+            EmailConfirmed = true,
+            SecurityStamp = Guid.NewGuid().ToString(),
+            ConcurrencyStamp = Guid.NewGuid().ToString(),
+            // DO NOT add to newUser.Roles here to avoid the loop
+        };
+
+        var hasher = new PasswordHasher<AspNetUser>();
+        newUser.PasswordHash = hasher.HashPassword(newUser, "FCdoctor@123");
+
+        // 3. Setup Doctor link
+        model.Id = identityUserId; // Assigning string to string
         model.CreatedOn = DateTime.Now;
         model.CreatedBy = User.Identity?.Name ?? string.Empty;
 
+        // 4. Create the Role Link using your new entity
+        var role = await repo.AspNetRoles.GetFirstAsync(x => x.Name == "Doctor");
+        var userRole = new AspNetUserRole
+        {
+            UserId = identityUserId,
+            RoleId = role.Id
+        };
+
+        // 5. Save everything
+        repo.AspNetUsers.Create(newUser);
         repo.Doctors.Create(model);
+        repo.AspNetUserRoles.Create(userRole); // Explicitly create the link
+
         return await repo.SaveAsync()
             ? ResponseHelper.Created_Result("/api/doctor", null,
-                new DefaultResponseMessageModel("Successfully created new Doctor.", ""))
-            : ResponseHelper.Bad_Request(null,
-                new DefaultResponseMessageModel("Unable to created Doctor.", ""));
+                new DefaultResponseMessageModel($"Successfully created Doctor #{model.DoctorId}.", ""))
+            : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Database error.", ""));
     }
 
     [HttpPut]
@@ -79,9 +144,11 @@ public class DoctorsController(
             await repo.Doctors.GetFirstAsync(x => x.DoctorId == model.DoctorId);
 
         if (doctor == null)
+        {
             return ResponseHelper.NotFound_Request(
                 null,
                 new DefaultResponseMessageModel("Doctor not found", ""));
+        }
 
         //Re-assign Values
         doctor.DoctorId = model.DoctorId;

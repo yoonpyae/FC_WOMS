@@ -110,6 +110,8 @@ namespace WOMS.Server.Controllers.Auth
                         user.Id,
                         user.UserName);
 
+                    var doctor = await _repo.Doctors.GetFirstAsync(x => x.Id == user.Id);
+
                     // Return a successful response with the token details
                     return ResponseHelper.OK_Result(
                         new
@@ -123,7 +125,8 @@ namespace WOMS.Server.Controllers.Auth
                                 user.UserName,
                                 user.Email,
                                 user.PhoneNumber,
-                                user_role = role.ToLower()
+                                user_role = role.ToLower(),
+                                doctorId = doctor?.DoctorId ?? 0
                             }
                         },
                         new DefaultResponseMessageModel("Successfully generated access token.", "")

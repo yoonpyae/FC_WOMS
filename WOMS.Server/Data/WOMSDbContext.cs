@@ -16,6 +16,8 @@ public partial class WOMSDbContext : DbContext
 
     public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
 
+    public virtual DbSet<AspNetUserRole> AspNetUserRoles { get; set; }
+
     public virtual DbSet<AspNetRoleClaim> AspNetRoleClaims { get; set; }
 
     public virtual DbSet<AspNetUser> AspNetUsers { get; set; }
@@ -105,17 +107,20 @@ public partial class WOMSDbContext : DbContext
                 .IsUnique()
                 .HasFilter("([NormalizedUserName] IS NOT NULL)");
 
-            entity.HasMany(d => d.Roles).WithMany(p => p.Users)
-                .UsingEntity<Dictionary<string, object>>(
-                    "AspNetUserRole",
-                    r => r.HasOne<AspNetRole>().WithMany().HasForeignKey("RoleId"),
-                    l => l.HasOne<AspNetUser>().WithMany().HasForeignKey("UserId"),
-                    j =>
-                    {
-                        j.HasKey("UserId", "RoleId");
-                        j.ToTable("AspNetUserRoles");
-                        j.HasIndex(new[] { "RoleId" }, "IX_AspNetUserRoles_RoleId");
-                    });
+        });
+
+        modelBuilder.Entity<AspNetUserRole>(entity =>
+        {
+            entity.ToTable("AspNetUserRoles");
+            entity.HasKey(e => new { e.UserId, e.RoleId });
+
+            entity.HasOne(d => d.User)
+                .WithMany(p => p.AspNetUserRoles) // Matches the fixed property in AspNetUser.cs
+                .HasForeignKey(d => d.UserId);
+
+            entity.HasOne(d => d.Role)
+                .WithMany(p => p.AspNetUserRoles) // Matches the fixed property in AspNetRole.cs
+                .HasForeignKey(d => d.RoleId);
         });
 
         modelBuilder.Entity<Branch>(entity =>
@@ -135,6 +140,12 @@ public partial class WOMSDbContext : DbContext
         modelBuilder.Entity<Doctor>(entity =>
         {
             entity.HasKey(e => new { e.DoctorId, e.BranchId }).HasName("PK_Doctor_1");
+
+            entity.HasOne(d => d.IdNavigation)
+                .WithMany(p => p.Doctors)
+                .HasForeignKey(d => d.Id) // Correctly map string GUID Id as the FK
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_Doctor_AspNetUsers");
         });
 
         modelBuilder.Entity<MainStock>(entity =>

@@ -77,7 +77,7 @@ export class PatientDetailComponent implements OnInit {
   loadDashboardData(id: string): void {
     this.loading = true;
     const branchId = Number.parseInt(this.sharedService.getDefaultBranchId() ?? '0');
-    const doctorId = Number.parseInt(this.sharedService.getUserId() ?? '0');
+    let doctorId = Number.parseInt((this.sharedService.getDoctorId() ?? "0"));
     forkJoin({
       patientReq: this.patientService.getById(id, branchId),
       appointmentReq: this.appointmentService.getByPatientId(id, branchId, doctorId),

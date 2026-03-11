@@ -135,10 +135,11 @@ export class DetailComponent implements OnInit {
     let branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
     this.loading = true;
 
-    this.doctorId = parseInt(this.route.snapshot.paramMap.get('id') ?? '');
+    const routeId = this.route.snapshot.paramMap.get('id');
+    this.doctorId = routeId ? parseInt(routeId) : 0;
     this.doctorService.getById(this.doctorId, branchId).subscribe({
       next: (res) => {
-        this.doctor = res.data;
+        this.doctor = res.data as DoctorModel;
         this.loading = false;
       },
       error: err => { },
@@ -150,7 +151,7 @@ export class DetailComponent implements OnInit {
     });
   }
 
- //#region Profile Photo
+  //#region Profile Photo
 
   onSelectedPhotos(event: any) {
     this.files = event.currentFiles.filter((file: File) => {

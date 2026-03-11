@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace WOMS.Server.Entities;
 
 [PrimaryKey("DoctorId", "BranchId")]
 [Table("Doctor")]
+[Index("Id", Name = "IX_Doctors_Id")]
 public partial class Doctor
 {
     [Key]
@@ -62,4 +64,11 @@ public partial class Doctor
     public bool Status { get; set; }
 
     public string? Remark { get; set; }
+
+    public string? Id { get; set; }
+
+    [ForeignKey("Id")]
+    [InverseProperty("Doctors")]
+    [System.Text.Json.Serialization.JsonIgnore]
+    public virtual AspNetUser? IdNavigation { get; set; }
 }

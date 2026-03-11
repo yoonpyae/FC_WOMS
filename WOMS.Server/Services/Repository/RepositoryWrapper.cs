@@ -40,6 +40,7 @@ namespace WOMS.Server.Services.Repository
         private IServiceRepo? _service;
         private IOPDVoucherRepo? _opdVoucher;
         private IOPDVoucherItemRepo? _opdVoucherItem;
+        private IAspNetUserRoleRepo? _aspNetUserRole;
 
         #endregion
 
@@ -80,6 +81,14 @@ namespace WOMS.Server.Services.Repository
             }
         }
 
+        public IAspNetUserRoleRepo AspNetUserRoles
+        {
+            get
+            {
+                _aspNetUserRole ??= new AspNetUserRoleRepo(Context);
+                return _aspNetUserRole;
+            }
+        }
 
         public ITokenClaimRepo TokenClaims
         {

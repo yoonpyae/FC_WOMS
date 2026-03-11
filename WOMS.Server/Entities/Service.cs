@@ -13,6 +13,9 @@ public partial class Service
     [Key]
     public long ServiceId { get; set; }
 
+    [Key]
+    public long BranchId { get; set; }
+
     [StringLength(200)]
     public string? ServiceName { get; set; }
 
@@ -37,7 +40,4 @@ public partial class Service
     public string? DeletedBy { get; set; }
 
     public bool IsActive { get; set; }
-
-    [Key]
-    public long BranchId { get; set; }
 }

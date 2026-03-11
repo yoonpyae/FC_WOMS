@@ -94,5 +94,9 @@ export class LoginComponent implements OnInit {
     this.cookieService.set('username', res.data.user.userName);
     this.cookieService.set('userrole', res.data.user.user_role);
     this.cookieService.set('authorized_status', 'authorized');
+
+    if (res.data.user.doctorId) {
+      this.cookieService.set('doctorId', res.data.user.doctorId.toString());
+    }
   }
 }

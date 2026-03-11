@@ -1,6 +1,7 @@
 export interface DoctorModel {
     doctorId: number;
     branchId: number;
+    id: string | null;
     name: string;
     degree: string;
     specialized: string;

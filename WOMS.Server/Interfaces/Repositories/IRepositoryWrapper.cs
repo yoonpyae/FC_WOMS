@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
+using WOMS.Server.Entities;
 
 namespace WOMS.Server.Interfaces.Repositories
 {
@@ -30,6 +31,7 @@ namespace WOMS.Server.Interfaces.Repositories
         IServiceRepo Services { get; }
         IOPDVoucherRepo OPDVouchers { get; }
         IOPDVoucherItemRepo OPDVoucherItems { get; }
+        IAspNetUserRoleRepo AspNetUserRoles { get; }
 
         #endregion
 

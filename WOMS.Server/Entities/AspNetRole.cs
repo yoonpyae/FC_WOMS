@@ -23,6 +23,7 @@ public partial class AspNetRole
     public virtual ICollection<AspNetRoleClaim> AspNetRoleClaims { get; set; } = new List<AspNetRoleClaim>();
 
     [ForeignKey("RoleId")]
-    [InverseProperty("Roles")]
-    public virtual ICollection<AspNetUser> Users { get; set; } = new List<AspNetUser>();
+    [InverseProperty("Role")]
+    [System.Text.Json.Serialization.JsonIgnore]
+    public virtual ICollection<AspNetUserRole> AspNetUserRoles { get; set; } = new List<AspNetUserRole>();
 }
