@@ -24,29 +24,6 @@ public class PatientsController(
         await repo.ViPatients.GetFirstAsync(x => x.PatientId == id && x.BranchId == branchId) ,
         null);
 
-    [HttpGet("{id}/consultations-with-prescriptions")]
-    [EndpointSummary("Get Consultations with Prescriptions")]
-    [EndpointDescription("Get all consultations and their prescriptions for a patient")]
-    public async Task<IActionResult> GetConsultationsWithPrescriptions(string id, long branchId)
-    {
-        // Get all consultations for the patient
-        var consultations = await repo.Consultations.GetAsync(x => x.PatientId == id && x.BranchId == branchId);
-
-        // For each consultation, get its prescriptions
-        var result = new List<object>();
-        foreach (var consultation in consultations)
-        {
-            var prescriptions = await repo.Prescriptions.GetAsync(p => p.ConsultationId == consultation.ConsultationId);
-            result.Add(new
-            {
-                Consultation = consultation,
-                Prescriptions = prescriptions
-            });
-        }
-
-        return ResponseHelper.OK_Result(result, null);
-    }
-
     [HttpPost]
     [ValidateModel]
     [EndpointSummary("Create")]
