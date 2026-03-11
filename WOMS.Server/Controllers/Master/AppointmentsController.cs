@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-
-namespace WOMS.Server.Controllers.Master;
+﻿namespace WOMS.Server.Controllers.Master;
 
 [Authorize]
 [Route("api/master/[controller]")]
@@ -78,6 +75,25 @@ public class AppointmentsController(IRepositoryWrapper repo) : ControllerBase
     [EndpointDescription("Creates new Appointment.")]
     public async Task<IActionResult> Create(Appointment model)
     {
+        DoctorSchedule? schedule = await repo.DoctorSchedules.GetFirstAsync(x =>
+        x.ScheduleId == model.ScheduleId &&
+        x.BranchId == model.BranchId);
+
+        if (schedule != null && schedule.MaxPatient.HasValue)
+        {
+            IReadOnlyList<Appointment>? currentAppointments = await repo.Appointments.GetAsync(x =>
+                x.ScheduleId == model.ScheduleId &&
+                x.AppointmentDate == model.AppointmentDate &&
+                !x.DeletedOn.HasValue);
+
+            if (currentAppointments.Count >= schedule.MaxPatient.Value)
+            {
+                return ResponseHelper.Bad_Request(null,
+                    new DefaultResponseMessageModel("This time slot is full. Please select another time or date.", ""));
+            }
+        }
+
+        model.Status = "Confirmed";
         model.CreatedOn = DateTime.Now;
         model.CreatedBy = User.Identity?.Name ?? string.Empty;
 
@@ -90,26 +106,26 @@ public class AppointmentsController(IRepositoryWrapper repo) : ControllerBase
                 new DefaultResponseMessageModel("Unable to create Appointment", ""));
     }
 
-    [HttpDelete("{id:long}")]
+    [HttpDelete("{ano:long}/{branchId:long}")]
     [EndpointSummary("Delete")]
     [EndpointDescription("Deletes Appointment.")]
-    public async Task<IActionResult> Delete(long id)
+    public async Task<IActionResult> Delete(long ano, long branchId)
     {
-        Appointment? appointment = await repo.Appointments.GetFirstAsync(x => x.Ano == id);
+        Appointment? appointment = await repo.Appointments.GetFirstAsync(x =>
+            x.Ano == ano &&
+            x.BranchId == branchId);
         if (appointment is null)
-            return ResponseHelper.NotFound_Request(null,
-                new DefaultResponseMessageModel("Unable to find Appointment", ""));
+            return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Unable to find Appointment", ""));
 
-        appointment.DeletedOn = DateTime.Now;
-        appointment.DeletedBy = User.Identity?.Name ?? string.Empty;
+        appointment.Status = "Cancelled";
+        appointment.UpdatedOn = DateTime.Now;
+        appointment.UpdatedBy = User.Identity?.Name ?? string.Empty;
 
         repo.Appointments.Update(appointment);
 
         return await repo.SaveAsync()
-            ? ResponseHelper.OK_Result(null,
-                new DefaultResponseMessageModel("Successfully deleted Appointment.", ""))
-            : ResponseHelper.Bad_Request(null,
-                new DefaultResponseMessageModel("Unable to delete Appointment", ""));
+            ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Appointment has been cancelled successfully.", ""))
+            : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to cancel Appointment", ""));
     }
     #endregion
 }
