@@ -57,4 +57,7 @@ public partial class ViPrescription
 
     [StringLength(256)]
     public string? DeletedBy { get; set; }
+
+    [StringLength(200)]
+    public string? ItemName { get; set; }
 }
