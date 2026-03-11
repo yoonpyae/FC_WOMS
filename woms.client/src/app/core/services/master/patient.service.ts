@@ -15,7 +15,7 @@ export class PatientService {
     return this.httpClinet.get<RootModel>(`${environment.main_url}/master/patients?branchId=${branchId}`);
   }
 
-  getById(id:string, branchId: number): Observable<RootModel> {
+  getById(id: string, branchId: number): Observable<RootModel> {
     return this.httpClinet.get<RootModel>(`${environment.main_url}/master/patients/${id}?branchId=${branchId}`);
   }
 
@@ -27,7 +27,7 @@ export class PatientService {
     return this.httpClinet.put<RootModel>(`${environment.main_url}/master/patients`, model);
   }
 
-  delete(id: string) {
-    return this.httpClinet.delete<RootModel>(`${environment.main_url}/master/patients/${id}`, {});
+  delete(id: string, branchId: number) {
+    return this.httpClinet.delete<RootModel>(`${environment.main_url}/master/patients/${id}?BranchId=${branchId}`, {});
   }
 }
