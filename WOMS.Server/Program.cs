@@ -15,6 +15,7 @@ builder.Services.AddOpenApi();
 
 // Db Config
 builder.Services.AddDbAndIdentityConfig(builder.Configuration);
+builder.Services.AddHostedService<AppointmentCleanupService>();
 
 // JWT Auth Config
 builder.Services.AddJWTAuthConfig(builder.Configuration);
