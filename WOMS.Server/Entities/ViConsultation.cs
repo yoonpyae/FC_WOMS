@@ -57,4 +57,6 @@ public partial class ViConsultation
 
     [StringLength(200)]
     public string PatientName { get; set; } = null!;
+
+    public double? ConsultantFee { get; set; }
 }
