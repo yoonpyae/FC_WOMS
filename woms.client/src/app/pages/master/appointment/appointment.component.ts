@@ -79,13 +79,6 @@ export class AppointmentComponent implements OnInit {
 
   today: Date = new Date();
 
-  statuses = [
-    { label: 'Pending', value: 'Pending' },
-    { label: 'Confirmed', value: 'Confirmed' },
-    { label: 'Completed', value: 'Completed' },
-    { label: 'Cancelled', value: 'Cancelled' }
-  ];
-
   private formBuilder = inject(FormBuilder);
   public appointmentForm: FormGroup = this.formBuilder.group({
     ano: [0, Validators.required],
@@ -97,7 +90,6 @@ export class AppointmentComponent implements OnInit {
     phoneNo: new FormControl('', {
       validators: [Validators.required, Validators.pattern("^(0(1|9)[0-9]{7,9})$")]
     }),
-    status: ['Pending'],
     remark: [null as string | null],
   });
 
@@ -170,19 +162,19 @@ export class AppointmentComponent implements OnInit {
       next: (res) => {
         this.appointmentForm.controls['ano'].setValue(res.data as number);
         this.appointmentForm.controls['branchId'].setValue(branchId);
-        this.appointmentForm.controls['status'].setValue('Pending');
         this.modalVisible = true;
       },
     });
   }
 
   submit(): void {
-    if (this.appointmentForm.valid) {
+    if (this.appointmentForm.valid && this.selectedSchedule) {
       this.isSubmitting = true;
-      this.loggerService.info(this.selectedAppointment);
       let model = this.appointmentForm.value as AppointmentModel;
-      model.appointmentDate = this.datePipe.transform(this.appointmentForm.controls['appointmentDate'].value, 'yyyy-MM-dd') ?? "";
-      model.scheduleId = this.selectedSchedule.scheduleId ?? 0;
+
+      model.appointmentDate = this.datePipe.transform(this.selectedAppointmentDate, 'yyyy-MM-dd') ?? "";
+      model.scheduleId = this.selectedSchedule.scheduleId;
+      model.status = "Confirmed";
       this.appointmentService.create(model).subscribe({
         next: res => {
           this.modalVisible = false;
@@ -190,7 +182,12 @@ export class AppointmentComponent implements OnInit {
           this.messageService.add({ key: 'globalMessage', severity: 'success', summary: 'Success', detail: res.message.en });
         },
         error: err => {
-          this.messageService.add({ key: 'globalMessage', severity: 'warn', summary: 'Warning', detail: err.message.en });
+          this.messageService.add({
+            key: 'globalMessage',
+            severity: 'warn',
+            summary: 'Booking Failed',
+            detail: err.error?.message?.en || "Could not complete booking."
+          });
           this.isSubmitting = false;
         },
         complete: () => {
@@ -213,7 +210,10 @@ export class AppointmentComponent implements OnInit {
         header: 'Delete Confirmation',
         icon: 'pi pi-info-circle',
         accept: () => {
-          this.appointmentService.delete(this.selectedAppointment.ano).subscribe({
+          const ano = this.selectedAppointment.ano;
+          const branchId = this.selectedAppointment.branchId;
+
+          this.appointmentService.delete(ano, branchId).subscribe({
             next: (res) => {
               this.messageService.add({
                 key: 'globalMessage',
@@ -352,8 +352,10 @@ export class AppointmentComponent implements OnInit {
   }
 
   getSeverity(status: string) {
+    if (!status) return 'secondary';
+
     switch (status.toLowerCase()) {
-      case 'pending': return 'warning';
+      case 'pending': return 'warn';
       case 'confirmed': return 'info';
       case 'completed': return 'success';
       case 'cancelled': return 'danger';
@@ -362,6 +364,8 @@ export class AppointmentComponent implements OnInit {
   }
 
   getIcon(status: string) {
+    if (!status) return 'pi pi-question-circle';
+
     switch (status.toLowerCase()) {
       case 'pending': return 'pi pi-clock';
       case 'confirmed': return 'pi pi-calendar-check';
