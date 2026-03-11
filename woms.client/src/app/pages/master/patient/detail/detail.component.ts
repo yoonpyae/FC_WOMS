@@ -84,36 +84,20 @@ export class PatientDetailComponent implements OnInit {
       consultationReq: this.consultationService.getByPatientId(id, branchId, doctorId)
     }).subscribe({
       next: (res: any) => {
-        // 1. Assign Patient Data
         this.patient = res.patientReq.data as ViPatientModel;
 
-        // 2. Assign Appointments
         const appts = (res.appointmentReq.data || []) as ViAppointmentModel[];
         this.appointments = appts.sort((a, b) =>
           new Date(b.appointmentDate).getTime() - new Date(a.appointmentDate).getTime()
         );
 
-        // 3. Assign Consultations
-        this.consultations = (res.consultationReq.data || []) as ViConsultationModel[];
+        const rawConsultData = res.consultationReq.data || [];
 
-        // 4. PRE-FETCH ALL PRESCRIPTIONS!
-        // If there are consultations, map over them and fetch all their prescriptions at once
-        if (this.consultations.length > 0) {
-          const prescriptionRequests = this.consultations.map(c =>
-            this.consultationService.getPrescriptionByConsultationId(c.consultationId)
-          );
-
-          forkJoin(prescriptionRequests).subscribe({
-            next: (responses: any[]) => {
-              // Map the responses back to their specific consultation IDs
-              responses.forEach((pRes, index) => {
-                const cId = this.consultations[index].consultationId;
-                this.consultationPrescriptions[cId] = pRes.data?.prescriptions || [];
-              });
-            },
-            error: () => this.loggerService.error('Failed to pre-load prescriptions.')
-          });
-        }
+        this.consultations = rawConsultData.map((item: any) => item.consultation);
+        rawConsultData.forEach((item: any) => {
+          const cId = item.consultation.consultationId;
+          this.consultationPrescriptions[cId] = item.prescriptions || [];
+        });
       },
       error: (err: any) => {
         this.loggerService.error(err);
