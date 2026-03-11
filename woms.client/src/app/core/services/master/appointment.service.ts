@@ -44,7 +44,10 @@ export class AppointmentService {
     return this.httpClient.put<RootModel>(`${environment.main_url}/master/appointments`, model);
   }
 
-  delete(id: number): Observable<RootModel> {
-    return this.httpClient.delete<RootModel>(`${environment.main_url}/master/appointments/${id}`);
+  delete(ano: number, branchId: number): Observable<RootModel> {
+    return this.httpClient.delete<RootModel>(
+      `${environment.main_url}/master/appointments/${ano}/${branchId}`
+    );
   }
+
 }
