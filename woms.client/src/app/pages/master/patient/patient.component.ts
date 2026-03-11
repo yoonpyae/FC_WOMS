@@ -164,7 +164,8 @@ export class PatientComponent implements OnInit {
         header: 'Delete Confirmation',
         icon: 'pi pi-info-circle',
         accept: () => {
-          this.patientService.delete(this.selectedPatient.patientId).subscribe({
+          let branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
+          this.patientService.delete(this.selectedPatient.patientId, branchId).subscribe({
             next: (res) => {
               this.messageService.add({
                 key: 'globalMessage',
