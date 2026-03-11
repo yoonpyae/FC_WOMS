@@ -185,19 +185,6 @@
             </div>
 
         </div>
-        
-
-        <!-- STATUS -->
-        <div class="flex flex-col gap-2">
-            <label class="text-700 font-medium">Status</label>
-            <p-dropdown formControlName="status" [options]="statuses" optionLabel="label" optionValue="value"
-                styleClass="w-full border-round-lg"> <ng-template pTemplate="selectedItem">
-                    <div class="flex align-items-center" *ngIf="appointmentForm.get('status')?.value"> <p-tag
-                            [value]="appointmentForm.get('status')?.value"
-                            [severity]="getSeverity(appointmentForm.get('status')?.value)"> </p-tag> </div>
-                </ng-template> <ng-template let-status pTemplate="item"> <p-tag [value]="status.label"
-                        [severity]="getSeverity(status.value)"></p-tag> </ng-template> </p-dropdown>
-        </div>
 
         <!-- NOTES -->
         <div class="flex flex-col gap-2">
