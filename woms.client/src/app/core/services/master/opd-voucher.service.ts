@@ -21,7 +21,7 @@ export class OPDVoucherService {
   }
 
   getByDateRange(branchId: number, sDate: string, eDate: string): Observable<RootModel> {
-    return this.httpClient.get<RootModel>(`${environment.main_url}/master/opdvouchers/get-by-dateRange?BranchId=${branchId}&startDate=${sDate}&endDate=${eDate}`);
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/opdvouchers/by-dateRange?BranchId=${branchId}&startDate=${sDate}&endDate=${eDate}`);
   }
 
   GetByDetails(id: string, branchId: number): Observable<RootModel> {
