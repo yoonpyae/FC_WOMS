@@ -355,7 +355,6 @@ export class AppointmentComponent implements OnInit {
     if (!status) return 'secondary';
 
     switch (status.toLowerCase()) {
-      case 'pending': return 'warn';
       case 'confirmed': return 'info';
       case 'completed': return 'success';
       case 'cancelled': return 'danger';
@@ -367,8 +366,7 @@ export class AppointmentComponent implements OnInit {
     if (!status) return 'pi pi-question-circle';
 
     switch (status.toLowerCase()) {
-      case 'pending': return 'pi pi-clock';
-      case 'confirmed': return 'pi pi-calendar-check';
+      case 'confirmed': return 'pi pi-clock';
       case 'completed': return 'pi pi-check-circle';
       case 'cancelled': return 'pi pi-times-circle';
       default: return 'pi pi-question-circle';
