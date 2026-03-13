@@ -105,11 +105,11 @@
                     </p-tag>
                 </td>
                 <td>
-                    <p-tag [value]="opdVoucher.status" [severity]="
-                        opdVoucher.status === 'Open' ? 'warning' :
-                        opdVoucher.status === 'Closed' ? 'success' :
-                        opdVoucher.status === 'Cancelled' ? 'danger' : 'info'
-                    " [rounded]="true">
+                    <p-tag [value]="opdVoucher.status?.trim()" [severity]="
+    opdVoucher.status?.trim() === 'Paid' ? 'success' :
+    opdVoucher.status?.trim() === 'Open' ? 'warning' :
+    opdVoucher.status?.trim() === 'Cancelled' ? 'danger' : 'info'
+" [rounded]="true">
                     </p-tag>
                 </td>
                 <td>{{ opdVoucher.createdOn | date: "dd/MMM/yyyy hh:mm:ss a" }}</td>
@@ -123,7 +123,7 @@
     </p-table>
 </div>
 <!-- #endregion -->
- 
+
 <p-confirmDialog [breakpoints]="{
     '1920px': '30vw',
     '1440px': '60vw',
@@ -136,3 +136,4 @@
     rejectButtonStyleClass="p-button-outlined"></p-confirmDialog>
 
 <p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>
