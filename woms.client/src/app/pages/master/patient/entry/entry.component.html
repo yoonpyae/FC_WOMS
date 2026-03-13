@@ -64,7 +64,7 @@
 
                 <label class="font-semibold">Phone Number</label>
 
-                <input formControlName="phone" pInputText placeholder="Enter Phone Number..." required inputmode="tel"
+                <input formControlName="phone" pInputText type="number" placeholder="Enter Phone Number..." required inputmode="tel"
                     class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400" />
 
                 <small *ngIf="patientForm.controls['phone'].invalid && patientForm.get('phone')?.dirty &&
