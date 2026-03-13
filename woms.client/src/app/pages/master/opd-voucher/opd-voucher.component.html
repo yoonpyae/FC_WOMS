@@ -14,9 +14,8 @@
                     <div class="flex flex-col sm:flex-row gap-3">
 
                         <div class="w-full sm:w-auto">
-                            <p-splitButton label="Create" icon="pi pi-plus" [model]="items"
-                                (onClick)="modalVisible = true" styleClass="p-button-primary w-full"
-                                [style]="{ width: '100%' }">
+                            <p-splitButton label="Create" icon="pi pi-plus" [model]="items" (onClick)="create()"
+                                styleClass="p-button-primary w-full" [style]="{ width: '100%' }">
                             </p-splitButton>
                         </div>
 
