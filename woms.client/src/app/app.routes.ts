@@ -36,6 +36,7 @@ import { PatientDetailComponent } from './pages/master/patient/detail/detail.com
 import { EntryComponent } from './pages/stock/purchase/entry/entry.component';
 import { ServiceComponent } from './pages/master/service/service.component';
 import { title } from 'process';
+import { OPDVoucherEntryComponent } from './pages/master/opd-voucher/entry/entry.component';
 
 export const routes: Routes = [
 	{ path: '', component: HomeComponent },
@@ -137,8 +138,8 @@ export const routes: Routes = [
 				canActivate: [AuthGuardService],
 				data: { title: 'OPD Voucher', roles: [UserRole.Receptionist, UserRole.SuperAdmin] },
 				children: [
-					{ path: 'histories', component: OpdVoucherComponent, data: { title: 'OPD Service' } },
-					// { path: 'create-vouchers', component: YourOpdVoucherCreateComponent },
+					{ path: 'histories', component: OpdVoucherComponent, data: { title: 'OPD Vouher History' } },
+					{ path: 'create-voucher', component: OPDVoucherEntryComponent, data: { title: 'Create Voucher' } },
 				]
 			},
 
