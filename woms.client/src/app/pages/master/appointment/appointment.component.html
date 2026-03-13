@@ -36,6 +36,10 @@
         <ng-template #header>
             <tr style="white-space: nowrap">
                 <th pFrozenColumn [style]="{ width: '10px' }">#</th>
+                <th pSortableColumn="patientName">
+                    Name
+                    <p-sortIcon field="patientName"></p-sortIcon>
+                </th>
                 <th pSortableColumn="doctorName">
                     Doctor
                     <p-sortIcon field="doctorName"></p-sortIcon>
@@ -44,11 +48,6 @@
                     Date & Time
                     <p-sortIcon field="appointmentDate"></p-sortIcon>
                 </th>
-
-                <th pSortableColumn="patientName">
-                    Name
-                    <p-sortIcon field="patientName"></p-sortIcon>
-                </th>
                 <th pSortableColumn="patientPhone">
                     Patient Phone
                     <p-sortIcon field="patientPhone"></p-sortIcon>
@@ -56,10 +55,6 @@
                 <th pSortableColumn="status">
                     Status
                     <p-sortIcon field="status"></p-sortIcon>
-                </th>
-                <th pSortableColumn="appointmentRemark">
-                    Remark
-                    <p-sortIcon field="appointmentRemark"></p-sortIcon>
                 </th>
                 <th pSortableColumn="createdOn">
                     Created On
@@ -76,6 +71,7 @@
                 <td>
                     <span class="pi pi-circle" [class.pi-check-circle]="selectedAppointment === appointment"></span>
                 </td>
+                <td>{{ appointment.patientName }}</td>
                 <td>{{ appointment.doctorName }}</td>
                 <td>
                     <span class="mr-2">{{ appointment.appointmentDate | date: "dd MMM yyyy" }}</span>
@@ -84,7 +80,7 @@
                         {{ appointment.startTime }}
                     </span>
                 </td>
-                <td>{{ appointment.patientName }}</td>
+
                 <td>{{ appointment.patientPhone }}</td>
                 <td>
                     <p-tag [value]="appointment.appointmentStatus"
@@ -92,7 +88,6 @@
                         [icon]="getIcon(appointment.appointmentStatus)" [rounded]="true">
                     </p-tag>
                 </td>
-                <td>{{ appointment.appointmentRemark }}</td>
                 <td>{{ appointment.createdOn | date: "dd/MMM/yyyy hh:mm:ss a" }}</td>
                 <td>{{ appointment.createdBy }}</td>
             </tr>
