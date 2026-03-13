@@ -1,6 +1,8 @@
 import { CommonModule, DatePipe } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { Router, ActivatedRoute } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { ViConsultationModel } from "@core_models/master/consultation.model";
 import { DoctorModel } from "@core_models/master/doctor.model";
 import { OPDVoucherEntryModel, OPDVoucherItemModel } from "@core_models/master/opd-voucher.model";
@@ -38,24 +40,10 @@ interface OPDItemCookieData extends OPDVoucherItemModel {
 @Component({
   selector: 'app-opd-voucher-entry',
   imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    InputTextModule,
-    SelectModule,
-    ButtonModule,
-    TableModule,
-    ToastModule,
-    TextareaModule,
-    DialogModule,
-    ConfirmPopupModule,
-    IconFieldModule,
-    InputIconModule,
-    DatePickerModule,
-    SelectButtonModule,
-    ConfirmDialogModule,
-    DoctorDropDownComponent,
-    PatientDropDownComponent
+    CommonModule, FormsModule, ReactiveFormsModule, InputTextModule, SelectModule,
+    ButtonModule, TableModule, ToastModule, TextareaModule, DialogModule,
+    ConfirmPopupModule, IconFieldModule, InputIconModule, DatePickerModule,
+    SelectButtonModule, ConfirmDialogModule, DoctorDropDownComponent, PatientDropDownComponent
   ],
   standalone: true,
   templateUrl: './entry.component.html',
@@ -63,12 +51,14 @@ interface OPDItemCookieData extends OPDVoucherItemModel {
 })
 export class OPDVoucherEntryComponent implements OnInit {
 
+  isViewMode: boolean = false;
+  viewVno: string | null = null;
+  allowPaymentUpdate: boolean = false;
+
   services: ServiceModel[] = [];
   consultations: ViConsultationModel[] = [];
-
   cookieData: OPDItemCookieData[] = [];
 
-  // Toggle State for UI
   entryTypes = [
     { label: 'Service', value: 'Service' },
     { label: 'Consultation', value: 'Consultation' }
@@ -82,9 +72,9 @@ export class OPDVoucherEntryComponent implements OnInit {
 
   loading: boolean = false;
   isSubmitting: boolean = false;
-
   patientId = '';
   patientName = '';
+  doctorName = '';
 
   private readonly OPD_COOKIE_NAME = 'opd-voucher-details';
 
@@ -129,20 +119,90 @@ export class OPDVoucherEntryComponent implements OnInit {
     private loggerService: LoggerService,
     private confirmationService: ConfirmationService,
     private cookieService: CookieService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
     const branchId = Number.parseInt(this.sharedService.getDefaultBranchId() ?? '0');
     this.opdVoucherForm.patchValue({ branchId });
-
-    this.loadItemsFromCookie();
     this.getServices(branchId);
+
+    // Check URL for View Mode
+    this.route.queryParams.subscribe(params => {
+      this.viewVno = params['viewVno'] || null;
+
+      if (this.viewVno) {
+        this.isViewMode = true;
+        this.loadExistingVoucher(this.viewVno, branchId);
+      } else {
+        this.loadItemsFromCookie();
+      }
+    });
 
     this.opdVoucherForm.get('discountAmount')?.valueChanges.subscribe(() => this.onAmountChange());
     this.opdVoucherForm.get('paidAmount')?.valueChanges.subscribe(() => this.onAmountChange());
     this.opdVoucherForm.get('quantity')?.valueChanges.subscribe(() => this.calculateTempItemAmount());
     this.opdVoucherForm.get('unitPrice')?.valueChanges.subscribe(() => this.calculateTempItemAmount());
+  }
+
+  loadExistingVoucher(vno: string, branchId: number) {
+    this.loading = true;
+
+    forkJoin({
+      header: this.opdVoucherService.getById(vno, branchId),
+      details: this.opdVoucherService.GetByDetails(vno, branchId)
+    }).subscribe({
+      next: (res: any) => {
+        const headerData = res.header.data;
+        const detailsData = res.details.data;
+
+        this.opdVoucherForm.patchValue({
+          opdvno: headerData.opdvno,
+          vdate: new Date(headerData.vdate),
+          patientId: headerData.patientId,
+          patientName: headerData.patientName,
+          doctorId: headerData.doctorId,
+          totalAmount: headerData.totalAmount,
+          discountAmount: headerData.discountAmount,
+          paidAmount: headerData.paidAmount,
+          leftAmount: headerData.leftAmount,
+          paymentType: headerData.paymentType,
+          remark: headerData.remark
+        });
+
+        this.patientName = headerData.patientName;
+        this.patientId = headerData.patientId;
+        this.doctorName = headerData.doctorName;
+
+        this.cookieData = detailsData.map((item: any) => {
+          const isService = item.serviceId !== 0;
+          return {
+            opdvno: item.opdvno,
+            serviceId: item.serviceId,
+            consultationId: item.consultationId,
+            itemType: isService ? 'Service' : 'Consultation',
+            itemName: isService ? (item.serviceName || 'Service') : 'Consultation',
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            amount: item.amount || item.totalItemAmount
+          };
+        });
+
+        this.opdVoucherForm.disable();
+
+        if (headerData.leftAmount > 0) {
+          this.allowPaymentUpdate = true;
+          this.opdVoucherForm.get('paidAmount')?.enable();
+          this.opdVoucherForm.get('paymentType')?.enable();
+        } else {
+          this.allowPaymentUpdate = false;
+        }
+      },
+      error: (err) => this.loggerService.error("Failed to load voucher details"),
+      complete: () => this.loading = false
+    });
   }
 
   getServices(branchId: number) {
@@ -206,7 +266,17 @@ export class OPDVoucherEntryComponent implements OnInit {
     }
   }
 
+  // <-- ADDED VALIDATION HERE
   onEntryTypeChange() {
+    if (this.selectedEntryType === 'Consultation') {
+      if (!this.selectedDoctor || !this.selectedPatient) {
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Notice',
+          detail: 'Please select a Patient and a Doctor first to view their consultations.'
+        });
+      }
+    }
     this.resetItemFields();
   }
 
@@ -255,7 +325,6 @@ export class OPDVoucherEntryComponent implements OnInit {
     }
 
     let displayItemName = '';
-
     if (this.selectedEntryType === 'Service') {
       displayItemName = this.selectedService?.serviceName || 'Unknown Service';
     } else {
@@ -275,7 +344,18 @@ export class OPDVoucherEntryComponent implements OnInit {
     };
 
     const existingItems = this.getItemsFromCookie();
-    existingItems.push(newItem);
+
+    const existingItem = existingItems.find(item =>
+      item.itemType === this.selectedEntryType &&
+      (this.selectedEntryType === 'Service' ? item.serviceId === newItem.serviceId : item.consultationId === newItem.consultationId)
+    );
+
+    if (existingItem) {
+      existingItem.quantity = (existingItem.quantity || 0) + (newItem.quantity || 0);
+      existingItem.amount = (existingItem.amount || 0) + (newItem.amount || 0);
+    } else {
+      existingItems.push(newItem);
+    }
 
     this.saveItemsToCookie(existingItems);
     this.cookieData = existingItems;
@@ -347,13 +427,8 @@ export class OPDVoucherEntryComponent implements OnInit {
   submit() {
     this.opdVoucherForm.markAllAsTouched();
 
-    if (this.opdVoucherForm.invalid) {
-      this.messageService.add({ severity: 'error', summary: 'Validation Error', detail: 'Please fill all required fields.' });
-      return;
-    }
-
-    if (!this.cookieData.length) {
-      this.messageService.add({ severity: 'error', summary: 'No Items', detail: 'Please add at least one item.' });
+    if (this.opdVoucherForm.invalid || !this.cookieData.length) {
+      this.messageService.add({ severity: 'error', summary: 'Validation Error', detail: 'Please fill all required fields and add items.' });
       return;
     }
 
@@ -390,10 +465,16 @@ export class OPDVoucherEntryComponent implements OnInit {
       })) as OPDVoucherItemModel[]
     };
 
-    this.opdVoucherService.create(payload).subscribe({
+    const apiCall = this.isViewMode
+      ? this.opdVoucherService.update(payload)
+      : this.opdVoucherService.create(payload);
+
+    apiCall.subscribe({
       next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'OPD Voucher saved successfully.' });
+        const msg = this.isViewMode ? 'Payment updated successfully.' : 'OPD Voucher saved successfully.';
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: msg });
         this.clear();
+        this.router.navigate(['/opd-voucher/histories']);
       },
       error: (err) => {
         this.loggerService.error("Error saving OPD voucher");
@@ -429,5 +510,9 @@ export class OPDVoucherEntryComponent implements OnInit {
     this.patientId = '';
     this.patientName = '';
     this.consultations = [];
+  }
+
+  onCancel() {
+    this.router.navigate(['/opd-voucher/histories']);
   }
 }
