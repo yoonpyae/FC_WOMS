@@ -73,9 +73,9 @@ export class OpdVoucherComponent implements OnInit {
   ) {
     this.items = [
       {
-        label: 'Edit / View',
-        icon: 'pi pi-pencil',
-        command: () => this.edit(),
+        label: 'View',
+        icon: 'pi pi-eye',
+        command: () => this.view(),
       },
       {
         label: 'Delete',
@@ -134,10 +134,10 @@ export class OpdVoucherComponent implements OnInit {
     this.router.navigate(['/opd-voucher/create-voucher']);
   }
 
-  edit(): void {
+  view(): void {
     if (this.selectedOPDVoucher) {
       this.router.navigate(['/opd-voucher/create-voucher'], {
-        queryParams: { editVno: this.selectedOPDVoucher.opdvno }
+        queryParams: { viewVno: this.selectedOPDVoucher.opdvno }
       });
     } else {
       this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Please choose an OPD Voucher.' });
@@ -145,84 +145,84 @@ export class OpdVoucherComponent implements OnInit {
   }
 
 
-delete (): void {
-  if(this.selectedOPDVoucher != null) {
-  this.confirmationService.confirm({
-    message: 'Are You Sure Want To Delete?',
-    header: 'Delete Confirmation',
-    icon: 'pi pi-info-circle',
-    accept: () => {
-      this.loading = true;
-      this.opdVoucherService.delete(this.selectedOPDVoucher.opdvno).subscribe({
-        next: (res) => {
-          this.messageService.add({ key: 'globalMessage', severity: 'success', summary: 'Success', detail: res.message.en, });
-          this.loadData();
-          this.selectedOPDVoucher = null as any;
+  delete(): void {
+    if (this.selectedOPDVoucher != null) {
+      this.confirmationService.confirm({
+        message: 'Are You Sure Want To Delete?',
+        header: 'Delete Confirmation',
+        icon: 'pi pi-info-circle',
+        accept: () => {
+          this.loading = true;
+          this.opdVoucherService.delete(this.selectedOPDVoucher.opdvno).subscribe({
+            next: (res) => {
+              this.messageService.add({ key: 'globalMessage', severity: 'success', summary: 'Success', detail: res.message.en, });
+              this.loadData();
+              this.selectedOPDVoucher = null as any;
+            },
+            error: (err) => {
+              this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.message });
+            },
+            complete: () => {
+              this.loading = false;
+            }
+          });
         },
-        error: (err) => {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.message });
-        },
-        complete: () => {
-          this.loading = false;
-        }
+        key: 'OPDDeleteDialog',
       });
-    },
-    key: 'OPDDeleteDialog',
-  });
-} else {
-  this.messageService.add({
-    key: 'globalMessage',
-    severity: 'warn',
-    summary: 'Warning',
-    detail: 'Please choose OPD Voucher.',
-  });
-}
+    } else {
+      this.messageService.add({
+        key: 'globalMessage',
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Please choose OPD Voucher.',
+      });
+    }
   }
 
-//#endregion
+  //#endregion
 
-//#region Export
+  //#region Export
 
-excel(): void {
-  let exportData = this.selectedOPDVoucher ? [this.selectedOPDVoucher] : this.opdVouchers;
+  excel(): void {
+    let exportData = this.selectedOPDVoucher ? [this.selectedOPDVoucher] : this.opdVouchers;
 
-  if(exportData.length === 0) {
-  this.messageService.add({
-    key: 'globalMessage',
-    severity: 'warn',
-    summary: 'Warning',
-    detail: 'No data available to export!',
-  });
-  return;
-}
+    if (exportData.length === 0) {
+      this.messageService.add({
+        key: 'globalMessage',
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'No data available to export!',
+      });
+      return;
+    }
 
-let columns = [
-  { key: 'opdvno', value: 'Voucher No' },
-  { key: 'vdate', value: 'Voucher Date' },
-  { key: 'patientId', value: 'Patient Id' },
-  { key: 'patientName', value: 'Patient Name' },
-  { key: 'doctorId', value: 'Doctor Id' },
-  { key: 'doctorName', value: 'Doctor Name' },
-  { key: 'totalAmount', value: 'Total Amount' },
-  { key: 'discountAmount', value: 'Discount Amount' },
-  { key: 'leftAmount', value: 'leftAmount' },
-  { key: 'paymentType', value: 'Payment Type' },
-  { key: 'remark', value: 'Remark' },
-  { key: 'createdOn', value: 'Created On' },
-  { key: 'createdBy', value: 'Created By' },
-  { key: 'updatedOn', value: 'Updated On' },
-  { key: 'updatedBy', value: 'Updated By' },
-];
+    let columns = [
+      { key: 'opdvno', value: 'Voucher No' },
+      { key: 'vdate', value: 'Voucher Date' },
+      { key: 'patientId', value: 'Patient Id' },
+      { key: 'patientName', value: 'Patient Name' },
+      { key: 'doctorId', value: 'Doctor Id' },
+      { key: 'doctorName', value: 'Doctor Name' },
+      { key: 'totalAmount', value: 'Total Amount' },
+      { key: 'discountAmount', value: 'Discount Amount' },
+      { key: 'leftAmount', value: 'leftAmount' },
+      { key: 'paymentType', value: 'Payment Type' },
+      { key: 'remark', value: 'Remark' },
+      { key: 'createdOn', value: 'Created On' },
+      { key: 'createdBy', value: 'Created By' },
+      { key: 'updatedOn', value: 'Updated On' },
+      { key: 'updatedBy', value: 'Updated By' },
+    ];
 
-this.exportService.exportSelectColsWithDynamicHeader(exportData, columns, 'OPD Voucher');
+    this.exportService.exportSelectColsWithDynamicHeader(exportData, columns, 'OPD Voucher');
   }
 
-//#endregion
+  //#endregion
 
-closeEntryForm(refreshNeeded: boolean) {
-  this.modalVisible = false;
-  if (refreshNeeded) {
-    this.loadData();
+  closeEntryForm(refreshNeeded: boolean) {
+    this.modalVisible = false;
+    if (refreshNeeded) {
+      this.loadData();
+    }
   }
-}
 }
