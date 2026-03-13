@@ -115,7 +115,6 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
     {
         try
         {
-            // 1. Fetch the existing voucher (Ensure it matches the branch)
             OPDVoucher? existingVoucher = await repo.OPDVouchers.GetFirstAsync(x => x.Opdvno == model.Opdvno && x.BranchId == model.BranchId);
 
             if (existingVoucher == null)
@@ -125,7 +124,6 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
 
             bool isFullyPaid = model.LeftAmount == 0 && model.PaidAmount == model.TotalAmount;
 
-            // 2. Update parent voucher properties
             existingVoucher.DoctorId = model.DoctorId;
             existingVoucher.PatientId = model.PatientId;
             existingVoucher.Vdate = model.Vdate;
@@ -141,7 +139,6 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
 
             repo.OPDVouchers.Update(existingVoucher);
 
-            // 3. Handle Items: Remove old items
             IReadOnlyList<OPDVoucherItem>? existingItems = await repo.OPDVoucherItems.GetAsync(x => x.Opdvno == model.Opdvno);
             if (existingItems != null)
             {
@@ -151,7 +148,6 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
                 }
             }
 
-            // 4. Handle Items: Add new items
             if (model.Items != null)
             {
                 foreach (OPDVoucherItem item in model.Items)
@@ -171,7 +167,6 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
                 }
             }
 
-            // 5. Save all changes atomically
             return await repo.SaveAsync()
                 ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully updated OPD Voucher.", ""))
                 : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Failed to update OPD Voucher.", ""));
@@ -190,7 +185,6 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
     {
         try
         {
-            // 1. Fetch existing voucher (require branchId for security)
             OPDVoucher? existingVoucher = await repo.OPDVouchers.GetFirstAsync(x => x.Opdvno == vno && x.BranchId == branchId);
 
             if (existingVoucher == null)
@@ -198,13 +192,11 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
                 return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Voucher not found.", ""));
             }
 
-            // 2. Apply Soft Delete fields
             existingVoucher.DeletedOn = DateTime.UtcNow;
             existingVoucher.DeletedBy = User.Identity?.Name;
 
             repo.OPDVouchers.Update(existingVoucher);
 
-            // 3. Save changes
             return await repo.SaveAsync()
                 ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully deleted OPD Voucher.", ""))
                 : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Failed to delete OPD Voucher.", ""));
