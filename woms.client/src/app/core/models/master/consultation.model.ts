@@ -22,6 +22,7 @@ export interface ViConsultationModel {
     branchId: number;
     doctorId: number;
     visitDate: string;
+    consultantFee: number;
     patientId: string;
     ano: number | null;
     symptoms: string | null;
