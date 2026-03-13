@@ -1,0 +1,201 @@
+<form [formGroup]="opdVoucherForm" class="flex flex-col gap-4">
+    <div class="card mb-0">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 w-full">
+            <div class="col-span-12 w-full">
+
+                <div class="grid grid-cols-12 gap-4 mb-4 items-end bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <div class="col-span-12 sm:col-span-6 md:col-span-3 lg:col-span-3">
+                        <div class="flex flex-col gap-2">
+                            <label>Voucher Date</label>
+                            <p-date-picker formControlName="vdate" [showIcon]="true" [style]="{ width: '100%' }"
+                                dateFormat="dd/M/yy" inputId="vdate"></p-date-picker>
+                        </div>
+                    </div>
+
+                    <div class="col-span-12 sm:col-span-6 md:col-span-3 lg:col-span-3">
+                        <div class="flex flex-col gap-2">
+                            <label>Patient</label>
+                            <app-patient-drop-down (onValueChange)="onPatientSelected($event)">
+                            </app-patient-drop-down>
+                        </div>
+                    </div>
+
+                    <div class="col-span-12 sm:col-span-6 md:col-span-3 lg:col-span-3">
+                        <div class="flex flex-col gap-2">
+                            <label>Doctor</label>
+                            <app-doctor-drop-down [(ngModel)]="selectedDoctor" [ngModelOptions]="{ standalone: true }"
+                                optionLabel="name"
+                                (onValueChange)="onDoctorChange(selectedDoctor)"></app-doctor-drop-down>
+                        </div>
+                    </div>
+
+                    <div class="col-span-12 sm:col-span-6 md:col-span-3 lg:col-span-3">
+                        <div class="flex flex-col gap-2">
+                            <label>Payment Type</label>
+                            <p-select [options]="paymentTypes" formControlName="paymentType" optionLabel="label"
+                                optionValue="value" placeholder="Select Payment Type" class="w-full"></p-select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-4 mb-4 items-end bg-white p-4 rounded-lg border border-gray-200">
+
+                    <div class="col-span-12 md:col-span-3 lg:col-span-3">
+                        <div class="flex flex-col gap-2">
+                            <label class="font-semibold text-gray-700">Select Entry Type</label>
+                            <p-selectButton [options]="entryTypes" [(ngModel)]="selectedEntryType"
+                                [ngModelOptions]="{ standalone: true }" optionLabel="label" optionValue="value"
+                                (onChange)="onEntryTypeChange()"></p-selectButton>
+                        </div>
+                    </div>
+
+                    <div class="col-span-12 md:col-span-5 lg:col-span-4">
+                        <div class="flex flex-col gap-2">
+                            <label>{{ selectedEntryType === 'Service' ? 'Select Service' : 'Select Consultation'
+                                }}</label>
+
+                            <p-select *ngIf="selectedEntryType === 'Service'" [options]="services"
+                                [(ngModel)]="selectedService" (onChange)="onServiceChange()" optionLabel="serviceName"
+                                placeholder="Search Service..." [filter]="true" [showClear]="true"
+                                [ngModelOptions]="{ standalone: true }" class="w-full">
+                            </p-select>
+
+                            <p-select *ngIf="selectedEntryType === 'Consultation'" [options]="consultations"
+                                [(ngModel)]="selectedConsultation" (onChange)="onConsultationChange()"
+                                placeholder="Search Consultation..." [filter]="true" [showClear]="true"
+                                [ngModelOptions]="{ standalone: true }" class="w-full">
+                                <ng-template pTemplate="selectedItem" let-item>
+                                    <span *ngIf="item">Dr. {{item.doctorName}} ({{ item.visitDate | date:'dd/MM'
+                                        }})</span>
+                                </ng-template>
+                                <ng-template pTemplate="item" let-item>
+                                    <div>Dr. {{item.doctorName}} - {{ item.visitDate | date:'dd/MM/yy h:mm a' }} (Fee:
+                                        {{item.consultantFee}})</div>
+                                </ng-template>
+                            </p-select>
+                        </div>
+                    </div>
+
+                    <div class="col-span-6 md:col-span-2 lg:col-span-1">
+                        <div class="flex flex-col gap-2">
+                            <label>Qty</label>
+                            <input min="1" type="number" formControlName="quantity" pInputText
+                                (keydown)="preventNegativeInput($event)" class="w-full text-right" />
+                        </div>
+                    </div>
+
+                    <div class="col-span-6 md:col-span-2 lg:col-span-2">
+                        <div class="flex flex-col gap-2">
+                            <label>Price</label>
+                            <input min="0" type="number" formControlName="unitPrice" pInputText
+                                (keydown)="preventNegativeInput($event)" class="w-full text-right" />
+                        </div>
+                    </div>
+
+                    <div class="col-span-12 md:col-span-12 lg:col-span-2 flex items-end justify-end mt-2 lg:mt-0">
+                        <p-button icon="pi pi-plus" label="Add Item" styleClass="w-full" severity="info"
+                            (onClick)="addItemToCookie()">
+                        </p-button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                    <div class="lg:col-span-8 xl:col-span-9 overflow-x-auto">
+                        <div class="border rounded-lg" style="max-height: 590px; overflow-y: auto;">
+                            <p-table [value]="cookieData" selectionMode="single" dataKey="id" [scrollable]="true"
+                                scrollHeight="flex" [loading]="loading" [tableStyle]="{ 'min-width': '600px' }">
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th style="width: 15%">Type</th>
+                                        <th style="width: 45%">Item Name / Details</th>
+                                        <th class="text-right">Price</th>
+                                        <th class="text-right">Qty</th>
+                                        <th class="text-right">Amount</th>
+                                        <th class="text-center">
+                                            <button pButton icon="pi pi-trash"
+                                                class="p-button-rounded p-button-text p-button-danger"
+                                                (click)="clearAllItemsFromCookie()" title="Clear All"></button>
+                                        </th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-entry let-i="rowIndex">
+                                    <tr>
+                                        <td>
+                                            <span class="px-2 py-1 rounded text-xs font-medium"
+                                                [ngClass]="entry.itemType === 'Service' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'">
+                                                {{ entry.itemType }}
+                                            </span>
+                                        </td>
+                                        <td class="font-semibold">{{ entry.itemName }}</td>
+                                        <td class="text-right">{{ entry.unitPrice | number:'1.0-0' }}</td>
+                                        <td class="text-right">{{ entry.quantity | number:'1.0-0' }}</td>
+                                        <td class="text-right">{{ entry.amount | number:'1.0-0' }}</td>
+                                        <td class="text-center">
+                                            <button pButton icon="pi pi-trash"
+                                                class="p-button-rounded p-button-text p-button-danger"
+                                                (click)="removeItemFromCookie(i)" title="Delete Item"></button>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="emptymessage">
+                                    <tr>
+                                        <td colspan="6" class="text-center py-6 text-gray-500">
+                                            <i class="pi pi-inbox text-2xl mb-2 block"></i>
+                                            Select a Service or Consultation above to add items to the voucher.
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-4 xl:col-span-3 mt-2">
+                        <div class="border rounded-lg bg-gray-50 flex flex-col p-4 gap-3">
+                            <div class="flex flex-col gap-2">
+                                <label class="font-semibold text-gray-700">Total Amount</label>
+                                <input pInputText type="text" class="w-full text-right bg-white font-bold text-lg"
+                                    [value]="opdVoucherForm.get('totalAmount')?.value | number:'1.0-0'" readonly />
+                            </div>
+
+                            <div class="flex flex-col gap-2">
+                                <label>Discount Amount</label>
+                                <input formControlName="discountAmount" pInputText type="number" min="0"
+                                    (keypress)="preventNegativeInput($event)" (keydown.enter)="$event.preventDefault()"
+                                    class="w-full text-right bg-white" />
+                            </div>
+
+                            <div class="flex flex-col gap-2">
+                                <label>Paid Amount</label>
+                                <input formControlName="paidAmount" pInputText type="number" min="0"
+                                    (keypress)="preventNegativeInput($event)" (keydown.enter)="$event.preventDefault()"
+                                    class="w-full text-right bg-white" />
+                            </div>
+
+                            <div class="flex flex-col gap-2">
+                                <label class="font-semibold text-gray-700">Left Amount</label>
+                                <input pInputText type="text"
+                                    class="w-full text-right bg-white font-bold text-lg text-red-600"
+                                    [value]="opdVoucherForm.get('leftAmount')?.value | number:'1.0-0'" readonly />
+                            </div>
+
+                            <div class="flex flex-col gap-2 mt-2">
+                                <label>Remark</label>
+                                <textarea pTextarea formControlName="remark" rows="2"
+                                    class="w-full bg-white"></textarea>
+                            </div>
+
+                            <div class="flex flex-wrap gap-2 pt-4 mt-2 border-t border-gray-200">
+                                <p-button icon="pi pi-check" label="Save Voucher" severity="success" class="flex-1"
+                                    styleClass="w-full" [loading]="isSubmitting" (onClick)="submit()"></p-button>
+                                <p-button icon="pi pi-refresh" label="Clear" severity="secondary" class="flex-1"
+                                    styleClass="w-full p-button-outlined" (onClick)="clear()"></p-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>
