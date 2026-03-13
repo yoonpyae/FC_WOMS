@@ -108,10 +108,10 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
         }
     }
 
-    [HttpPut]
-    [EndpointSummary("Update")]
-    [EndpointDescription("Updates an existing OPD voucher and its items.")]
-    public async Task<IActionResult> UpdateOPDVoucher(OPDVoucherEntryModel model)
+  [HttpPut]
+    [EndpointSummary("Update Payment")]
+    [EndpointDescription("Updates only the payment details of an existing OPD voucher.")]
+    public async Task<IActionResult> UpdateOPDVoucher(OPDVoucher model)
     {
         try
         {
@@ -122,59 +122,32 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
                 return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Voucher not found.", ""));
             }
 
-            bool isFullyPaid = model.LeftAmount == 0 && model.PaidAmount == model.TotalAmount;
+            double netAmount = existingVoucher.TotalAmount - existingVoucher.DiscountAmount;
+            if (model.PaidAmount > netAmount)
+            {
+                return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Paid amount cannot exceed the net amount.", ""));
+            }
 
-            existingVoucher.DoctorId = model.DoctorId;
-            existingVoucher.PatientId = model.PatientId;
-            existingVoucher.Vdate = model.Vdate;
-            existingVoucher.TotalAmount = model.TotalAmount;
-            existingVoucher.DiscountAmount = model.DiscountAmount;
+            bool isFullyPaid = model.LeftAmount == 0 && model.PaidAmount == netAmount;
+
             existingVoucher.PaidAmount = model.PaidAmount;
             existingVoucher.LeftAmount = model.LeftAmount;
             existingVoucher.PaymentType = model.PaymentType;
-            existingVoucher.Remark = model.Remark;
+            existingVoucher.Status = isFullyPaid ? "Paid" : "Unpaid";
+            
             existingVoucher.UpdatedOn = DateTime.Now;
             existingVoucher.UpdatedBy = User.Identity?.Name;
-            existingVoucher.Status = isFullyPaid ? "Paid" : "Unpaid";
 
             repo.OPDVouchers.Update(existingVoucher);
 
-            IReadOnlyList<OPDVoucherItem>? existingItems = await repo.OPDVoucherItems.GetAsync(x => x.Opdvno == model.Opdvno);
-            if (existingItems != null)
-            {
-                foreach (OPDVoucherItem item in existingItems)
-                {
-                    repo.OPDVoucherItems.Delete(item);
-                }
-            }
-
-            if (model.Items != null)
-            {
-                foreach (OPDVoucherItem item in model.Items)
-                {
-                    OPDVoucherItem voucherItem = new()
-                    {
-                        Opdvno = item.Opdvno,
-                        ServiceId = item.ServiceId,
-                        ConsultationId = item.ConsultationId,
-                        Quantity = item.Quantity,
-                        UnitPrice = item.UnitPrice,
-                        Amount = item.Amount,
-                        Result = item.Result,
-                        ResultDate = item.ResultDate
-                    };
-                    repo.OPDVoucherItems.Create(voucherItem);
-                }
-            }
-
             return await repo.SaveAsync()
-                ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully updated OPD Voucher.", ""))
-                : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Failed to update OPD Voucher.", ""));
+                ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully updated voucher payment.", ""))
+                : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Failed to update voucher payment.", ""));
         }
         catch (Exception ex)
         {
             return ResponseHelper.InternalServerError_Request(null,
-                new DefaultResponseMessageModel("An error occurred while updating the OPD Voucher.", ex.Message));
+                new DefaultResponseMessageModel("An error occurred while updating the OPD Voucher payment.", ex.Message));
         }
     }
 
