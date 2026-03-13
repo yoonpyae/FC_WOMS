@@ -15,7 +15,11 @@
                     <div class="col-span-12 sm:col-span-6 md:col-span-3 lg:col-span-3">
                         <div class="flex flex-col gap-2">
                             <label>Patient</label>
-                            <app-patient-drop-down (onValueChange)="onPatientSelected($event)">
+
+                            <input *ngIf="isViewMode" pInputText [value]="patientName" disabled
+                                class="w-full bg-gray-100" />
+
+                            <app-patient-drop-down *ngIf="!isViewMode" (onValueChange)="onPatientSelected($event)">
                             </app-patient-drop-down>
                         </div>
                     </div>
@@ -23,8 +27,12 @@
                     <div class="col-span-12 sm:col-span-6 md:col-span-3 lg:col-span-3">
                         <div class="flex flex-col gap-2">
                             <label>Doctor</label>
-                            <app-doctor-drop-down [(ngModel)]="selectedDoctor" [ngModelOptions]="{ standalone: true }"
-                                optionLabel="name"
+
+                            <input *ngIf="isViewMode" pInputText [value]="doctorName" disabled
+                                class="w-full bg-gray-100" />
+
+                            <app-doctor-drop-down *ngIf="!isViewMode" [(ngModel)]="selectedDoctor"
+                                [ngModelOptions]="{ standalone: true }" optionLabel="name"
                                 (onValueChange)="onDoctorChange(selectedDoctor)"></app-doctor-drop-down>
                         </div>
                     </div>
@@ -38,8 +46,8 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-12 gap-4 mb-4 items-end bg-white p-4 rounded-lg border border-gray-200">
-
+                <div *ngIf="!isViewMode"
+                    class="grid grid-cols-12 gap-4 mb-4 items-end bg-white p-4 rounded-lg border border-gray-200">
                     <div class="col-span-12 md:col-span-3 lg:col-span-3">
                         <div class="flex flex-col gap-2">
                             <label class="font-semibold text-gray-700">Select Entry Type</label>
@@ -111,7 +119,7 @@
                                         <th class="text-right">Price</th>
                                         <th class="text-right">Qty</th>
                                         <th class="text-right">Amount</th>
-                                        <th class="text-center">
+                                        <th *ngIf="!isViewMode" class="text-center">
                                             <button pButton icon="pi pi-trash"
                                                 class="p-button-rounded p-button-text p-button-danger"
                                                 (click)="clearAllItemsFromCookie()" title="Clear All"></button>
@@ -130,7 +138,7 @@
                                         <td class="text-right">{{ entry.unitPrice | number:'1.0-0' }}</td>
                                         <td class="text-right">{{ entry.quantity | number:'1.0-0' }}</td>
                                         <td class="text-right">{{ entry.amount | number:'1.0-0' }}</td>
-                                        <td class="text-center">
+                                        <td *ngIf="!isViewMode" class="text-center">
                                             <button pButton icon="pi pi-trash"
                                                 class="p-button-rounded p-button-text p-button-danger"
                                                 (click)="removeItemFromCookie(i)" title="Delete Item"></button>
@@ -185,10 +193,19 @@
                             </div>
 
                             <div class="flex flex-wrap gap-2 pt-4 mt-2 border-t border-gray-200">
-                                <p-button icon="pi pi-check" label="Save Voucher" severity="success" class="flex-1"
-                                    styleClass="w-full" [loading]="isSubmitting" (onClick)="submit()"></p-button>
-                                <p-button icon="pi pi-refresh" label="Clear" severity="secondary" class="flex-1"
-                                    styleClass="w-full p-button-outlined" (onClick)="clear()"></p-button>
+                                <p-button *ngIf="!isViewMode" icon="pi pi-check" label="Save Voucher" severity="success"
+                                    class="flex-1" styleClass="w-full" [loading]="isSubmitting"
+                                    (onClick)="submit()"></p-button>
+                                <p-button *ngIf="!isViewMode" icon="pi pi-refresh" label="Clear" severity="secondary"
+                                    class="flex-1" styleClass="w-full p-button-outlined" (onClick)="clear()"></p-button>
+
+                                <p-button *ngIf="isViewMode && allowPaymentUpdate" icon="pi pi-wallet"
+                                    label="Update Payment" severity="warn" class="flex-1" styleClass="w-full"
+                                    [loading]="isSubmitting" (onClick)="submit()"></p-button>
+
+                                <p-button *ngIf="isViewMode" icon="pi pi-arrow-left" label="Back to List"
+                                    severity="secondary" class="flex-1" styleClass="w-full p-button-outlined"
+                                    (onClick)="onCancel()"></p-button>
                             </div>
                         </div>
                     </div>
