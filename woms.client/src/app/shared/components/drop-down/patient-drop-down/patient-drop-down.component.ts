@@ -20,7 +20,7 @@ import { EntryComponent } from 'src/app/pages/master/patient/entry/entry.compone
     template: `
 <p-select [options]="patient" [(ngModel)]="selectedValue" [style]="{'width': '100%'}" optionLabel="patientId"
     dataKey="patientId" placeholder="Select Patient" [loading]="loading" [filter]="true" filterBy="name,phone"
-    [disabled]="!isEnabled" appendTo="body" (onChange)="onChanges($event)" [disabled]="disabled">
+    [disabled]="!isEnabled" appendTo="body" (onChange)="onChanges($event)" [disabled]="disabled" [showClear]="true">
 
     <ng-template #selectedItem let-selectedOption>
         <div class="flex items-center gap-2" *ngIf="selectedOption">
