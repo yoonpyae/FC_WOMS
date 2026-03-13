@@ -1,6 +1,7 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ViOPDVoucherModel } from '@core_models/master/opd-voucher.model';
 import { OPDVoucherService } from '@core_services/master/opd-voucher.service';
 import { ExportService } from '@shared_services/export.service';
@@ -20,7 +21,6 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { OPDVoucherEntryComponent } from './entry/entry.component';
 
 @Component({
   selector: 'app-opd-voucher',
@@ -41,7 +41,6 @@ import { OPDVoucherEntryComponent } from './entry/entry.component';
     ConfirmDialogModule,
     DatePickerModule,
     SelectModule,
-    // OPDVoucherEntryComponent
   ],
   standalone: true,
   providers: [ConfirmationService, ExportService, DatePipe],
@@ -62,9 +61,6 @@ export class OpdVoucherComponent implements OnInit {
   startDate: Date = new Date();
   endDate: Date = new Date();
 
-  @ViewChild(OPDVoucherEntryComponent) entryComponent!: OPDVoucherEntryComponent;
-
-
   constructor(
     private opdVoucherService: OPDVoucherService,
     private messageService: MessageService,
@@ -73,10 +69,11 @@ export class OpdVoucherComponent implements OnInit {
     private loggerService: LoggerService,
     private sharedService: SharedService,
     private datePipe: DatePipe,
+    private router: Router
   ) {
     this.items = [
       {
-        label: 'Edit',
+        label: 'Edit / View',
         icon: 'pi pi-pencil',
         command: () => this.edit(),
       },
@@ -110,11 +107,14 @@ export class OpdVoucherComponent implements OnInit {
 
     this.opdVoucherService.getByDateRange(branchId, sdate, edate).subscribe({
       next: (res) => {
-        this.opdVouchers = res.data as ViOPDVoucherModel[];
+        this.opdVouchers = (res.data as ViOPDVoucherModel[]) || [];
         this.loading = false;
         this.loggerService.info(this.opdVouchers);
       },
-      error: () => { },
+      error: (err) => {
+        this.loggerService.error(err);
+        this.loading = false;
+      },
       complete: () => {
         this.loading = false;
       },
@@ -130,85 +130,99 @@ export class OpdVoucherComponent implements OnInit {
   }
 
   //#region CRUD Operations
-
   create(): void {
-    this.selectedOPDVoucher = null as any;
-    this.modalVisible = true;
+    this.router.navigate(['/opd-voucher/create-voucher']);
   }
 
-  edit(): void { }
-
-  delete(): void {
-    if (this.selectedOPDVoucher != null) {
-      this.confirmationService.confirm({
-        message: 'Are You Sure Want To Delete?',
-        header: 'Delete Confirmation',
-        icon: 'pi pi-info-circle',
-        accept: () => {
-          this.loading = true;
-          this.opdVoucherService.delete(this.selectedOPDVoucher.opdvno).subscribe({
-            next: (res) => {
-              this.messageService.add({ key: 'globalMessage', severity: 'success', summary: 'Success', detail: res.message.en, });
-              this.loadData();
-              this.selectedOPDVoucher = null as any;
-            },
-            error: (err) => {
-              this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.message });
-            },
-            complete: () => {
-              this.loading = false;
-            }
-          });
-        },
-        key: 'OPDDeleteDialog',
+  edit(): void {
+    if (this.selectedOPDVoucher) {
+      this.router.navigate(['/opd-voucher/create-voucher'], {
+        queryParams: { editVno: this.selectedOPDVoucher.opdvno }
       });
     } else {
-      this.messageService.add({
-        key: 'globalMessage',
-        severity: 'warn',
-        summary: 'Warning',
-        detail: 'Please choose OPD Voucher.',
-      });
+      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Please choose an OPD Voucher.' });
     }
   }
 
-  //#endregion
 
-  //#region Export
-
-  excel(): void {
-    let exportData = this.selectedOPDVoucher ? [this.selectedOPDVoucher] : this.opdVouchers;
-
-    if (exportData.length === 0) {
-      this.messageService.add({
-        key: 'globalMessage',
-        severity: 'warn',
-        summary: 'Warning',
-        detail: 'No data available to export!',
+delete (): void {
+  if(this.selectedOPDVoucher != null) {
+  this.confirmationService.confirm({
+    message: 'Are You Sure Want To Delete?',
+    header: 'Delete Confirmation',
+    icon: 'pi pi-info-circle',
+    accept: () => {
+      this.loading = true;
+      this.opdVoucherService.delete(this.selectedOPDVoucher.opdvno).subscribe({
+        next: (res) => {
+          this.messageService.add({ key: 'globalMessage', severity: 'success', summary: 'Success', detail: res.message.en, });
+          this.loadData();
+          this.selectedOPDVoucher = null as any;
+        },
+        error: (err) => {
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.message });
+        },
+        complete: () => {
+          this.loading = false;
+        }
       });
-      return;
-    }
-
-    let columns = [
-      { key: 'opdvno', value: 'Voucher No' },
-      { key: 'vdate', value: 'Voucher Date' },
-      { key: 'patientId', value: 'Patient Id' },
-      { key: 'patientName', value: 'Patient Name' },
-      { key: 'doctorId', value: 'Doctor Id' },
-      { key: 'doctorName', value: 'Doctor Name' },
-      { key: 'totalAmount', value: 'Total Amount' },
-      { key: 'discountAmount', value: 'Discount Amount' },
-      { key: 'leftAmount', value: 'leftAmount' },
-      { key: 'paymentType', value: 'Payment Type' },
-      { key: 'remark', value: 'Remark' },
-      { key: 'createdOn', value: 'Created On' },
-      { key: 'createdBy', value: 'Created By' },
-      { key: 'updatedOn', value: 'Updated On' },
-      { key: 'updatedBy', value: 'Updated By' },
-    ];
-
-    this.exportService.exportSelectColsWithDynamicHeader(exportData, columns, 'OPD Voucher');
+    },
+    key: 'OPDDeleteDialog',
+  });
+} else {
+  this.messageService.add({
+    key: 'globalMessage',
+    severity: 'warn',
+    summary: 'Warning',
+    detail: 'Please choose OPD Voucher.',
+  });
+}
   }
 
-  //#endregion
+//#endregion
+
+//#region Export
+
+excel(): void {
+  let exportData = this.selectedOPDVoucher ? [this.selectedOPDVoucher] : this.opdVouchers;
+
+  if(exportData.length === 0) {
+  this.messageService.add({
+    key: 'globalMessage',
+    severity: 'warn',
+    summary: 'Warning',
+    detail: 'No data available to export!',
+  });
+  return;
+}
+
+let columns = [
+  { key: 'opdvno', value: 'Voucher No' },
+  { key: 'vdate', value: 'Voucher Date' },
+  { key: 'patientId', value: 'Patient Id' },
+  { key: 'patientName', value: 'Patient Name' },
+  { key: 'doctorId', value: 'Doctor Id' },
+  { key: 'doctorName', value: 'Doctor Name' },
+  { key: 'totalAmount', value: 'Total Amount' },
+  { key: 'discountAmount', value: 'Discount Amount' },
+  { key: 'leftAmount', value: 'leftAmount' },
+  { key: 'paymentType', value: 'Payment Type' },
+  { key: 'remark', value: 'Remark' },
+  { key: 'createdOn', value: 'Created On' },
+  { key: 'createdBy', value: 'Created By' },
+  { key: 'updatedOn', value: 'Updated On' },
+  { key: 'updatedBy', value: 'Updated By' },
+];
+
+this.exportService.exportSelectColsWithDynamicHeader(exportData, columns, 'OPD Voucher');
+  }
+
+//#endregion
+
+closeEntryForm(refreshNeeded: boolean) {
+  this.modalVisible = false;
+  if (refreshNeeded) {
+    this.loadData();
+  }
+}
 }
