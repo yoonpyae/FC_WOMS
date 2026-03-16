@@ -47,12 +47,12 @@
             <div class="flex justify-between items-start mb-4">
                 <div class="flex items-center gap-2 text-amber-500 font-medium">
                     <i class="pi pi-users"></i>
-                    <span>Active Patients</span>
+                    <span>Unique Patients</span>
                 </div>
             </div>
             <div>
                 <h2 class="text-4xl font-bold text-gray-900">{{ activePatientsCount }}</h2>
-                <p class="text-xs text-gray-500 mt-1 mb-4">Total clinic patients</p>
+                <p class="text-xs text-gray-500 mt-1 mb-4">Distinct individuals seen today</p>
                 <a [routerLink]="['/patient']"
                     class="text-sm text-amber-500 font-semibold hover:text-amber-600 flex justify-between items-center group cursor-pointer">
                     Patient Records <i
