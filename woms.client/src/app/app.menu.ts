@@ -14,7 +14,14 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
         label: 'Dashboard',
         icon: 'pi pi-fw pi-chart-pie',
         routerLink: ['/dashboard'],
-      }
+        data: { roles: [UserRole.SuperAdmin] }
+      },
+      {
+        label: 'Dashboard',
+        icon: 'pi pi-fw pi-chart-pie',
+        routerLink: ['/doctor-dashboard'],
+        data: { roles: [UserRole.Doctor] }
+      },
     ],
   },
   {
