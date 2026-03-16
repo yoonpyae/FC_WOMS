@@ -84,7 +84,7 @@
                 <td>{{ consultation.visitDate | date : 'dd/MMM/yyyy' }}</td>
                 <td>{{ consultation.notes}}</td>
                 <td>
-                    <p-tag value="{{ consultation.status?'Active':'InActive' }}"
+                    <p-tag value="{{ consultation.status?'Completed':'InActive' }}"
                         [severity]="consultation.status?'success':'info'"
                         icon="{{ consultation.status?'pi pi-check':'pi pi-minus-circle' }}" [rounded]="true"></p-tag>
                 </td>
