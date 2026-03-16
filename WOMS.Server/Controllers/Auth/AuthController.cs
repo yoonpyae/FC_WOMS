@@ -126,7 +126,8 @@ namespace WOMS.Server.Controllers.Auth
                                 user.Email,
                                 user.PhoneNumber,
                                 user_role = role.ToLower(),
-                                doctorId = doctor?.DoctorId ?? 0
+                                doctorId = doctor?.DoctorId ?? 0,
+                                doctorName= doctor?.Name
                             }
                         },
                         new DefaultResponseMessageModel("Successfully generated access token.", "")
