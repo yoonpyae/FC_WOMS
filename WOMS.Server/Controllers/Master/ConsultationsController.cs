@@ -233,18 +233,17 @@ namespace WOMS.Server.Controllers.Master
         [EndpointDescription("Deletes a consultation record and its associated prescriptions.")]
         public async Task<IActionResult> Delete(string id)
         {
-            // 1. Soft-Delete Consultation
             Consultation? consultation = await repo.Consultations.GetFirstAsync(x => x.ConsultationId == id);
             if (consultation == null)
             {
                 return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Consultation record not found.", ""));
             }
 
+            consultation.Status = "incomplete";
             consultation.DeletedOn = DateTime.Now;
             consultation.DeletedBy = User.Identity?.Name ?? string.Empty;
             repo.Consultations.Update(consultation);
 
-            // 2. Soft-Delete Associated Prescriptions
             var prescriptions = await repo.Prescriptions.GetAsync(x => x.ConsultationId == id && !x.DeletedOn.HasValue);
 
             if (prescriptions != null && prescriptions.Any())
