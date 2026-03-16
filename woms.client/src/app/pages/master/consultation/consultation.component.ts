@@ -27,6 +27,7 @@ import { DropdownStateService } from '@shared_services/state-management/dropdown
 import { ItemCodeDropdownComponent } from '@shared_component/drop-down/item-code-dropdown/item-code-dropdown.component';
 import { DatePickerModule } from 'primeng/datepicker';
 import { ConsultationEntryModel } from '@core_models/master/prescription.model';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-consultation',
@@ -101,7 +102,7 @@ export class ConsultationComponent implements OnInit {
     symptoms: [''],
     diagnosis: [''],
     notes: [''],
-    status: ['Active'],
+    status: ['Completed'],
     // FormArray to hold multiple prescription items
     prescriptions: this.formBuilder.array([])
   });
@@ -113,6 +114,7 @@ export class ConsultationComponent implements OnInit {
     private loggerService: LoggerService,
     private sharedService: SharedService,
     private exportService: ExportService,
+    private route: ActivatedRoute
   ) {
     this.items = [
       { label: 'Edit', icon: 'pi pi-pen-to-square', command: () => this.update() },
@@ -123,6 +125,18 @@ export class ConsultationComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadData();
+
+    this.route.queryParams.subscribe(params => {
+      const autoPatientId = params['patientId'];
+      if (autoPatientId) {
+        this.create();
+
+        this.patientId = autoPatientId;
+        this.consultationForm.patchValue({ patientId: autoPatientId });
+
+        this.fetchPatientExtraInfo(autoPatientId);
+      }
+    });
   }
 
   // --- Form Array Getters and Setters ---
@@ -172,7 +186,7 @@ export class ConsultationComponent implements OnInit {
     this.consultationForm.get('patientId')?.enable();
 
     // reset form and seed branch/doctor default values
-    this.consultationForm.reset({ consultationId: 'TEMP_ID', visitDate: new Date(), status: 'Active' });
+    this.consultationForm.reset({ consultationId: 'TEMP_ID', visitDate: new Date(), status: 'Completed' });
     this.consultationForm.patchValue({
       branchId: Number.parseInt(this.sharedService.getDefaultBranchId() ?? '0'),
       doctorId: this.currentDoctorId
@@ -382,6 +396,11 @@ export class ConsultationComponent implements OnInit {
       next: (res: any) => {
         this.patientInfo = res.data?.patient;
         this.appointmentInfo = res.data?.appointment;
+
+        if (this.patientInfo) {
+          this.selectedPatient = this.patientInfo;
+          this.name = this.patientInfo.name;
+        }
 
         if (!this.isEdit) {
           if (this.appointmentInfo) {
