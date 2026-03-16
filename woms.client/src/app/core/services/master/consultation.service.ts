@@ -32,6 +32,10 @@ export class ConsultationService {
     return this.httpClient.get<RootModel>(`${environment.main_url}/master/consultations/getpatient-info?patientId=${patientId}&branchId=${branchId}&doctorId=${doctorId}`);
   }
 
+  getMonthlyVisits(branchId: number, doctorId: number, year: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/master/consultations/monthly-visits?branchId=${branchId}&doctorId=${doctorId}&year=${year}`);
+  }
+
   create(model: ConsultationEntryModel): Observable<RootModel> {
     return this.httpClient.post<RootModel>(`${environment.main_url}/master/consultations`, model);
   }
