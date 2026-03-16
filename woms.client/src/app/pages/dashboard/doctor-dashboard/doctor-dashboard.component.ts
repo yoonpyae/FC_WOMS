@@ -77,21 +77,28 @@ export class DoctorDashboardComponent implements OnInit {
 
         this.todayAppointmentCount = myTodayApps.length;
 
-        // Map Status instead of hardcoded 'Consultation'
+        // Optimize KPI: Instead of fetching the whole DB, just count unique patients today
+        const uniquePatients = new Set(myTodayApps.map((a: any) => a.patientId));
+        this.activePatientsCount = uniquePatients.size;
+
+        // Map for the "Schedule" Tab
         this.todayAppointments = myTodayApps.map((appt: any) => ({
           patientId: appt.patientId,
           patientName: appt.patientName || 'Unknown Patient',
-          time: this.formatTime(appt.appointmentTime) || 'TBD',
+          time: this.formatTime(appt.startTime) || 'TBD', // Mapped from startTime in your JSON
           duration: '30 min',
-          status: appt.appointmentStatus,
+          status: appt.appointmentStatus || 'Pending',    // Fixed mapping bug
           urgent: false
         }));
 
+        // Map for the "Patients" Tab
         this.todayPatients = myTodayApps.map((appt: any) => ({
           patientId: appt.patientId,
           patientName: appt.patientName || 'Unknown Patient',
           gender: appt.gender || 'Unknown',
-          status: appt.status || 'Pending'
+          age: this.calculateAge(appt.dob),               // Dynamic Age calculation
+          type: 'Regular',
+          status: appt.appointmentStatus || 'Pending'     // Fixed mapping bug
         }));
       },
       error: (err) => this.loggerService.error("Failed to load today's appointments")
@@ -159,15 +166,6 @@ export class DoctorDashboardComponent implements OnInit {
       },
       error: (err) => this.loggerService.error("Failed to load upcoming appointments")
     });
-
-    this.patientService.get(this.branchId).subscribe({
-      next: (res: any) => {
-        const patients = res.data || [];
-        this.activePatientsCount = patients.length;
-      },
-      error: (err) => this.loggerService.error("Failed to load patients"),
-      complete: () => this.loading = false
-    });
   }
 
   goToConsultation(patientId: string, status: string) {
@@ -226,5 +224,14 @@ export class DoctorDashboardComponent implements OnInit {
 
     if (isYesterday) return `Yesterday, ${timeStr}`;
     return `${this.datePipe.transform(dateObj, 'MMM d, yyyy')}, ${timeStr}`;
+  }
+
+  calculateAge(dobString: string | null): string {
+    if (!dobString) return 'N/A';
+    const dob = new Date(dobString);
+    const diffMs = Date.now() - dob.getTime();
+    const ageDate = new Date(diffMs);
+    const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+    return `${age} yrs`;
   }
 }
