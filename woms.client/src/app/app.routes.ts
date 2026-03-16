@@ -37,6 +37,7 @@ import { EntryComponent } from './pages/stock/purchase/entry/entry.component';
 import { ServiceComponent } from './pages/master/service/service.component';
 import { title } from 'process';
 import { OPDVoucherEntryComponent } from './pages/master/opd-voucher/entry/entry.component';
+import { DoctorDashboardComponent } from './pages/dashboard/doctor-dashboard/doctor-dashboard.component';
 
 export const routes: Routes = [
 	{ path: '', component: HomeComponent },
@@ -58,7 +59,13 @@ export const routes: Routes = [
 				path: 'dashboard',
 				component: DashboardComponent,
 				canActivate: [AuthGuardService],
-				data: { title: 'Dashboard' },
+				data: { title: 'Dashboard', roles: [UserRole.SuperAdmin] },
+			},
+			{
+				path: 'doctor-dashboard',
+				component: DoctorDashboardComponent,
+				canActivate: [AuthGuardService],
+				data: { title: 'Dashboard', roles: [UserRole.Doctor] }
 			},
 
 			// --- OUTPATIENT DEPARTMENT ---
