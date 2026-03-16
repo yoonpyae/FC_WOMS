@@ -86,6 +86,31 @@ namespace WOMS.Server.Controllers.Master
             }, null);
         }
 
+        [HttpGet("monthly-visits")]
+        [EndpointSummary("Monthly Visits")]
+        [EndpointDescription("Gets the total completed patient visits grouped by month for a specific year.")]
+        public async Task<IActionResult> GetMonthlyVisits(long branchId, long doctorId, int year)
+        {
+            var consultations = await repo.ViConsultations.GetAsync(x =>
+                x.BranchId == branchId &&
+                x.DoctorId == doctorId &&
+                x.Status == "Completed" &&
+                x.VisitDate.Year == year &&
+                !x.DeletedOn.HasValue);
+
+            var monthlyCounts = consultations
+                .GroupBy(c => c.VisitDate.Month)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            var result = new List<int>();
+            for (int month = 1; month <= 12; month++)
+            {
+                result.Add(monthlyCounts.ContainsKey(month) ? monthlyCounts[month] : 0);
+            }
+
+            return ResponseHelper.OK_Result(result, null);
+        }
+
         [HttpPost]
         [EndpointSummary("Create")]
         [EndpointDescription("Creates a new consultation record with multiple prescriptions.")]
