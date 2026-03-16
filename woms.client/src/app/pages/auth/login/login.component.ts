@@ -21,7 +21,6 @@ import { SharedService } from '../../../shared/services/shared.service';
   imports: [
     CommonModule,
     RouterModule,
-
     FormsModule,
     InputTextModule,
     PasswordModule,
@@ -62,9 +61,6 @@ export class LoginComponent implements OnInit {
   }
 
   login(): void {
-
-    //if (this.isRemberMeChecked) window.localStorage.setItem('remember-me', this.isRemberMeChecked ? 'remember' : '');
-
     this.isLoading = true;
 
     this.authService.accessToken(this.username, this.password).subscribe(
@@ -74,7 +70,15 @@ export class LoginComponent implements OnInit {
           this.isLoading = false;
 
           if (this.sharedService.getDefaultBranchId() != "") {
-            this.router.navigate(['/dashboard']);
+
+            const userRole = res.data.user.user_role;
+
+            if (userRole === 'doctor') {
+              this.router.navigate(['/doctor-dashboard']);
+            } else {
+              this.router.navigate(['/dashboard']);
+            }
+
           }
           else {
             this.router.navigate(['setting']);
@@ -97,6 +101,7 @@ export class LoginComponent implements OnInit {
 
     if (res.data.user.doctorId) {
       this.cookieService.set('doctorId', res.data.user.doctorId.toString());
+      this.cookieService.set('doctorName', res.data.user.doctorName);
     }
   }
 }
