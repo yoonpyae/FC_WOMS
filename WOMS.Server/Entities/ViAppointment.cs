@@ -64,4 +64,10 @@ public partial class ViAppointment
     public string? DeletedBy { get; set; }
 
     public long? DoctorId { get; set; }
+
+    [Column("DOB")]
+    public DateOnly? Dob { get; set; }
+
+    [StringLength(7)]
+    public string? Gender { get; set; }
 }
