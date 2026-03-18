@@ -129,5 +129,16 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
         routerLink: ['/reports/voucher-reports']
       }
     ]
-  }
+  },
+  {
+    label: 'Management',
+    data: { roles: [UserRole.SuperAdmin] },
+    items: [
+      {
+        label:'Branch',
+        icon: 'pi pi-fw pi-building',
+        RouterLink:['/management/branchs']
+      }
+    ]
+  },
 ];
