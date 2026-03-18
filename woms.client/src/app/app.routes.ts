@@ -38,6 +38,7 @@ import { ServiceComponent } from './pages/master/service/service.component';
 import { title } from 'process';
 import { OPDVoucherEntryComponent } from './pages/master/opd-voucher/entry/entry.component';
 import { DoctorDashboardComponent } from './pages/dashboard/doctor-dashboard/doctor-dashboard.component';
+import { BranchComponent } from './pages/master/branch/branch.component';
 
 export const routes: Routes = [
 	{ path: '', component: HomeComponent },
@@ -161,7 +162,19 @@ export const routes: Routes = [
 					// { path: 'stock-reports', component: StockReportComponent },
 					// { path: 'voucher-reports', component: VoucherReportComponent },
 				]
-			}
+			},
+
+			{
+				path: 'management',
+				canActivate: [AuthGuardService],
+				data: { title: ' Management', roles: [UserRole.SuperAdmin] },
+				children: [
+					{
+						component: BranchComponent,
+						path: 'branchs',
+					}
+				]
+			},
 		],
 	}
 ];
