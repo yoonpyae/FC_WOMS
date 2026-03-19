@@ -14,6 +14,7 @@ import { RootModel } from '@core_models/root.model';
 import { LoggerService } from '../../../shared/services/logger.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SharedService } from '../../../shared/services/shared.service';
+import { DialogModule } from 'primeng/dialog';
 
 
 @Component({
@@ -25,7 +26,8 @@ import { SharedService } from '../../../shared/services/shared.service';
     InputTextModule,
     PasswordModule,
     ButtonModule,
-    CheckboxModule
+    CheckboxModule,
+    DialogModule
   ],
   providers: [
     AuthService
@@ -40,7 +42,7 @@ import { SharedService } from '../../../shared/services/shared.service';
     }`]
 })
 export class LoginComponent implements OnInit {
-
+  showForgotPasswordDialog: boolean = false;
   isRemberMeChecked: boolean = false;
   isLoading: boolean = false;
   username!: string;
@@ -75,7 +77,14 @@ export class LoginComponent implements OnInit {
 
             if (userRole === 'doctor') {
               this.router.navigate(['/doctor-dashboard']);
-            } else {
+            }
+            else if (userRole === 'pharmacist') {
+              this.router.navigate(['/pharmacist-dashboard']);
+            }
+            else if (userRole === 'receptionist') {
+              this.router.navigate(['/reception-dashboard']);
+            }
+            else {
               this.router.navigate(['/dashboard']);
             }
 
@@ -92,16 +101,34 @@ export class LoginComponent implements OnInit {
   }
 
   setValueToSession(res: RootModel) {
-    window.localStorage.setItem('access_token', res.data.access_token);
-    window.localStorage.setItem('refresh_token', res.data.refresh_token);
-    this.cookieService.set('userId', res.data.user.id);
-    this.cookieService.set('username', res.data.user.userName);
-    this.cookieService.set('userrole', res.data.user.user_role);
-    this.cookieService.set('authorized_status', 'authorized');
+    const token = res.data.access_token;
+    const refreshToken = res.data.refresh_token;
+
+    // 1. Handle Token Storage based on Checkbox
+    if (this.isRemberMeChecked) {
+      window.localStorage.setItem('access_token', token);
+      window.localStorage.setItem('refresh_token', refreshToken);
+    } else {
+      window.sessionStorage.setItem('access_token', token);
+      window.sessionStorage.setItem('refresh_token', refreshToken);
+      window.localStorage.removeItem('access_token');
+      window.localStorage.removeItem('refresh_token');
+    }
+
+    const expiryDays = this.isRemberMeChecked ? 30 : undefined;
+
+    this.cookieService.set('userId', res.data.user.id, expiryDays);
+    this.cookieService.set('username', res.data.user.userName, expiryDays);
+    this.cookieService.set('userrole', res.data.user.user_role, expiryDays);
+    this.cookieService.set('authorized_status', 'authorized', expiryDays);
 
     if (res.data.user.doctorId) {
-      this.cookieService.set('doctorId', res.data.user.doctorId.toString());
-      this.cookieService.set('doctorName', res.data.user.doctorName);
+      this.cookieService.set('doctorId', res.data.user.doctorId.toString(), expiryDays);
+      this.cookieService.set('doctorName', res.data.user.doctorName, expiryDays);
     }
   }
+
+  openForgotPassword() {
+  this.showForgotPasswordDialog = true;
+}
 }
