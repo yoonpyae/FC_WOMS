@@ -1,0 +1,112 @@
+<p-toast></p-toast>
+
+<div class="transition-colors duration-200">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight m-0">Current Inventory Report</h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-1 m-0">Monitor stock levels, valuations, and low-stock alerts.</p>
+        </div>
+        <p-button icon="pi pi-refresh" label="Refresh Data" severity="secondary" (onClick)="loadReport()" [loading]="loading"></p-button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div class="card bg-white dark:bg-gray-800 p-5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm mb-0">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-medium">
+                    <i class="pi pi-wallet"></i><span>Est. Inventory Value</span>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ totalInventoryValue | currency:'MMK ':'symbol':'1.0-0' }}</h2>
+        </div>
+
+        <div class="card bg-white dark:bg-gray-800 p-5 rounded-lg border border-blue-100 dark:border-blue-900/50 shadow-sm mb-0">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium">
+                    <i class="pi pi-box"></i><span>Unique Items</span>
+                </div>
+            </div>
+            <h2 class="text-4xl font-bold text-gray-900 dark:text-white">{{ totalUniqueItems }}</h2>
+        </div>
+
+        <div class="card bg-white dark:bg-gray-800 p-5 rounded-lg border border-amber-100 dark:border-amber-900/50 shadow-sm mb-0">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-2 text-amber-500 dark:text-amber-400 font-medium">
+                    <i class="pi pi-exclamation-triangle"></i><span>Low Stock (≤ {{LOW_STOCK_THRESHOLD}})</span>
+                </div>
+            </div>
+            <h2 class="text-4xl font-bold text-amber-600 dark:text-amber-400">{{ lowStockItems }}</h2>
+        </div>
+
+        <div class="card bg-white dark:bg-gray-800 p-5 rounded-lg border border-red-100 dark:border-red-900/50 shadow-sm mb-0">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-2 text-red-500 dark:text-red-400 font-medium">
+                    <i class="pi pi-times-circle"></i><span>Out of Stock</span>
+                </div>
+            </div>
+            <h2 class="text-4xl font-bold text-red-600 dark:text-red-400">{{ outOfStockItems }}</h2>
+        </div>
+    </div>
+
+    <div class="card bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm mb-6">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4 border-b border-gray-100 dark:border-gray-700 pb-3">Top 10 Items by Volume</h3>
+        <p-chart type="bar" [data]="chartData" [options]="chartOptions" height="300px"></p-chart>
+    </div>
+
+    <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm mb-0">
+        <p-table #dt [value]="inventory" [paginator]="true" [rows]="10" [loading]="loading"
+            [globalFilterFields]="['itemCode', 'itemName', 'chemicalName', 'typeName']"
+            styleClass="p-datatable-striped p-datatable-sm" sortField="groundBalance" [sortOrder]="1">
+            
+            <ng-template #caption>
+                <div class="flex flex-wrap gap-3 justify-between items-center">
+                    <p-iconfield iconPosition="left">
+                        <p-inputicon><i class="pi pi-search"></i></p-inputicon>
+                        <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')" placeholder="Search items..." class="w-full sm:w-64" />
+                    </p-iconfield>
+                    <p-button label="Export Excel" icon="pi pi-file-excel" severity="success" (onClick)="excel()"></p-button>
+                </div>
+            </ng-template>
+
+            <ng-template #header>
+                <tr>
+                    <th pSortableColumn="itemCode">Code <p-sortIcon field="itemCode"></p-sortIcon></th>
+                    <th pSortableColumn="itemName">Item Name <p-sortIcon field="itemName"></p-sortIcon></th>
+                    <th pSortableColumn="typeName">Type <p-sortIcon field="typeName"></p-sortIcon></th>
+                    <th pSortableColumn="avgPrice" class="text-right">Avg Cost <p-sortIcon field="avgPrice"></p-sortIcon></th>
+                    <th pSortableColumn="salePrice" class="text-right">Sale Price <p-sortIcon field="salePrice"></p-sortIcon></th>
+                    <th pSortableColumn="groundBalance" class="text-center">In Stock <p-sortIcon field="groundBalance"></p-sortIcon></th>
+                    <th class="text-center">Status</th>
+                </tr>
+            </ng-template>
+
+            <ng-template #body let-item>
+                <tr>
+                    <td class="font-mono text-sm text-gray-500 dark:text-gray-400">{{ item.itemCode }}</td>
+                    <td class="font-semibold text-gray-900 dark:text-white">
+                        {{ item.itemName }}
+                        <div class="text-xs text-gray-500 font-normal mt-0.5">{{ item.chemicalName }}</div>
+                    </td>
+                    <td>{{ item.typeName }}</td>
+                    <td class="text-right">{{ (item.avgPrice || item.purchasePrice) | currency:'MMK ':'symbol':'1.0-0' }}</td>
+                    <td class="text-right text-indigo-600 dark:text-indigo-400 font-semibold">{{ item.salePrice | currency:'MMK ':'symbol':'1.0-0' }}</td>
+                    <td class="text-center">
+                        <span [ngClass]="{
+                            'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400': item.groundBalance <= 0,
+                            'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400': item.groundBalance > 0 && item.groundBalance <= LOW_STOCK_THRESHOLD,
+                            'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400': item.groundBalance > LOW_STOCK_THRESHOLD
+                        }" class="px-3 py-1 rounded-full text-xs font-bold border border-transparent">
+                            {{ item.groundBalance }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <i class="pi" [ngClass]="item.status ? 'pi-check-circle text-green-500' : 'pi-times-circle text-red-500'"></i>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template #emptymessage>
+                <tr><td colspan="7" class="text-center py-6 text-gray-500">No inventory records found.</td></tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
