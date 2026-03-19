@@ -37,4 +37,8 @@ export class MainStockService {
   delete(code: string): Observable<RootModel> {
     return this.httpClient.delete<RootModel>(`${environment.main_url}/stock/mainstocks/code?code=${code}`)
   }
+
+  getInventoryReport(branchId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/stock/mainstocks?branchId=${branchId}`);
+  }
 }
