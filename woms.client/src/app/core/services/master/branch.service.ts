@@ -27,7 +27,7 @@ export class BranchService {
   update(model: BranchModel) {
     return this.httpClient.put<RootModel>(`${environment.main_url}/branches`, model);
   }
-
+  
   delete(id: number) {
     return this.httpClient.delete<RootModel>(`${environment.main_url}/branches/${id}`, {});
   }
