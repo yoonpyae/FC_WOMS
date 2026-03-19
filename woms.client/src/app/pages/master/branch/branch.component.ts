@@ -13,7 +13,6 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { TextareaModule } from 'primeng/textarea';
-import { SplitButton } from 'primeng/splitbutton';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 
 @Component({
@@ -25,7 +24,6 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
     ReactiveFormsModule,
     ToastModule,
     ButtonModule,
-    SplitButton,
     InputTextModule,
     InputIconModule,
     IconFieldModule,
@@ -40,17 +38,20 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
   styleUrl: './branch.component.scss' // Optional
 })
 export class BranchComponent implements OnInit {
-  
+
   branches: any[] = [];
   selectedBranch: any;
   items!: MenuItem[] | undefined;
-  
+
   loading: boolean = false;
   isSubmitting: boolean = false;
   showForm: boolean = false;
 
+  isEdit: boolean = false;
+  currentBranchId: number = 0;
+
   private formBuilder = inject(FormBuilder);
-  
+
   public branchForm: FormGroup = this.formBuilder.group({
     branchName: ['', Validators.required],
     contactPerson: ['', Validators.required],
@@ -70,12 +71,7 @@ export class BranchComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private loggerService: LoggerService
-  ) {
-    // Only View and Delete for now since the API only supports Create/Get/Delete
-    this.items = [
-      { label: 'Delete', icon: 'pi pi-trash', command: () => this.delete() }
-    ];
-  }
+  ) { }
 
   ngOnInit(): void {
     this.loadData();
@@ -107,6 +103,27 @@ export class BranchComponent implements OnInit {
     });
   }
 
+  editBranch(branch: any): void {
+    this.isEdit = true;
+    this.showForm = true;
+    this.currentBranchId = branch.branchId;
+
+    // Populate the form with the selected branch data
+    this.branchForm.patchValue({
+      branchName: branch.branchName,
+      contactPerson: branch.contactPerson,
+      primaryPhone: branch.primaryPhone,
+      otherPhone: branch.otherPhone,
+      email: branch.email,
+      addressDetail: branch.addressDetail,
+      townshipId: branch.townshipId || 1,
+      stateId: branch.stateId || 1,
+      isDefault: branch.isDefault,
+      status: branch.status,
+      remark: branch.remark
+    });
+  }
+
   cancelForm(): void {
     this.showForm = false;
     this.branchForm.reset();
@@ -119,40 +136,31 @@ export class BranchComponent implements OnInit {
     }
 
     this.isSubmitting = true;
-    const payload = this.branchForm.getRawValue();
 
-    this.branchService.create(payload).subscribe({
+    // Construct the payload and attach the ID if we are editing
+    const payload = {
+      ...this.branchForm.getRawValue(),
+      branchId: this.isEdit ? this.currentBranchId : 0
+    };
+
+    const request$ = this.isEdit
+      ? this.branchService.update(payload)
+      : this.branchService.create(payload);
+
+    request$.subscribe({
       next: (res: any) => {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Branch created successfully.' });
+        const msg = this.isEdit ? 'Branch updated successfully.' : 'Branch created successfully.';
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: msg });
         this.loadData();
         this.cancelForm();
       },
       error: (err: any) => {
-        this.loggerService.error("Error creating branch");
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to create branch.' });
+        this.loggerService.error("Error saving branch");
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to save branch.' });
         this.isSubmitting = false;
       },
       complete: () => {
         this.isSubmitting = false;
-      }
-    });
-  }
-
-  delete(): void {
-    if (!this.selectedBranch) {
-      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Please select a branch to delete.' });
-      return;
-    }
-
-    this.confirmationService.confirm({
-      message: `Are you sure you want to delete ${this.selectedBranch.branchName}?`,
-      header: 'Confirm Deletion',
-      icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
-      rejectButtonStyleClass: 'p-button-text p-button-secondary',
-      accept: () => {
-        // Implement delete call here when you add it to the Branch Controller
-        this.messageService.add({ severity: 'info', summary: 'Notice', detail: 'Delete API not yet implemented.' });
       }
     });
   }
