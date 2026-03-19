@@ -50,4 +50,10 @@ export class AppointmentService {
     );
   }
 
+  getReport(branchId: number, startDate?: string, endDate?: string): Observable<RootModel> {
+    let url = `${environment.main_url}/master/appointments/report?branchId=${branchId}`;
+    if (startDate) url += `&startDate=${startDate}`;
+    if (endDate) url += `&endDate=${endDate}`;
+    return this.httpClient.get<RootModel>(url);
+  }
 }
