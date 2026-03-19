@@ -17,7 +17,6 @@ import { DetailComponent as DoctorDetailComponent } from './pages/master/doctor/
 import { PatientComponent } from './pages/master/patient/patient.component';
 import { AppointmentComponent } from './pages/master/appointment/appointment.component';
 import { OpdVoucherComponent } from './pages/master/opd-voucher/opd-voucher.component';
-// import { OpdDoctorAttachComponent } from './pages/opd/opd-doctor-attach/opd-doctor-attach.component';
 
 // Stock Management
 import { SupplierComponent } from './pages/master/supplier/supplier.component';
@@ -27,8 +26,6 @@ import { MainStockComponent } from './pages/stock/main-stock/main-stock.componen
 import { PurchaseComponent } from './pages/stock/purchase/purchase.component';
 
 // Vouchers & Billing
-// import { CreateVoucherComponent as LabCreateVoucherComponent } from './pages/lab-voucher/create-voucher/create-voucher.component';
-// import { HistoryComponent as LabHistoryComponent } from './pages/lab-voucher/history/history.component';
 import { PharmacyCreateVoucherComponent } from './pages/pharmacy-voucher/create-voucher/create-voucher.component';
 import { PharmacyVoHistoryComponent } from './pages/pharmacy-voucher/history/history.component';
 import { ConsultationComponent } from './pages/master/consultation/consultation.component';
@@ -43,6 +40,8 @@ import { UserManagementComponent } from './pages/master/user-management/user-man
 import { AppointmentReportComponent } from './pages/reports/appointment-report/appointment-report.component';
 import { StockReportComponent } from './pages/reports/stock-report/stock-report.component';
 import { VoucherReportComponent } from './pages/reports/voucher-report/voucher-report.component';
+import { PharmacistDashboardComponent } from './pages/dashboard/pharmacist-dashboard/pharmacist-dashboard.component';
+import { ReceptionDashboardComponent } from './pages/dashboard/reception-dashboard/reception-dashboard.component';
 
 export const routes: Routes = [
 	{ path: '', component: HomeComponent },
@@ -72,7 +71,18 @@ export const routes: Routes = [
 				canActivate: [AuthGuardService],
 				data: { title: 'Dashboard', roles: [UserRole.Doctor] }
 			},
-
+			{
+				path: 'pharmacist-dashboard',
+				component: PharmacistDashboardComponent,
+				canActivate: [AuthGuardService],
+				data: { title: 'Pharmacy Dashboard', roles: [UserRole.Pharmacist] }
+			},
+			{
+				path: 'reception-dashboard',
+				component: ReceptionDashboardComponent,
+				canActivate: [AuthGuardService],
+				data: { title: 'Reception Dashboard', roles: [UserRole.Receptionist] }
+			},
 			// --- OUTPATIENT DEPARTMENT ---
 			{
 				path: 'doctor',
