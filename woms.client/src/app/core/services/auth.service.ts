@@ -15,7 +15,10 @@ export class AuthService {
     private http: HttpClient,
     private logger: LoggerService,
     private cookieService: CookieService) {
+  }
 
+  private getStorageItem(key: string): string | null {
+    return window.localStorage.getItem(key) || window.sessionStorage.getItem(key);
   }
 
   getUser(phone: string): Observable<RootModel> {
@@ -40,17 +43,15 @@ export class AuthService {
   refreshToken(): Observable<RootModel> {
     let url: string = `${environment.main_url}/auth/refresh-token`;
     const body = {
-      access_token: window.localStorage.getItem('access_token'),
-      refresh_token: window.localStorage.getItem('refresh_token')
+      access_token: this.getStorageItem('access_token'),
+      refresh_token: this.getStorageItem('refresh_token')
     };
     return this.http.post<RootModel>(url, body);
   }
 
   isHasToken(): boolean {
-    return (
-      window.localStorage.getItem('refresh_token') !== undefined &&
-      window.localStorage.getItem('refresh_token') !== null &&
-      window.localStorage.getItem('refresh_token') !== '')
+    const token = this.getStorageItem('refresh_token');
+    return (token !== undefined && token !== null && token !== '');
   }
 
   isLoggedIn(): boolean {
@@ -61,20 +62,25 @@ export class AuthService {
   }
 
   logout(): void {
-    this.cookieService.delete('authorized_status', '');
+    this.cookieService.delete('authorized_status', '/');
   }
 
   logoutForce(): void {
-    this.cookieService.delete('authorized_status', '');
-    this.cookieService.delete('username');
-    this.cookieService.delete('userrole');
-    this.cookieService.delete('userId');
-    this.cookieService.delete('doctorId');
+    this.cookieService.delete('authorized_status', '/');
+    this.cookieService.delete('username', '/');
+    this.cookieService.delete('userrole', '/');
+    this.cookieService.delete('userId', '/');
+    this.cookieService.delete('doctorId', '/');
+    this.cookieService.delete('doctorName', '/');
 
     window.localStorage.removeItem('access_token');
     window.localStorage.removeItem('refresh_token');
-
     window.localStorage.removeItem('default_company');
     window.localStorage.removeItem('default_branch');
+
+    window.sessionStorage.removeItem('access_token');
+    window.sessionStorage.removeItem('refresh_token');
+    window.sessionStorage.removeItem('default_company');
+    window.sessionStorage.removeItem('default_branch');
   }
 }
