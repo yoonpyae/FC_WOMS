@@ -1,3 +1,125 @@
-<div class="card" style="height: 85vh;">
-  <h1>HELLO WORLD</h1>
+<div class="transition-colors duration-200">
+    
+    <div class="mb-8 flex justify-between items-end">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">System Overview</h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">Welcome back, {{ userName }}. Here is what's happening at the clinic today.</p>
+        </div>
+        <div>
+            <p-button icon="pi pi-refresh" [rounded]="true" severity="secondary" [outlined]="true" (onClick)="loadDashboardData()" [loading]="loading"></p-button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+        
+        <div class="card bg-white dark:bg-gray-800 p-5 rounded-xl border border-blue-100 dark:border-blue-900/50 shadow-sm mb-0 hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium">
+                    <i class="pi pi-calendar"></i><span>Today's Appointments</span>
+                </div>
+            </div>
+            <div>
+                <h2 class="text-4xl font-bold text-gray-900 dark:text-white">{{ appointmentsCount }}</h2>
+                <a [routerLink]="['/appointment']" class="text-sm text-blue-600 dark:text-blue-400 font-semibold hover:underline mt-4 inline-block">View Schedule <i class="pi pi-arrow-right text-xs"></i></a>
+            </div>
+        </div>
+
+        <div class="card bg-white dark:bg-gray-800 p-5 rounded-xl border border-emerald-100 dark:border-emerald-900/50 shadow-sm mb-0 hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-medium">
+                    <i class="pi pi-wallet"></i><span>Today's Income</span>
+                </div>
+            </div>
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ todayIncome | currency:'MMK ':'symbol':'1.0-0' }}</h2>
+                <a [routerLink]="['/reports/voucher-reports']" class="text-sm text-emerald-600 dark:text-emerald-400 font-semibold hover:underline mt-4 inline-block">View Financials <i class="pi pi-arrow-right text-xs"></i></a>
+            </div>
+        </div>
+
+        <div class="card bg-white dark:bg-gray-800 p-5 rounded-xl border border-rose-100 dark:border-rose-900/50 shadow-sm mb-0 hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-2 text-rose-500 dark:text-rose-400 font-medium">
+                    <i class="pi pi-credit-card"></i><span>Today's Expenses</span>
+                </div>
+            </div>
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ todayExpense | currency:'MMK ':'symbol':'1.0-0' }}</h2>
+                <a [routerLink]="['/purchase']" class="text-sm text-rose-500 dark:text-rose-400 font-semibold hover:underline mt-4 inline-block">View Purchases <i class="pi pi-arrow-right text-xs"></i></a>
+            </div>
+        </div>
+
+        <div class="card bg-white dark:bg-gray-800 p-5 rounded-xl border border-amber-100 dark:border-amber-900/50 shadow-sm mb-0 hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-2 text-amber-500 dark:text-amber-400 font-medium">
+                    <i class="pi pi-exclamation-triangle"></i><span>Low Stock Alerts</span>
+                </div>
+            </div>
+            <div>
+                <h2 class="text-4xl font-bold text-gray-900 dark:text-white">{{ lowStockCount }}</h2>
+                <a [routerLink]="['/reports/stock-reports']" class="text-sm text-amber-500 dark:text-amber-400 font-semibold hover:underline mt-4 inline-block">View Inventory <i class="pi pi-arrow-right text-xs"></i></a>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-2 card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-0">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Revenue Trend (Last 7 Days)</h3>
+            </div>
+            <div *ngIf="!loading && chartData" class="w-full">
+                <p-chart type="line" [data]="chartData" [options]="chartOptions" height="300px"></p-chart>
+            </div>
+            <div *ngIf="loading" class="flex justify-center items-center h-[300px]">
+                <i class="pi pi-spin pi-spinner text-3xl text-emerald-500"></i>
+            </div>
+        </div>
+
+        <div class="lg:col-span-1 card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-0">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6">Quick Actions</h3>
+            
+            <div class="flex flex-col gap-3">
+                <button [routerLink]="['/patient']" class="p-4 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left flex items-center gap-4 group">
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="pi pi-user-plus text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900 dark:text-white">Register Patient</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Add a new patient to the system</p>
+                    </div>
+                </button>
+
+                <button [routerLink]="['/opd-voucher/create-voucher']" class="p-4 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left flex items-center gap-4 group">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="pi pi-receipt text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900 dark:text-white">New OPD Voucher</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Create billing for outpatients</p>
+                    </div>
+                </button>
+
+                <button [routerLink]="['/purchase']" class="p-4 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left flex items-center gap-4 group">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="pi pi-box text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900 dark:text-white">Add Stock Purchase</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Record incoming pharmacy stock</p>
+                    </div>
+                </button>
+
+                <button [routerLink]="['/reports/appointment-reports']" class="p-4 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left flex items-center gap-4 group">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="pi pi-chart-bar text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900 dark:text-white">View Reports</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Analyze clinic performance data</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
