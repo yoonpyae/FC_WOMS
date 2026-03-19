@@ -250,11 +250,10 @@ export class AppointmentComponent implements OnInit {
 
   // #region Export
   excel(): void {
-    let exportData = this.selectedAppointment ? [this.selectedAppointment] : this.appointments;
+    let exportData = this.appointments; // Report uses the full filtered list
 
-    if (exportData.length === 0) {
+    if (!exportData || exportData.length === 0) {
       this.messageService.add({
-        key: 'globalMessage',
         severity: 'warn',
         summary: 'Warning',
         detail: 'No data available to export!',
@@ -262,115 +261,119 @@ export class AppointmentComponent implements OnInit {
       return;
     }
 
+    // Keys perfectly mapped to your provided API Response
     let columns = [
-      { key: 'ano', value: 'Appointment Number' },
-      { key: 'name', value: 'Name' },
-      { key: 'phoneNo', value: 'Phone Number' },
-      { key: 'appointmentDate', value: 'Appointment Date' },
-      { key: 'doctorId', value: 'Doctor ID' },
-      { key: 'doctorName', value: 'DoctorName' },
+      { key: 'ano', value: 'Appt No.' },
+      { key: 'appointmentDate', value: 'Date' },
+      { key: 'dayOfWeek', value: 'Day' },
+      { key: 'startTime', value: 'Start Time' },
+      { key: 'endTime', value: 'End Time' },
+      { key: 'patientName', value: 'Patient Name' },
+      { key: 'patientPhone', value: 'Phone Number' },
+      { key: 'gender', value: 'Gender' },
+      { key: 'dob', value: 'DOB' },
+      { key: 'doctorName', value: 'Doctor Name' },
+      { key: 'specialized', value: 'Specialty' },
+      { key: 'appointmentStatus', value: 'Status' },
+      { key: 'appointmentRemark', value: 'Remark' },
       { key: 'createdOn', value: 'Created On' },
-      { key: 'createdBy', value: 'Created By' },
-      { key: 'updatedOn', value: 'Updated On' },
-      { key: 'updatedBy', value: 'Updated By' },
-      { key: 'status', value: 'Status' },
-      { key: 'remark', value: 'Remark' },
+      { key: 'createdBy', value: 'Created By' }
     ];
 
-    this.exportService.exportSelectColsWithDynamicHeader(exportData, columns, 'Appointment');
+    this.exportService.exportSelectColsWithDynamicHeader(exportData, columns, 'Appointment_Report');
   }
-  // #endregion
+// #endregion
 
-  // #region UI & Event Handlers
+// #region UI & Event Handlers
 
-  onPatientChange(): void {
-    if (this.selectedPatient) {
-      this.appointmentForm.get('patientId')?.setValue(this.selectedPatient.patientId);
-      this.appointmentForm.get('name')?.setValue(this.selectedPatient.name);
-      this.appointmentForm.get('phoneNo')?.setValue(this.selectedPatient.phone);
-    } else {
-      this.appointmentForm.get('patientId')?.setValue('');
-      this.appointmentForm.get('name')?.setValue('');
-      this.appointmentForm.get('phoneNo')?.setValue('');
-    }
-  }
-
-  clearSelection(): void {
-    this.selectedAppointment = null as any;
+onPatientChange(): void {
+  if(this.selectedPatient) {
+  this.appointmentForm.get('patientId')?.setValue(this.selectedPatient.patientId);
+  this.appointmentForm.get('name')?.setValue(this.selectedPatient.name);
+  this.appointmentForm.get('phoneNo')?.setValue(this.selectedPatient.phone);
+} else {
+  this.appointmentForm.get('patientId')?.setValue('');
+  this.appointmentForm.get('name')?.setValue('');
+  this.appointmentForm.get('phoneNo')?.setValue('');
+}
   }
 
-  setAutoFocus() {
-    setTimeout(() => {
-      this.nameInput?.nativeElement?.focus();
-    }, 0);
+clearSelection(): void {
+  this.selectedAppointment = null as any;
+}
+
+setAutoFocus() {
+  setTimeout(() => {
+    this.nameInput?.nativeElement?.focus();
+  }, 0);
+}
+
+preventNegativeInput($event: KeyboardEvent): void {
+  let inputChar = $event.key;
+  if(inputChar === '-' || inputChar === 'e') {
+  $event.preventDefault();
+}
+  }
+// #endregion
+
+// #region Helpers
+
+OnDoctorChange(event: any): void {
+  this.loggerService.info("Doctor changed");
+  if(this.selectedDoctor) {
+  this.appointmentForm.get('doctorId')?.setValue(this.selectedDoctor.doctorId);
+  this.GetDutytime(this.selectedAppointmentDate);
+} else {
+  this.appointmentForm.get('doctorId')?.setValue(null);
+}
   }
 
-  preventNegativeInput($event: KeyboardEvent): void {
-    let inputChar = $event.key;
-    if (inputChar === '-' || inputChar === 'e') {
-      $event.preventDefault();
-    }
+selectSchedule(slot: any) {
+  this.selectedSchedule = slot;
+  // If you want to store the scheduleId in your Reactive Form:
+  this.appointmentForm.patchValue({ scheduleId: slot.scheduleId });
+}
+
+GetDutytime(selectedDate: Date): void {
+  if(!selectedDate || !this.selectedDoctor) return;
+
+// Ensure we have a clean string for day of week
+const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const dayOfWeek = days[selectedDate.getDay()];
+
+const branchId = Number(this.sharedService.getDefaultBranchId() ?? 0);
+const doctorId = Number(this.selectedDoctor.doctorId);
+
+this.doctorService.getScheduleByDoctorDay(doctorId, dayOfWeek, branchId).subscribe({
+  next: (res) => {
+    const data = res?.data ?? [];
+    this.schedules = Array.isArray(data)
+      ? data.filter((s: any) => s.doctorId == doctorId)
+      : [];
   }
-  // #endregion
-
-  // #region Helpers
-
-  OnDoctorChange(event: any): void {
-    this.loggerService.info("Doctor changed");
-    if (this.selectedDoctor) {
-      this.appointmentForm.get('doctorId')?.setValue(this.selectedDoctor.doctorId);
-      this.GetDutytime(this.selectedAppointmentDate);
-    } else {
-      this.appointmentForm.get('doctorId')?.setValue(null);
-    }
-  }
-
-  selectSchedule(slot: any) {
-    this.selectedSchedule = slot;
-    // If you want to store the scheduleId in your Reactive Form:
-    this.appointmentForm.patchValue({ scheduleId: slot.scheduleId });
-  }
-
-  GetDutytime(selectedDate: Date): void {
-    if (!selectedDate || !this.selectedDoctor) return;
-
-    // Ensure we have a clean string for day of week
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const dayOfWeek = days[selectedDate.getDay()];
-
-    const branchId = Number(this.sharedService.getDefaultBranchId() ?? 0);
-    const doctorId = Number(this.selectedDoctor.doctorId);
-
-    this.doctorService.getScheduleByDoctorDay(doctorId, dayOfWeek, branchId).subscribe({
-      next: (res) => {
-        const data = res?.data ?? [];
-        this.schedules = Array.isArray(data)
-          ? data.filter((s: any) => s.doctorId == doctorId)
-          : [];
-      }
-    });
+});
   }
 
-  getSeverity(status: string) {
-    if (!status) return 'secondary';
+getSeverity(status: string) {
+  if (!status) return 'secondary';
 
-    switch (status.toLowerCase()) {
-      case 'confirmed': return 'info';
-      case 'completed': return 'success';
-      case 'cancelled': return 'danger';
-      default: return 'secondary';
-    }
+  switch (status.toLowerCase()) {
+    case 'confirmed': return 'info';
+    case 'completed': return 'success';
+    case 'cancelled': return 'danger';
+    default: return 'secondary';
   }
+}
 
-  getIcon(status: string) {
-    if (!status) return 'pi pi-question-circle';
+getIcon(status: string) {
+  if (!status) return 'pi pi-question-circle';
 
-    switch (status.toLowerCase()) {
-      case 'confirmed': return 'pi pi-clock';
-      case 'completed': return 'pi pi-check-circle';
-      case 'cancelled': return 'pi pi-times-circle';
-      default: return 'pi pi-question-circle';
-    }
+  switch (status.toLowerCase()) {
+    case 'confirmed': return 'pi pi-clock';
+    case 'completed': return 'pi pi-check-circle';
+    case 'cancelled': return 'pi pi-times-circle';
+    default: return 'pi pi-question-circle';
   }
+}
   // #endregion
 }
