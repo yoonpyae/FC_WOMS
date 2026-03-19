@@ -14,7 +14,6 @@ public class DashboardController(IRepositoryWrapper repo) : ControllerBase
         DateTime tomorrow = today.AddDays(1);
         DateOnly todayDateOnly = DateOnly.FromDateTime(today);
 
-        // 1. Today's Appointments
         IReadOnlyList<ViAppointment>? appointments = await repo.ViAppointments.GetAsync(x =>
             x.BranchId == branchId &&
             x.AppointmentDate == todayDateOnly &&
@@ -22,24 +21,19 @@ public class DashboardController(IRepositoryWrapper repo) : ControllerBase
 
         int appointmentsCount = appointments?.Count ?? 0;
 
-        // 2. Today's Income (OPD + Pharmacy Paid Amounts)
         IReadOnlyList<ViOPDVoucher>? opdVouchers = await repo.ViOPDVouchers.GetAsync(x =>
             x.BranchId == branchId && x.Vdate >= today && x.Vdate < tomorrow && !x.DeletedOn.HasValue);
         IReadOnlyList<ViPharmacyVoucher>? pharmVouchers = await repo.ViPharmacyVouchers.GetAsync(x =>
             x.BranchId == branchId && x.Vdate >= today && x.Vdate < tomorrow && !x.DeletedOn.HasValue);
 
-        // FIXED: Removed the internal ?? 0 since PaidAmount is a non-nullable double
         double todayIncome = (opdVouchers?.Sum(x => x.PaidAmount) ?? 0) +
                              (pharmVouchers?.Sum(x => x.PaidAmount) ?? 0);
 
-        // 3. Today's Expenses (Purchases)
         IReadOnlyList<ViPurchase>? purchases = await repo.ViPurchases.GetAsync(x =>
             x.BranchId == branchId && x.PurchaseDate >= today && x.PurchaseDate < tomorrow && !x.DeletedOn.HasValue);
 
-        // FIXED: Removed the internal ?? 0 since PayAmount is a non-nullable double
         double todayExpense = purchases?.Sum(x => x.PayAmount) ?? 0;
 
-        // 4. Low Stock Alerts (Ground balance between 1 and 100)
         IReadOnlyList<ViMainStock>? mainStocks = await repo.ViMainStocks.GetAsync(x =>
             x.BranchId == branchId && !x.DeletedOn.HasValue && x.GroundBalance > 0 && x.GroundBalance <= 100);
 
@@ -74,7 +68,6 @@ public class DashboardController(IRepositoryWrapper repo) : ControllerBase
         {
             DateTime targetDate = startDate.AddDays(i);
 
-            // FIXED: Added .HasValue and .Value.Date to safely handle nullable DateTimes
             double opdDaily = opdVouchers
                 .Where(x => x.Vdate.HasValue && x.Vdate.Value.Date == targetDate.Date)
                 .Sum(x => x.PaidAmount);
