@@ -15,7 +15,6 @@ import { SelectModule } from 'primeng/select';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-
     SelectModule,
     ButtonModule
   ],
@@ -41,7 +40,7 @@ export class SettingComponent implements OnInit {
     this.branchService.get().subscribe({
       next: (res) => {
         this.branchs = res.data as BranchModel[];
-        let userRole = this.sharedService.getUserRole() ?? '';
+        // let userRole = this.sharedService.getUserRole() ?? '';
         // if (userRole == 'branch') {
         //   this.disabledbranch = true;
         //   this.selectedbranch = this.branchs[0];
@@ -56,8 +55,21 @@ export class SettingComponent implements OnInit {
     }
     else {
       this.sharedService.setDefaultBranchId(this.selectedbranch?.branchId.toString());
-      this.router.navigate(['/dashboard']);
+      
+      const userRole = (this.sharedService.getUserRole() ?? '').toLowerCase();
+
+      if (userRole === 'doctor') {
+        this.router.navigate(['/doctor-dashboard']);
+      } 
+      else if (userRole === 'pharmacist') {
+        this.router.navigate(['/pharmacist-dashboard']);
+      } 
+      else if (userRole === 'receptionist') {
+        this.router.navigate(['/reception-dashboard']);
+      } 
+      else {
+        this.router.navigate(['/dashboard']);
+      }
     }
   }
-
 }
