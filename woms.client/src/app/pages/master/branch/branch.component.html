@@ -7,9 +7,8 @@
         [globalFilterFields]="['branchName','contactPerson','primaryPhone','email']"
         [tableStyle]="{ 'min-width': '60rem' }"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} branches"
-        [rowsPerPageOptions]="[10,25,50]" selectionMode="single" [(selection)]="selectedBranch"
-        dataKey="branchId">
-        
+        [rowsPerPageOptions]="[10,25,50]" selectionMode="single" [(selection)]="selectedBranch" dataKey="branchId">
+
         <ng-template #caption>
             <div class="flex flex-wrap gap-3 justify-between items-center mb-4">
                 <div class="flex items-center">
@@ -23,7 +22,8 @@
                         <input #search pInputText type="text" (input)="dt1.filterGlobal(search.value, 'contains')"
                             placeholder="Search branches..." class="w-full sm:w-64" />
                     </p-iconfield>
-                    <p-splitButton label="Create Branch" icon="pi pi-plus" [model]="items" (onClick)="create()"></p-splitButton>
+                <p-button label="Create Account" icon="pi pi-user-plus" (onClick)="create()"></p-button>
+                    
                 </div>
             </div>
         </ng-template>
@@ -56,14 +56,17 @@
                 </td>
                 <td>
                     <p-tag [value]="branch.status ? 'Active' : 'Inactive'"
-                        [severity]="branch.status ? 'success' : 'danger'"
-                        [rounded]="true">
+                        [severity]="branch.status ? 'success' : 'danger'" [rounded]="true">
                     </p-tag>
                 </td>
                 <td class="text-sm text-gray-500">{{ branch.createdOn | date : 'MMM dd, yyyy' }}</td>
+                <td class="text-right">
+                    <p-button icon="pi pi-pencil" severity="secondary" [text]="true"
+                        (onClick)="editBranch(branch)"></p-button>
+                </td>
             </tr>
         </ng-template>
-        
+
         <ng-template #emptymessage>
             <tr>
                 <td colspan="8" class="text-center py-8 text-gray-500 dark:text-gray-400">
@@ -77,30 +80,37 @@
 
 <div *ngIf="showForm" [formGroup]="branchForm" class="transition-colors duration-200">
 
-    <div class="flex items-center gap-3 mb-6">
+<div class="flex items-center gap-3 mb-6">
         <p-button icon="pi pi-arrow-left" [rounded]="true" [text]="true" severity="secondary" (onClick)="cancelForm()"></p-button>
         <div>
-            <h2 class="text-2xl font-bold m-0 text-gray-900 dark:text-white">Create New Branch</h2>
-            <p class="text-gray-500 dark:text-gray-400 m-0 text-sm">Add a new clinic location to the system.</p>
+            <h2 class="text-2xl font-bold m-0 text-gray-900 dark:text-white">{{ isEdit ? 'Edit Branch' : 'Create New Branch' }}</h2>
+            <p class="text-gray-500 dark:text-gray-400 m-0 text-sm">{{ isEdit ? 'Update details for this clinic location.' : 'Add a new clinic location to the system.' }}</p>
         </div>
     </div>
 
-    <div class="card bg-white dark:bg-gray-800 p-6 md:p-8 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm max-w-4xl mx-auto">
-        <h3 class="text-lg font-bold mb-6 text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-3">Branch Details</h3>
+    <div
+        class="card bg-white dark:bg-gray-800 p-6 md:p-8 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm max-w-4xl mx-auto">
+        <h3
+            class="text-lg font-bold mb-6 text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-3">
+            Branch Details</h3>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div class="flex flex-col gap-2">
-                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Branch Name <span class="text-red-500">*</span></label>
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Branch Name <span
+                        class="text-red-500">*</span></label>
                 <input formControlName="branchName" pInputText placeholder="e.g. Tayoke Kyaung Branch" class="w-full" />
-            </div>
-            
-            <div class="flex flex-col gap-2">
-                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Contact Person <span class="text-red-500">*</span></label>
-                <input formControlName="contactPerson" pInputText placeholder="Manager or Head Doctor name" class="w-full" />
             </div>
 
             <div class="flex flex-col gap-2">
-                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Primary Phone <span class="text-red-500">*</span></label>
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Contact Person <span
+                        class="text-red-500">*</span></label>
+                <input formControlName="contactPerson" pInputText placeholder="Manager or Head Doctor name"
+                    class="w-full" />
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Primary Phone <span
+                        class="text-red-500">*</span></label>
                 <input formControlName="primaryPhone" pInputText placeholder="09-XXXXXXXXX" class="w-full" />
             </div>
 
@@ -110,40 +120,49 @@
             </div>
 
             <div class="flex flex-col gap-2 md:col-span-2">
-                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Email Address <span class="text-red-500">*</span></label>
-                <input formControlName="email" type="email" pInputText placeholder="branch@familyclinic.com" class="w-full" />
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Email Address <span
+                        class="text-red-500">*</span></label>
+                <input formControlName="email" type="email" pInputText placeholder="branch@familyclinic.com"
+                    class="w-full" />
             </div>
 
             <div class="flex flex-col gap-2 md:col-span-2">
-                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Full Address <span class="text-red-500">*</span></label>
-                <textarea formControlName="addressDetail" pTextarea rows="3" placeholder="Building No, Street Name..." class="w-full"></textarea>
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Full Address <span
+                        class="text-red-500">*</span></label>
+                <textarea formControlName="addressDetail" pTextarea rows="3" placeholder="Building No, Street Name..."
+                    class="w-full"></textarea>
             </div>
 
-            <div class="flex items-center justify-between p-4 border border-gray-100 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/50">
+            <div
+                class="flex items-center justify-between p-4 border border-gray-100 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/50">
                 <div class="flex flex-col">
                     <span class="font-semibold text-gray-900 dark:text-white">Active Status</span>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">Set whether this branch is currently operational</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Set whether this branch is currently
+                        operational</span>
                 </div>
                 <p-toggleswitch formControlName="status"></p-toggleswitch>
             </div>
 
-            <div class="flex items-center justify-between p-4 border border-gray-100 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/50">
+            <div
+                class="flex items-center justify-between p-4 border border-gray-100 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/50">
                 <div class="flex flex-col">
                     <span class="font-semibold text-gray-900 dark:text-white">Default Branch</span>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">Set as the primary application fallback branch</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Set as the primary application fallback
+                        branch</span>
                 </div>
                 <p-toggleswitch formControlName="isDefault"></p-toggleswitch>
             </div>
 
             <div class="flex flex-col gap-2 md:col-span-2 mt-2">
                 <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Internal Remarks</label>
-                <textarea formControlName="remark" pTextarea rows="2" placeholder="Any additional notes..." class="w-full"></textarea>
+                <textarea formControlName="remark" pTextarea rows="2" placeholder="Any additional notes..."
+                    class="w-full"></textarea>
             </div>
         </div>
 
-        <div class="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+     <div class="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
             <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="cancelForm()"></p-button>
-            <p-button label="Create Branch" severity="contrast" icon="pi pi-check" (onClick)="saveBranch()" [loading]="isSubmitting"></p-button>
+            <p-button [label]="isEdit ? 'Update Branch' : 'Create Branch'" severity="contrast" icon="pi pi-check" (onClick)="saveBranch()" [loading]="isSubmitting"></p-button>
         </div>
 
     </div>
