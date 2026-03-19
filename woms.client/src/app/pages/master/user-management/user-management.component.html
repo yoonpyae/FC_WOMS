@@ -1,0 +1,102 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="card dark:bg-gray-800 dark:border-gray-700 transition-colors duration-200 shadow-sm" *ngIf="!showForm">
+    <p-table [value]="users" [paginator]="true" [rows]="10" [loading]="loading" styleClass="p-datatable-striped">
+        <ng-template #caption>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white m-0">Staff Accounts</h2>
+                <p-button label="Create Account" icon="pi pi-user-plus" (onClick)="create()"></p-button>
+            </div>
+        </ng-template>
+
+        <ng-template #header>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th class="text-right">Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template #body let-user>
+            <tr>
+                <td class="font-semibold text-gray-900 dark:text-white">{{ user.userName }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.phoneNumber || '-' }}</td>
+                <td>
+                    <p-tag [value]="user.role"
+                        [severity]="user.role === 'SuperAdmin' ? 'danger' : (user.role === 'Pharmacist' ? 'info' : 'success')"
+                        [rounded]="true"></p-tag>
+                </td>
+                <td class="text-right">
+                    <p-button icon="pi pi-pencil" severity="secondary" [text]="true"
+                        (onClick)="editUser(user)"></p-button>
+                    <p-button icon="pi pi-trash" severity="danger" [text]="true"
+                        (onClick)="deleteUser(user)"></p-button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+            <tr>
+                <td colspan="5" class="text-center py-6 text-gray-500">No staff accounts found.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<div *ngIf="showForm" [formGroup]="userForm" class="transition-colors duration-200">
+    <div class="flex items-center gap-3 mb-6">
+        <p-button icon="pi pi-arrow-left" [rounded]="true" [text]="true" severity="secondary"
+            (onClick)="cancelForm()"></p-button>
+        <div>
+            <h2 class="text-2xl font-bold m-0 text-gray-900 dark:text-white">{{ isEdit ? 'Edit Staff Account' : 'Create
+                Staff Account' }}</h2>
+            <p class="text-gray-500 dark:text-gray-400 m-0 text-sm">{{ isEdit ? 'Update employee contact details and
+                roles.' : 'Generate login credentials for a new employee.' }}</p>
+        </div>
+    </div>
+
+    <div
+        class="card bg-white dark:bg-gray-800 p-6 md:p-8 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm max-w-3xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+            <div class="flex flex-col gap-2">
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Username <span *ngIf="!isEdit"
+                        class="text-red-500">*</span></label>
+                <input formControlName="userName" pInputText placeholder="e.g. john_reception" class="w-full" />
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">System Role <span
+                        class="text-red-500">*</span></label>
+                <p-select [options]="roles" formControlName="role" class="w-full"></p-select>
+            </div>
+
+            <div class="flex flex-col gap-2 md:col-span-2">
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Email Address <span
+                        class="text-red-500">*</span></label>
+                <input formControlName="email" type="email" pInputText placeholder="staff@clinic.com" class="w-full" />
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Phone Number</label>
+                <input formControlName="phoneNumber" pInputText placeholder="09-XXXXXXXXX" class="w-full" />
+            </div>
+
+            <div *ngIf="!isEdit" class="flex flex-col gap-2">
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Temporary Password <span
+                        class="text-red-500">*</span></label>
+                <p-password formControlName="password" [toggleMask]="true" styleClass="w-full"
+                    inputStyleClass="w-full"></p-password>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+            <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="cancelForm()"></p-button>
+            <p-button [label]="isEdit ? 'Update Account' : 'Create Account'" severity="contrast" icon="pi pi-check"
+                (onClick)="saveUser()" [loading]="isSubmitting"></p-button>
+        </div>
+    </div>
+</div>
