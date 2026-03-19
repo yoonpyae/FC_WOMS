@@ -22,6 +22,18 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
         routerLink: ['/doctor-dashboard'],
         data: { roles: [UserRole.Doctor] }
       },
+      {
+        label: 'Dashboard',
+        icon: 'pi pi-fw pi-chart-pie',
+        routerLink: ['/pharmacist-dashboard'],
+        data: { roles: [UserRole.Pharmacist] }
+      },
+      {
+        label: 'Dashboard',
+        icon: 'pi pi-fw pi-chart-pie',
+        routerLink: ['/reception-dashboard'],
+        data: { roles: [UserRole.Receptionist] }
+      },
     ],
   },
   {
