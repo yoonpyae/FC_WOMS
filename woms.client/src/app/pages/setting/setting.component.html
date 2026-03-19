@@ -1,22 +1,40 @@
-<div class="grid grid-cols-12 min-h-screen">
-  <div class="col-span-12 flex items-center justify-center">
-    <div class="flex flex-col justify-center w-full max-w-md p-6 rounded-lg shadow-lg bg-white">
-      <h2 class="font-bold mt-2 text-center">Site Setting</h2>
-      <div class="flex flex-col gap-4">
+<div class="grid grid-cols-12 min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+  <div class="col-span-12 flex items-center justify-center p-4">
+    
+    <div class="flex flex-col justify-center w-full max-w-md p-6 sm:p-8 rounded-xl shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 transition-colors duration-200">
+      
+      <div class="text-center mb-8">
+        <img src="images/Family_Clinics_Logo_only.png" alt="Family Clinic Logo" class="h-16 mx-auto mb-4 drop-shadow-sm">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white m-0">Site Settings</h2>
+        <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">Configure your active branch session.</p>
+      </div>
+
+      <div class="flex flex-col gap-6">
+        
         <div class="flex flex-col gap-2">
-          <label>Default Branch</label>
-          <p-select [options]="branchs" [(ngModel)]="selectedbranch" [style]="{ 'width':'100%' }"
-            [disabled]="disabledbranch" optionLabel="branchName" [showClear]="true"
-            placeholder="Select a Branch"></p-select>
+          <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Default Branch <span class="text-red-500">*</span></label>
+          <p-select 
+            [options]="branchs" 
+            [(ngModel)]="selectedbranch" 
+            [style]="{ 'width':'100%' }"
+            [disabled]="disabledbranch" 
+            optionLabel="branchName" 
+            [showClear]="true"
+            placeholder="Select a Branch"
+            styleClass="w-full">
+          </p-select>
         </div>
-        <div>
+        
+        <div class="mt-2">
           <p-button pRipple
-            styleClass="w-full p-3 bg-[#00B6C7] border-0 text-white rounded-lg font-semibold text-base hover:bg-[#0096a7] transition"
+            styleClass="w-full p-3 bg-[#00B6C7] border-[#00B6C7] text-white rounded-lg font-semibold text-base hover:bg-[#0096a7] hover:border-[#0096a7] transition-colors"
             (click)="onSubmit()">
-            <i class="pi pi-check"></i> Submit
+            <i class="pi pi-check font-bold mr-2"></i> Submit
           </p-button>
         </div>
+
       </div>
     </div>
+
   </div>
 </div>
