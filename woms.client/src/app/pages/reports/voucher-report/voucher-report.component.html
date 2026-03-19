@@ -1,0 +1,210 @@
+<p-toast></p-toast>
+
+<div class="transition-colors duration-200">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight m-0">Financial & Vouchers</h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-1 m-0">Monitor cash flow, revenue, and outstanding balances.
+            </p>
+        </div>
+
+        <div
+            class="flex items-center gap-2 bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+            <p-datepicker [(ngModel)]="startDate" placeholder="Start Date" [showIcon]="true"
+                dateFormat="yy-mm-dd"></p-datepicker>
+            <span class="text-gray-400 font-bold">-</span>
+            <p-datepicker [(ngModel)]="endDate" placeholder="End Date" [showIcon]="true"
+                dateFormat="yy-mm-dd"></p-datepicker>
+            <p-button icon="pi pi-search" severity="contrast" (onClick)="loadReports()" [loading]="loading"></p-button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+        <div
+            class="card bg-white dark:bg-gray-800 p-5 rounded-lg border border-emerald-200 dark:border-emerald-900/50 shadow-sm mb-0">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-medium">
+                    <i class="pi pi-arrow-down-left"></i><span>Total Income</span>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{{ totalIncome | number:'1.0-0' }}
+                <span class="text-sm font-normal text-gray-500">MMK</span></h2>
+        </div>
+
+        <div
+            class="card bg-white dark:bg-gray-800 p-5 rounded-lg border border-blue-200 dark:border-blue-900/50 shadow-sm mb-0">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium">
+                    <i class="pi pi-clock"></i><span>Pending Receivables</span>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ totalReceivables | number:'1.0-0' }} <span
+                    class="text-sm font-normal text-gray-500">MMK</span></h2>
+        </div>
+
+        <div
+            class="card bg-white dark:bg-gray-800 p-5 rounded-lg border border-rose-200 dark:border-rose-900/50 shadow-sm mb-0">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-2 text-rose-500 dark:text-rose-400 font-medium">
+                    <i class="pi pi-arrow-up-right"></i><span>Total Expenses</span>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-rose-600 dark:text-rose-400">{{ totalExpense | number:'1.0-0' }} <span
+                    class="text-sm font-normal text-gray-500">MMK</span></h2>
+        </div>
+
+        <div
+            class="card bg-white dark:bg-gray-800 p-5 rounded-lg border border-amber-200 dark:border-amber-900/50 shadow-sm mb-0">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-2 text-amber-500 dark:text-amber-400 font-medium">
+                    <i class="pi pi-exclamation-circle"></i><span>Pending Payables</span>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ totalPayables | number:'1.0-0' }} <span
+                    class="text-sm font-normal text-gray-500">MMK</span></h2>
+        </div>
+    </div>
+
+    <div
+        class="card bg-white dark:bg-gray-800 p-2 sm:p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+        <p-tabs value="0">
+            <p-tablist>
+                <p-tab value="0"><i class="pi pi-briefcase mr-2"></i> OPD Income</p-tab>
+                <p-tab value="1"><i class="pi pi-shop mr-2"></i> Pharmacy Income</p-tab>
+                <p-tab value="2"><i class="pi pi-truck mr-2"></i> Purchase Expenses</p-tab>
+            </p-tablist>
+
+            <p-tabpanels>
+
+                <p-tabpanel value="0">
+                    <div class="flex justify-between items-center mb-4 mt-2">
+                        <p-iconfield iconPosition="left">
+                            <p-inputicon><i class="pi pi-search"></i></p-inputicon>
+                            <input pInputText type="text"
+                                (input)="dtOpd.filterGlobal($any($event.target).value, 'contains')"
+                                placeholder="Search OPD..." class="w-full sm:w-64" />
+                        </p-iconfield>
+                        <p-button label="Export" icon="pi pi-file-excel" severity="success" [outlined]="true"
+                            size="small" (onClick)="exportOPD()"></p-button>
+                    </div>
+                    <p-table #dtOpd [value]="opdVouchers" [paginator]="true" [rows]="10" [loading]="loading"
+                        [globalFilterFields]="['opdvno', 'patientName', 'doctorName']"
+                        styleClass="p-datatable-sm p-datatable-striped">
+                        <ng-template #header>
+                            <tr>
+                                <th pSortableColumn="vdate">Date <p-sortIcon field="vdate"></p-sortIcon></th>
+                                <th pSortableColumn="opdvno">Vno <p-sortIcon field="opdvno"></p-sortIcon></th>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th class="text-right">Total</th>
+                                <th class="text-right">Paid</th>
+                                <th class="text-right">Balance</th>
+                                <th>Status</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template #body let-v>
+                            <tr>
+                                <td>{{ v.vdate | date:'MMM dd, yyyy' }}</td>
+                                <td class="font-mono text-sm text-gray-500">{{ v.opdvno }}</td>
+                                <td class="font-semibold">{{ v.patientName }}</td>
+                                <td>{{ v.doctorName }}</td>
+                                <td class="text-right">{{ v.totalAmount | number }}</td>
+                                <td class="text-right text-emerald-600">{{ v.paidAmount | number }}</td>
+                                <td class="text-right font-bold" [ngClass]="{'text-rose-500': v.leftAmount > 0}">{{
+                                    v.leftAmount | number }}</td>
+                                <td><p-tag [value]="v.status"
+                                        [severity]="v.leftAmount > 0 ? 'warning' : 'success'"></p-tag></td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </p-tabpanel>
+
+                <p-tabpanel value="1">
+                    <div class="flex justify-between items-center mb-4 mt-2">
+                        <p-iconfield iconPosition="left">
+                            <p-inputicon><i class="pi pi-search"></i></p-inputicon>
+                            <input pInputText type="text"
+                                (input)="dtPharm.filterGlobal($any($event.target).value, 'contains')"
+                                placeholder="Search Pharmacy..." class="w-full sm:w-64" />
+                        </p-iconfield>
+                        <p-button label="Export" icon="pi pi-file-excel" severity="success" [outlined]="true"
+                            size="small" (onClick)="exportPharmacy()"></p-button>
+                    </div>
+                    <p-table #dtPharm [value]="pharmacyVouchers" [paginator]="true" [rows]="10" [loading]="loading"
+                        [globalFilterFields]="['vno', 'patientName']" styleClass="p-datatable-sm p-datatable-striped">
+                        <ng-template #header>
+                            <tr>
+                                <th pSortableColumn="vdate">Date <p-sortIcon field="vdate"></p-sortIcon></th>
+                                <th pSortableColumn="vno">Vno <p-sortIcon field="vno"></p-sortIcon></th>
+                                <th>Patient</th>
+                                <th class="text-right">Total</th>
+                                <th class="text-right">Paid</th>
+                                <th class="text-right">Balance</th>
+                                <th>Cashier</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template #body let-v>
+                            <tr>
+                                <td>{{ v.vdate | date:'MMM dd, yyyy' }}</td>
+                                <td class="font-mono text-sm text-gray-500">{{ v.vno }}</td>
+                                <td class="font-semibold">{{ v.patientName }}</td>
+                                <td class="text-right">{{ v.totalAmount | number }}</td>
+                                <td class="text-right text-emerald-600">{{ v.paidAmount | number }}</td>
+                                <td class="text-right font-bold" [ngClass]="{'text-rose-500': v.leftAmount > 0}">{{
+                                    v.leftAmount | number }}</td>
+                                <td>{{ v.issuePerson }}</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </p-tabpanel>
+
+                <p-tabpanel value="2">
+                    <div class="flex justify-between items-center mb-4 mt-2">
+                        <p-iconfield iconPosition="left">
+                            <p-inputicon><i class="pi pi-search"></i></p-inputicon>
+                            <input pInputText type="text"
+                                (input)="dtPur.filterGlobal($any($event.target).value, 'contains')"
+                                placeholder="Search POs..." class="w-full sm:w-64" />
+                        </p-iconfield>
+                        <p-button label="Export" icon="pi pi-file-excel" severity="success" [outlined]="true"
+                            size="small" (onClick)="exportPurchase()"></p-button>
+                    </div>
+                    <p-table #dtPur [value]="purchases" [paginator]="true" [rows]="10" [loading]="loading"
+                        [globalFilterFields]="['purchaseVno', 'supplierName', 'supplierCompanyName']"
+                        styleClass="p-datatable-sm p-datatable-striped">
+                        <ng-template #header>
+                            <tr>
+                                <th pSortableColumn="purchaseDate">Date <p-sortIcon field="purchaseDate"></p-sortIcon>
+                                </th>
+                                <th pSortableColumn="purchaseVno">PO Number <p-sortIcon
+                                        field="purchaseVno"></p-sortIcon></th>
+                                <th>Supplier</th>
+                                <th class="text-right">Net Amount</th>
+                                <th class="text-right">Amount Paid</th>
+                                <th class="text-right">Balance Due</th>
+                                <th>Status</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template #body let-p>
+                            <tr>
+                                <td>{{ p.purchaseDate | date:'MMM dd, yyyy' }}</td>
+                                <td class="font-mono text-sm text-gray-500">{{ p.purchaseVno }}</td>
+                                <td class="font-semibold">{{ p.supplierName }} <span
+                                        class="block text-xs font-normal text-gray-500">{{ p.supplierCompanyName
+                                        }}</span></td>
+                                <td class="text-right">{{ p.netAmount | number }}</td>
+                                <td class="text-right text-rose-500">{{ p.payAmount | number }}</td>
+                                <td class="text-right font-bold" [ngClass]="{'text-amber-500': p.leftAmount > 0}">{{
+                                    p.leftAmount | number }}</td>
+                                <td><p-tag [value]="p.status"
+                                        [severity]="p.leftAmount > 0 ? 'warning' : 'success'"></p-tag></td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </p-tabpanel>
+
+            </p-tabpanels>
+        </p-tabs>
+    </div>
+</div>
