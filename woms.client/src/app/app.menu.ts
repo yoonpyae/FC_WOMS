@@ -135,10 +135,15 @@ export const NAVIGATION_MENU: Readonly<any[]> = [
     data: { roles: [UserRole.SuperAdmin] },
     items: [
       {
-        label:'Branch',
+        label: 'Branch',
         icon: 'pi pi-fw pi-building',
-        RouterLink:['/management/branchs']
-      }
+        routerLink: ['/management/branchs']
+      },
+      {
+        label: 'User',
+        icon: 'pi pi-fw pi-user',
+        routerLink: ['/management/users']
+      },
     ]
   },
 ];
