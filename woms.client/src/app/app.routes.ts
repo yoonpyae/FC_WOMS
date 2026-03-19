@@ -39,6 +39,10 @@ import { title } from 'process';
 import { OPDVoucherEntryComponent } from './pages/master/opd-voucher/entry/entry.component';
 import { DoctorDashboardComponent } from './pages/dashboard/doctor-dashboard/doctor-dashboard.component';
 import { BranchComponent } from './pages/master/branch/branch.component';
+import { UserManagementComponent } from './pages/master/user-management/user-management.component';
+import { AppointmentReportComponent } from './pages/reports/appointment-report/appointment-report.component';
+import { StockReportComponent } from './pages/reports/stock-report/stock-report.component';
+import { VoucherReportComponent } from './pages/reports/voucher-report/voucher-report.component';
 
 export const routes: Routes = [
 	{ path: '', component: HomeComponent },
@@ -158,9 +162,9 @@ export const routes: Routes = [
 				data: { title: 'Reports', roles: [UserRole.SuperAdmin] },
 				children: [
 					// TODO: Import and attach your Report components here once created
-					// { path: 'appointment-reports', component: AppointmentReportComponent },
-					// { path: 'stock-reports', component: StockReportComponent },
-					// { path: 'voucher-reports', component: VoucherReportComponent },
+					{ path: 'appointment-reports', component: AppointmentReportComponent },
+					{ path: 'stock-reports', component: StockReportComponent },
+					{ path: 'voucher-reports', component: VoucherReportComponent },
 				]
 			},
 
@@ -172,7 +176,8 @@ export const routes: Routes = [
 					{
 						component: BranchComponent,
 						path: 'branchs',
-					}
+					},
+					{ path: 'users', component: UserManagementComponent },
 				]
 			},
 		],
