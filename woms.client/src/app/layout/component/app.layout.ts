@@ -5,32 +5,30 @@ import { filter, Subscription } from 'rxjs';
 import { AppTopbar } from './app.topbar';
 import { AppSidebar } from './app.sidebar';
 import { LayoutService } from '../service/layout.service';
-import { PageTitleComponent } from "../../shared/components/page-title/page-title.component";
-import { BreadCrumbComponent } from "../../shared/components/bread-crumb/bread-crumb.component";
 
 @Component({
   selector: 'app-layout',
   standalone: true,
   imports: [CommonModule, AppTopbar, AppSidebar, RouterModule],
-  template: `<div class="layout-wrapper" [ngClass]="containerClass">
+  template: `
+    <div class="layout-wrapper" [ngClass]="containerClass">
         <app-topbar></app-topbar>
         <app-sidebar></app-sidebar>
-        <div class="layout-main-container">
-            <div class="layout-main">
+        
+        <div class="layout-main-container flex flex-col min-h-screen bg-surface-50 dark:bg-surface-950 transition-colors duration-200">
+            <div class="layout-main flex-1 p-4 md:p-6 lg:p-8 pt-6">
                 <router-outlet></router-outlet>
             </div>
-            <!-- <app-footer></app-footer> -->
-        </div>
+            </div>
+
         <div class="layout-mask animate-fadein"></div>
     </div> `
 })
 export class AppLayout {
   overlayMenuOpenSubscription: Subscription;
-
   menuOutsideClickListener: any;
 
   @ViewChild(AppSidebar) appSidebar!: AppSidebar;
-
   @ViewChild(AppTopbar) appTopBar!: AppTopbar;
 
   constructor(
@@ -61,7 +59,6 @@ export class AppLayout {
     const sidebarEl = document.querySelector('.layout-sidebar');
     const topbarEl = document.querySelector('.layout-menu-button');
     const eventTarget = event.target as Node;
-
     return !(sidebarEl?.isSameNode(eventTarget) || sidebarEl?.contains(eventTarget) || topbarEl?.isSameNode(eventTarget) || topbarEl?.contains(eventTarget));
   }
 
@@ -104,7 +101,6 @@ export class AppLayout {
     if (this.overlayMenuOpenSubscription) {
       this.overlayMenuOpenSubscription.unsubscribe();
     }
-
     if (this.menuOutsideClickListener) {
       this.menuOutsideClickListener();
     }
