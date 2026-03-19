@@ -127,5 +127,27 @@ public class AppointmentsController(IRepositoryWrapper repo) : ControllerBase
             ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Appointment has been cancelled successfully.", ""))
             : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to cancel Appointment", ""));
     }
+
+    [HttpGet("report")]
+    [EndpointSummary("Appointment Report")]
+    [EndpointDescription("Gets appointment report data within a specific date range.")]
+    public async Task<IActionResult> GetReport(long branchId, [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate)
+    {
+        IReadOnlyList<ViAppointment>? appointments = await repo.ViAppointments.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId);
+
+        if (startDate.HasValue)
+        {
+            appointments = appointments.Where(x => x.AppointmentDate >= startDate.Value).ToList();
+        }
+
+        if (endDate.HasValue)
+        {
+            appointments = appointments.Where(x => x.AppointmentDate <= endDate.Value).ToList();
+        }
+
+        List<ViAppointment> sortedAppointments = appointments.OrderByDescending(x => x.AppointmentDate).ToList();
+
+        return ResponseHelper.OK_Result(sortedAppointments, null);
+    }
     #endregion
 }
