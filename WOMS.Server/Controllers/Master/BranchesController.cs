@@ -47,5 +47,39 @@ public class BranchesController(IRepositoryWrapper repo) : ControllerBase
             : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to create Branch", ""));
     }
 
+    [HttpPut]
+    [ValidateModel]
+    [EndpointSummary("Update")]
+    [EndpointDescription("Updates an existing Branch.")]
+    public async Task<IActionResult> Update(Branch model)
+    {
+        var branch = await repo.Branches.GetFirstAsync(x => x.BranchId == model.BranchId);
+        if (branch == null)
+            return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Branch not found.", ""));
+
+        // Update fields
+        branch.BranchName = model.BranchName;
+        branch.ContactPerson = model.ContactPerson;
+        branch.PrimaryPhone = model.PrimaryPhone;
+        branch.OtherPhone = model.OtherPhone;
+        branch.Email = model.Email;
+        branch.AddressDetail = model.AddressDetail;
+        branch.TownshipId = model.TownshipId;
+        branch.StateId = model.StateId;
+        branch.Status = model.Status;
+        branch.IsDefault = model.IsDefault;
+        branch.Remark = model.Remark;
+
+        // Audit trails
+        branch.UpdatedOn = DateTime.Now;
+        branch.UpdatedBy = User.Identity?.Name ?? string.Empty;
+
+        repo.Branches.Update(branch);
+
+        return await repo.SaveAsync()
+            ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully updated Branch.", ""))
+            : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to update Branch", ""));
+    }
+
     #endregion
 }
