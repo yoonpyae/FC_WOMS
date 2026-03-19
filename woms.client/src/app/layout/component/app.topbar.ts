@@ -40,106 +40,73 @@ export interface layoutConfig {
   ],
   providers: [AuthService, ConfirmationService],
   template: `
-    <div class="layout-topbar">
+    <div class="layout-topbar bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border-b border-surface-200 dark:border-surface-700 shadow-sm transition-colors duration-200 h-[4rem] px-4 flex items-center justify-between sticky top-0 z-50 w-full relative">
       <app-lazy-progress-bar></app-lazy-progress-bar>
-      <div class="layout-topbar-logo-container flex justify-center">
-        <a class="layout-topbar-logo flex justify-between items-center gap-4" routerLink="/dashboard">
-          <img src="images/Family_Clinics_Logo_only.png" class="h-14 object-contain">
-          <h4 class="text-lg font-bold"></h4>
-        </a>
-            <h5>FAMILY CLINIC</h5>
-      </div>
-      <div class="flex justify-between items-center">
-        <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
-          <i class="pi pi-bars"></i>
+      
+      <div class="flex items-center flex-1 gap-4">
+        <button class="layout-menu-button p-link w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors shrink-0" (click)="layoutService.onMenuToggle()">
+          <i class="pi pi-bars text-xl text-surface-700 dark:text-surface-100"></i>
         </button>
-        <app-bread-crumb></app-bread-crumb>
-      </div>
-      <div class="layout-topbar-actions">
         
-        <div class="layout-config-menu">
-          <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
-            <i [ngClass]="{ 'pi ': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
-          </button>
-          <!-- <div class="">
-					<button
-						class="layout-topbar-action layout-topbar-action-highlight"
-						pStyleClass="@next"
-						enterFromClass="hidden"
-						enterActiveClass="animate-scalein"
-						leaveToClass="hidden"
-						leaveActiveClass="animate-fadeout"
-						[hideOnOutsideClick]="true">
-						<i class="pi pi-palette"></i>
-					</button>
-				</div> -->
-          <app-configurator/>
-        </div>
+        <a class="flex items-center gap-3 shrink-0" routerLink="/dashboard">
+          <img src="images/Family_Clinics_Logo_only.png" class="h-8 md:h-10 object-contain drop-shadow-sm">
+          <span class="text-lg md:text-xl font-bold tracking-tight text-surface-900 dark:text-surface-0 hidden sm:block">FAMILY CLINIC</span>
+        </a>
 
-        <button class="layout-topbar-menu-button layout-topbar-action" pStyleClass="@next" enterFromClass="hidden"
-                enterActiveClass="animate-scalein" leaveToClass="hidden" leaveActiveClass="animate-fadeout"
-                [hideOnOutsideClick]="true">
-          <i class="pi pi-ellipsis-v"></i>
+        <div class="hidden lg:flex items-center ml-4">
+          <app-bread-crumb></app-bread-crumb>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1 md:gap-2 shrink-0">
+        
+        <button type="button" class="p-link w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors" (click)="toggleDarkMode()">
+          <i [ngClass]="{ 'pi text-xl text-surface-700 dark:text-surface-100': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
+        </button>
+        
+        <app-configurator></app-configurator>
+
+        <button class="p-link w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors" (click)="menu.toggle($event)">
+          <i class="pi pi-user text-xl text-surface-700 dark:text-surface-100"></i>
         </button>
 
-        <div class="layout-topbar-menu hidden lg:block">
-          <div class="layout-topbar-menu-content">
-            <button type="button" class="layout-topbar-action">
-              <i class="pi pi-search"></i>
-              <span>Search</span>
-            </button>
-            <button type="button" class="layout-topbar-action" (click)="menu.toggle($event)">
-              <i class="pi pi-user"></i>
-              <span>Profile</span>
-            </button>
-            <p-menu #menu [model]="items" [popup]="true">
-              <ng-template pTemplate="start">
-                <button pRipple
-                        class="relative overflow-hidden w-full min-w-56 flex align-items-center text-color text-start hover:surface-200 border-noround">
-                  <div
-                      class="bg-slate-100 m-2 px-4 py-2 w-full flex flex-col rounded shadow-inner border border-slate-200">
-                    <div class="flex justify-between items-center">
-                      <span class="font-bold text-sm text-gray-500">Name</span>
-                      <span class="font-bold text-base">{{ fullName }}</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                      <span class="font-bold text-sm text-gray-500">Role</span>
-                      <span class="font-bold text-base">{{ roleName }}</span>
-                    </div>
-                  </div>
-                </button>
-              </ng-template>
-              <ng-template pTemplate="item" let-item>
-                <a pRipple class="flex items-center px-4 py-2" [routerLink]="item.routerLink"
-                   (click)="menuClick(item.label)">
-                  <span [class]="item.icon"></span>
-                  <span class="ml-2">{{ item.label }}</span>
-                  <p-badge *ngIf="item.badge" class="ml-auto" [value]="item.badge"/>
-                  <span *ngIf="item.shortcut"
-                        class="ml-auto border-1 surface-border border-round surface-100 text-xs p-1">{{ item.shortcut }}</span>
-                </a>
-              </ng-template>
-            </p-menu>
-          </div>
-        </div>
-
-        <p-confirmdialog #cd key="logoutDialog">
-          <ng-template #headless let-message let-onAccept="onAccept" let-onReject="onReject">
-            <div class="flex flex-col items-center p-8 bg-surface-0 dark:bg-surface-900 rounded">
-              <div
-                  class="rounded-full bg-amber-500 text-primary-contrast inline-flex justify-center items-center h-24 w-24 -mt-20">
-                <i class="pi pi-question !text-5xl"></i>
+        <p-menu #menu [model]="items" [popup]="true" styleClass="w-64 mt-2 rounded-xl border border-surface-200 dark:border-surface-700 shadow-lg">
+          <ng-template pTemplate="start">
+            <div class="p-4 border-b border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800/50 rounded-t-xl flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
+                {{ fullName.charAt(0) | uppercase }}
               </div>
-              <span class="font-bold text-2xl block mb-2 mt-6">{{ message.header }}</span>
-              <p class="mb-0">{{ message.message }}</p>
-              <div class="flex items-center gap-2 mt-6">
-                <p-button label="Logout" severity="danger" (onClick)="onAccept()" styleClass="w-32"></p-button>
-                <p-button label="Cancel" [outlined]="true" (onClick)="onReject()" styleClass="w-32"></p-button>
+              <div class="flex flex-col">
+                <span class="font-bold text-surface-900 dark:text-surface-0">{{ fullName }}</span>
+                <span class="text-xs text-surface-500 dark:text-surface-400 capitalize">{{ roleName }}</span>
               </div>
             </div>
           </ng-template>
-        </p-confirmdialog>
+          <ng-template pTemplate="item" let-item>
+            <a pRipple class="flex items-center px-4 py-3 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors cursor-pointer text-surface-700 dark:text-surface-100" [routerLink]="item.routerLink" (click)="menuClick(item.label)">
+              <span [class]="item.icon" class="text-lg"></span>
+              <span class="ml-3 font-medium">{{ item.label }}</span>
+            </a>
+          </ng-template>
+        </p-menu>
       </div>
+
+      <p-confirmdialog #cd key="logoutDialog">
+        <ng-template #headless let-message let-onAccept="onAccept" let-onReject="onReject">
+          <div class="flex flex-col items-center p-8 bg-surface-0 dark:bg-surface-900 rounded-2xl shadow-xl">
+            <div class="rounded-full bg-red-500/10 text-red-500 inline-flex justify-center items-center h-20 w-20 mb-4">
+              <i class="pi pi-power-off text-4xl"></i>
+            </div>
+            <span class="font-bold text-2xl block mb-2 text-surface-900 dark:text-surface-0">{{ message.header }}</span>
+            <p class="mb-6 text-surface-500 dark:text-surface-400 text-center">{{ message.message }}</p>
+            
+            <div class="flex items-center justify-center gap-4 w-full mt-2">
+              <p-button label="Cancel" [outlined]="true" severity="secondary" (onClick)="onReject()" styleClass="w-32 rounded-lg"></p-button>
+              <p-button label="Logout" severity="danger" (onClick)="onAccept()" styleClass="w-32 rounded-lg"></p-button>
+            </div>
+          </div>
+        </ng-template>
+      </p-confirmdialog>
     </div>`
 })
 export class AppTopbar {
@@ -155,10 +122,8 @@ export class AppTopbar {
   items!: MenuItem[];
 
   //#region User Info
-
   fullName!: string;
   roleName!: string;
-
   //#endregion
 
   constructor(
@@ -171,25 +136,20 @@ export class AppTopbar {
   ) { }
 
   ngOnInit(): void {
-    this.loadThemeFromCookie(); // Load theme on component initialization
+    this.loadThemeFromCookie(); 
 
     this.fullName = this.sharedService.getUserName() ?? "";
     this.roleName = this.sharedService.getUserRole() ?? "";
 
     this.items = [
       {
-        label: 'Options',
-        items: [
-          {
-            label: 'Setting',
-            icon: 'pi pi-cog',
-            routerLink: ['./setting']
-          },
-          {
-            label: 'Logout',
-            icon: 'pi pi-power-off',
-          }
-        ]
+        label: 'Setting',
+        icon: 'pi pi-cog',
+        routerLink: ['/setting'] 
+      },
+      {
+        label: 'Logout',
+        icon: 'pi pi-power-off',
       }
     ];
   }
@@ -199,7 +159,7 @@ export class AppTopbar {
   }
 
   toggleDarkMode() {
-    this.saveThemeToCookie(); // Save the theme preference
+    this.saveThemeToCookie(); 
     this.applyTheme();
   }
 
@@ -208,17 +168,13 @@ export class AppTopbar {
   }
 
   private loadThemeFromCookie() {
-
     const cookieValue = this.getCookieValue('darkTheme');
     if (cookieValue) {
-      this._config.darkTheme = cookieValue === 'true' ? true : false; // Parse the boolean from the string
+      this._config.darkTheme = cookieValue === 'true' ? true : false; 
       this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: cookieValue === 'true' ? true : false }));
-      //
     } else {
-      // Check for system preference if no cookie is set
       this.checkSystemPreference();
     }
-
   }
 
   private checkSystemPreference() {
@@ -239,7 +195,7 @@ export class AppTopbar {
     return null;
   }
 
-  private getCookieExpiryDate(days: number = 365): string { // Set cookie to expire in 365 days
+  private getCookieExpiryDate(days: number = 365): string { 
     const date = new Date();
     date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
     return date.toUTCString();
@@ -253,23 +209,14 @@ export class AppTopbar {
 
   private onLogout(): void {
     this.confirmationService.confirm({
-      message: 'Do you want to logout?',
-      header: 'Confirmation',
+      message: 'Are you sure you want to log out of your session?',
+      header: 'Confirm Logout',
       icon: 'pi pi-info-circle',
       accept: () => {
         this.authService.logoutForce();
         this.router.navigate(['./auth/login']);
       },
-      reject: (type: ConfirmEventType) => {
-        switch (type) {
-          case ConfirmEventType.REJECT:
-            // NO CODE
-            break;
-          case ConfirmEventType.CANCEL:
-            // NO CODE
-            break;
-        }
-      },
+      reject: (type: ConfirmEventType) => {},
       key: 'logoutDialog'
     });
   }
