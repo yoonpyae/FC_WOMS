@@ -1,0 +1,165 @@
+<div class="transition-colors duration-200">
+
+    <div class="mb-8 flex justify-between items-end">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Front Desk Overview</h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">Welcome back, {{ userName }}. Manage today's patients and
+                billing.</p>
+        </div>
+        <div>
+            <p-button icon="pi pi-refresh" [rounded]="true" severity="secondary" [outlined]="true"
+                (onClick)="loadDashboardData()" [loading]="loading"></p-button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+
+        <div
+            class="card bg-white dark:bg-gray-800 p-5 rounded-xl border border-blue-100 dark:border-blue-900/50 shadow-sm mb-0 hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium">
+                    <i class="pi pi-calendar"></i><span>Today's Bookings</span>
+                </div>
+            </div>
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ todayAppointments }}</h2>
+                <a [routerLink]="['/appointment']"
+                    class="text-sm text-blue-600 dark:text-blue-400 font-semibold hover:underline mt-4 inline-block">Manage
+                    Schedule <i class="pi pi-arrow-right text-xs"></i></a>
+            </div>
+        </div>
+
+        <div
+            class="card bg-white dark:bg-gray-800 p-5 rounded-xl border border-purple-100 dark:border-purple-900/50 shadow-sm mb-0 hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-medium">
+                    <i class="pi pi-user-plus"></i><span>New Patients Today</span>
+                </div>
+            </div>
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ newPatients }}</h2>
+                <a [routerLink]="['/patient']"
+                    class="text-sm text-purple-600 dark:text-purple-400 font-semibold hover:underline mt-4 inline-block">Patient
+                    Records <i class="pi pi-arrow-right text-xs"></i></a>
+            </div>
+        </div>
+
+        <div
+            class="card bg-white dark:bg-gray-800 p-5 rounded-xl border border-emerald-100 dark:border-emerald-900/50 shadow-sm mb-0 hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-medium">
+                    <i class="pi pi-wallet"></i><span>OPD Collected</span>
+                </div>
+            </div>
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ collectedAmount | currency:'MMK
+                    ':'symbol':'1.0-0' }}</h2>
+                <a [routerLink]="['/opd-voucher/histories']"
+                    class="text-sm text-emerald-600 dark:text-emerald-400 font-semibold hover:underline mt-4 inline-block">View
+                    Billing <i class="pi pi-arrow-right text-xs"></i></a>
+            </div>
+        </div>
+
+        <div
+            class="card bg-white dark:bg-gray-800 p-5 rounded-xl border border-rose-100 dark:border-rose-900/50 shadow-sm mb-0 hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-2 text-rose-500 dark:text-rose-400 font-medium">
+                    <i class="pi pi-exclamation-circle"></i><span>Pending OPD Bills</span>
+                </div>
+            </div>
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ pendingAmount | currency:'MMK
+                    ':'symbol':'1.0-0' }}</h2>
+                <a [routerLink]="['/opd-voucher/histories']"
+                    class="text-sm text-rose-500 dark:text-rose-400 font-semibold hover:underline mt-4 inline-block">Collect
+                    Payments <i class="pi pi-arrow-right text-xs"></i></a>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <div
+            class="lg:col-span-2 card bg-white dark:bg-gray-800 p-0 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-0">
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Next Up: Patient Queue</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Patients scheduled for the next few hours.</p>
+            </div>
+
+            <p-table [value]="upcomingAppointments" [loading]="loading" styleClass="p-datatable-striped p-datatable-sm">
+                <ng-template #header>
+                    <tr>
+                        <th>Time</th>
+                        <th>Patient Name</th>
+                        <th>Assigned Doctor</th>
+                        <th>Status</th>
+                    </tr>
+                </ng-template>
+                <ng-template #body let-appt>
+                    <tr>
+                        <td class="font-semibold text-gray-900 dark:text-white">{{ formatTime(appt.startTime) }}</td>
+                        <td class="font-bold">{{ appt.patientName }}</td>
+                        <td>Dr. {{ appt.doctorName }}</td>
+                        <td>
+                            <p-tag [value]="appt.appointmentStatus"
+                                [severity]="appt.appointmentStatus === 'Completed' ? 'success' : 'info'"></p-tag>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template #emptymessage>
+                    <tr>
+                        <td colspan="4" class="text-center py-8 text-gray-500 dark:text-gray-400">
+                            <i class="pi pi-calendar-times text-3xl mb-3 block text-gray-300 dark:text-gray-600"></i>
+                            No more upcoming appointments for today.
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+        <div
+            class="lg:col-span-1 card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-0">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6">Quick Actions</h3>
+
+            <div class="flex flex-col gap-3">
+                <button [routerLink]="['/patient']"
+                    class="p-4 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left flex items-center gap-4 group">
+                    <div
+                        class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="pi pi-user-plus text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900 dark:text-white">Register Walk-in</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Add a new patient to the system</p>
+                    </div>
+                </button>
+
+                <button [routerLink]="['/appointment']"
+                    class="p-4 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left flex items-center gap-4 group">
+                    <div
+                        class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="pi pi-calendar-plus text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900 dark:text-white">Book Appointment</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Schedule a future doctor visit</p>
+                    </div>
+                </button>
+
+                <button [routerLink]="['/opd-voucher/create-voucher']"
+                    class="p-4 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left flex items-center gap-4 group">
+                    <div
+                        class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="pi pi-receipt text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900 dark:text-white">Create OPD Bill</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Generate a voucher for consultation
+                        </p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
