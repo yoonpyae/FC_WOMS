@@ -52,7 +52,6 @@ export class DashboardComponent implements OnInit {
   loadDashboardData(): void {
     this.loading = true;
 
-    // 1. Load KPIs
     this.dashboardService.getKpis(this.branchId).subscribe({
       next: (res: any) => {
         if (res.data) {
@@ -65,7 +64,6 @@ export class DashboardComponent implements OnInit {
       error: (err) => this.loggerService.error('Failed to load KPIs')
     });
 
-    // 2. Load Revenue Chart Data
     this.dashboardService.getRevenueChart(this.branchId).subscribe({
       next: (res: any) => {
         const dataList = res.data || [];
