@@ -1,37 +1,67 @@
-<div class="flex items-center justify-center min-h-screen ">
-  <div class="flex flex-col items-center justify-center w-full max-w-md">
-    <div class="w-full py-10 px-8 sm:px-10 rounded-2xl borde shadow-xl">
-      <div class="text-center mb-8">
-        <div class="text-2xl font-semibold mb-2 tracking-tight">Welcome, Family Clinics!</div>
-        <span class="text-gray-500 font-normal text-base">Sign in to continue</span>
-      </div>
-      <div>
-        <label for="username1" class="block text-base font-medium mb-1">Username</label>
-        <input id="username1" pInputText type="text" [(ngModel)]="username" placeholder="Enter username"
-          class="w-full mb-6 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B6C7] transition">
+<div
+  class="flex items-center justify-center min-h-screen bg-surface-50 dark:bg-surface-950 transition-colors duration-200">
+  <div class="flex flex-col items-center justify-center w-full max-w-md p-4">
 
-        <label for="password1" class="block font-medium text-base mb-1">Password</label>
-        <p-password id="password1" [(ngModel)]="password" placeholder="Enter password" [style]="{width:'100%'}"
-          [toggleMask]="true" styleClass="mb-6"
-          inputStyleClass="w-full p-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B6C7] transition"></p-password>
-        <div class="flex items-center justify-between mb-6">
-          <div class="flex items-center">
-            <p-checkbox id="rememberme1" [binary]="true" styleClass="mr-2" [(ngModel)]="isRemberMeChecked"></p-checkbox>
-            <label for="rememberme1" class="text-sm text-[#00B6C7] font-medium cursor-pointer">Remember me</label>
+    <div
+      class="w-full py-10 px-8 sm:px-10 rounded-2xl bg-surface-0 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 shadow-xl animate-fadein transition-colors duration-200">
+
+      <div class="text-center mb-8">
+        <img src="images/Family_Clinics_Logo_only.png" alt="Family Clinic Logo"
+          class="h-16 mx-auto mb-4 drop-shadow-sm">
+        <div class="text-2xl font-bold text-surface-900 dark:text-surface-0 mb-1 tracking-tight">Welcome Back</div>
+        <span class="text-surface-500 dark:text-surface-400 font-normal text-sm">Sign in to continue to Family
+          Clinic</span>
+      </div>
+
+      <div class="flex flex-col gap-5">
+
+        <div class="flex flex-col gap-2">
+          <label for="username1" class="text-sm font-semibold text-surface-900 dark:text-surface-0">Username</label>
+          <input id="username1" pInputText type="text" [(ngModel)]="username" placeholder="Enter username"
+            class="w-full p-3 rounded-lg border border-surface-300 dark:border-surface-600 bg-surface-0 dark:bg-surface-950 text-surface-900 dark:text-surface-0 focus:ring-primary transition-colors">
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label for="password1" class="text-sm font-semibold text-surface-900 dark:text-surface-0">Password</label>
+          <p-password id="password1" [(ngModel)]="password" placeholder="Enter password" [style]="{width:'100%'}"
+            [toggleMask]="true" styleClass="w-full"
+            inputStyleClass="w-full p-3 rounded-lg border border-surface-300 dark:border-surface-600 bg-surface-0 dark:bg-surface-950 text-surface-900 dark:text-surface-0 focus:ring-primary transition-colors"></p-password>
+        </div>
+
+        <div class="flex items-center justify-between mt-1 mb-2">
+          <div class="flex items-center gap-2">
+            <p-checkbox id="rememberme1" [binary]="true" [(ngModel)]="isRemberMeChecked"></p-checkbox>
+            <label for="rememberme1"
+              class="text-sm font-medium text-surface-700 dark:text-surface-300 cursor-pointer">Remember me</label>
           </div>
-          <a class="text-sm font-medium text-[#00B6C7] hover:underline cursor-pointer transition">Forgot password?</a>
+          <a (click)="openForgotPassword()"
+            class="text-sm font-semibold text-primary hover:underline cursor-pointer transition-colors">Forgot
+            password?</a>
         </div>
-        <div *ngIf="!isLoading">
-          <p-button pRipple (click)="login()" label="Sign In"
-            styleClass="w-full p-3 bg-[#00B6C7] border-0 text-white rounded-lg font-semibold text-base hover:bg-[#0096a7] transition"></p-button>
-        </div>
-        <div *ngIf="isLoading">
-          <p-button pRipple [disabled]="true"
-            styleClass="w-full p-3 bg-[#00B6C7] border-0 text-white rounded-lg font-semibold text-base">
-            <i class="pi pi-spin pi-spinner mr-2" style="font-size: 1.2rem"></i> Please wait
+
+        <div class="mt-2">
+          <p-button pRipple *ngIf="!isLoading" (onClick)="login()" label="Sign In"
+            styleClass="w-full p-3 rounded-lg font-bold text-base transition-colors"></p-button>
+
+          <p-button pRipple *ngIf="isLoading" [disabled]="true"
+            styleClass="w-full p-3 rounded-lg font-bold text-base transition-colors">
+            <i class="pi pi-spin pi-spinner mr-2" style="font-size: 1.2rem"></i> Please wait...
           </p-button>
         </div>
+
       </div>
     </div>
   </div>
 </div>
+
+<p-dialog header="Password Reset" [(visible)]="showForgotPasswordDialog" [modal]="true" [style]="{ width: '25rem' }"
+  [draggable]="false" [resizable]="false">
+  <div class="flex flex-col items-center text-center p-4">
+    <i class="pi pi-shield text-4xl text-primary mb-4"></i>
+    <p class="text-surface-600 dark:text-surface-300 mb-6">
+      For security purposes, self-service password resets are disabled. Please contact your Clinic Administrator or IT
+      Support to securely issue a new temporary password.
+    </p>
+    <p-button label="I Understand" (onClick)="showForgotPasswordDialog = false" styleClass="w-full"></p-button>
+  </div>
+</p-dialog>
