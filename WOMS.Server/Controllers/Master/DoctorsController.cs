@@ -10,18 +10,16 @@ public class DoctorsController(
 {
     #region CRUD Operation
 
-    // GET
     [HttpGet]
     [EndpointSummary("List")]
     [EndpointDescription("List all Doctor without deleted data")]
     public async Task<IActionResult> Get(long branchId)
     {
-        var doctors = await repo.Doctors.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId);
-
-        // Projecting to a new list to avoid circular references
-        var result = doctors.Select(x => new {
+        IReadOnlyList<Doctor>? doctors = await repo.Doctors.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId);
+        var result = doctors.Select(x => new
+        {
             x.DoctorId,
-            x.Id, // The string GUID linked to AspNetUsers
+            x.Id,
             x.BranchId,
             x.Name,
             x.Degree,
@@ -34,7 +32,6 @@ public class DoctorsController(
             x.CreatedOn,
             x.CreatedBy
         });
-
         return ResponseHelper.OK_Result(result, null);
     }
 
@@ -43,18 +40,8 @@ public class DoctorsController(
     [EndpointDescription("List all Doctors with Status true and not deleted")]
     public async Task<IActionResult> GetActive(long branchId)
     {
-        var doctors = await repo.Doctors.GetAsync(
-            x => !x.DeletedOn.HasValue && x.BranchId == branchId && x.Status == true
-        );
-
-        var result = doctors.Select(x => new {
-            x.DoctorId,
-            x.Id, //
-            x.Name,
-            x.Specialized,
-            x.Status
-        });
-
+        IReadOnlyList<Doctor>? doctors = await repo.Doctors.GetAsync(x => !x.DeletedOn.HasValue && x.BranchId == branchId && x.Status == true);
+        var result = doctors.Select(x => new { x.DoctorId, x.Id, x.Name, x.Specialized, x.Status });
         return ResponseHelper.OK_Result(result, null);
     }
 
@@ -63,9 +50,12 @@ public class DoctorsController(
     [EndpointDescription("Get Doctor by Id")]
     public async Task<IActionResult> Get(long branchId, long id)
     {
-        var doctor = await repo.Doctors.GetFirstAsync(x => x.DoctorId == id && x.BranchId == branchId);
+        Doctor? doctor = await repo.Doctors.GetFirstAsync(x => x.DoctorId == id && x.BranchId == branchId);
+        if (doctor == null)
+        {
+            return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Doctor not found.", ""));
+        }
 
-        // Returning only specific fields to avoid the infinite Roles loop
         var result = new
         {
             doctor.DoctorId,
@@ -79,7 +69,6 @@ public class DoctorsController(
             doctor.UltrasoundFee,
             doctor.Status
         };
-
         return ResponseHelper.OK_Result(result, null);
     }
 
@@ -89,49 +78,69 @@ public class DoctorsController(
     [EndpointDescription("Create a new Doctors")]
     public async Task<IActionResult> Create(Doctor model)
     {
-        Doctor? lastRecord = await repo.Doctors.GetFirstAsync(x => x.BranchId == model.BranchId, q => q.OrderByDescending(x => x.DoctorId)); 
-        model.DoctorId = (lastRecord?.DoctorId ?? 0) + 1; 
+        //  Prevent Duplicate Doctors in the same branch
+        Doctor? existingDoctor = await repo.Doctors.GetFirstAsync(x =>
+            x.Name.ToLower() == model.Name.ToLower() &&
+            x.BranchId == model.BranchId &&
+            !x.DeletedOn.HasValue);
+
+        if (existingDoctor != null)
+        {
+            return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("A doctor with this name already exists in this branch.", ""));
+        }
+
+        Doctor? lastRecord = await repo.Doctors.GetFirstAsync(x => x.BranchId == model.BranchId, q => q.OrderByDescending(x => x.DoctorId));
+        model.DoctorId = (lastRecord?.DoctorId ?? 0) + 1;
+
         string userName = model.Name.Replace(" ", "").ToLower() + model.DoctorId;
-        string email = $"{userName}@gmail.com"; 
+        string email = $"{userName}@gmail.com";
+
+        //  Prevent Identity Collision
+        AspNetUser? userExists = await repo.AspNetUsers.GetFirstAsync(x => x.UserName == userName);
+        if (userExists != null)
+        {
+            return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Username collision detected. Please modify the doctor's name slightly.", ""));
+        }
+
         string identityUserId = Guid.NewGuid().ToString();
-        var newUser = new AspNetUser
+        AspNetUser newUser = new()
         {
             Id = identityUserId,
             UserName = userName,
             NormalizedUserName = userName.ToUpper(),
-            Email = $"{userName}@gmail.com",
-            NormalizedEmail = $"{userName}@gmail.com".ToUpper(),
+            Email = email,
+            NormalizedEmail = email.ToUpper(),
             EmailConfirmed = true,
             SecurityStamp = Guid.NewGuid().ToString(),
-            ConcurrencyStamp = Guid.NewGuid().ToString(),
-            // DO NOT add to newUser.Roles here to avoid the loop
+            ConcurrencyStamp = Guid.NewGuid().ToString()
         };
 
-        var hasher = new PasswordHasher<AspNetUser>();
+        PasswordHasher<AspNetUser> hasher = new();
         newUser.PasswordHash = hasher.HashPassword(newUser, "FCdoctor@123");
 
-        // 3. Setup Doctor link
-        model.Id = identityUserId; // Assigning string to string
+        model.Id = identityUserId;
         model.CreatedOn = DateTime.Now;
         model.CreatedBy = User.Identity?.Name ?? string.Empty;
 
-        // 4. Create the Role Link using your new entity
-        var role = await repo.AspNetRoles.GetFirstAsync(x => x.Name == "Doctor");
-        var userRole = new AspNetUserRole
+        AspNetRole? role = await repo.AspNetRoles.GetFirstAsync(x => x.Name == "Doctor");
+        if (role == null)
+        {
+            return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("System role 'Doctor' is missing. Please contact admin.", ""));
+        }
+
+        AspNetUserRole userRole = new()
         {
             UserId = identityUserId,
             RoleId = role.Id
         };
 
-        // 5. Save everything
         repo.AspNetUsers.Create(newUser);
         repo.Doctors.Create(model);
-        repo.AspNetUserRoles.Create(userRole); // Explicitly create the link
+        repo.AspNetUserRoles.Create(userRole);
 
         return await repo.SaveAsync()
-            ? ResponseHelper.Created_Result("/api/doctor", null,
-                new DefaultResponseMessageModel($"Successfully created Doctor #{model.DoctorId}.", ""))
-            : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Database error.", ""));
+            ? ResponseHelper.Created_Result("/api/doctor", null, new DefaultResponseMessageModel($"Successfully created Doctor #{model.DoctorId}.", ""))
+            : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Database error while creating doctor.", ""));
     }
 
     [HttpPut]
@@ -140,18 +149,24 @@ public class DoctorsController(
     [EndpointDescription("Update a Doctors")]
     public async Task<IActionResult> Update(Doctor model)
     {
-        Doctor? doctor =
-            await repo.Doctors.GetFirstAsync(x => x.DoctorId == model.DoctorId);
-
+        Doctor? doctor = await repo.Doctors.GetFirstAsync(x => x.DoctorId == model.DoctorId);
         if (doctor == null)
         {
-            return ResponseHelper.NotFound_Request(
-                null,
-                new DefaultResponseMessageModel("Doctor not found", ""));
+            return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Doctor not found", ""));
         }
 
-        //Re-assign Values
-        doctor.DoctorId = model.DoctorId;
+        //  Prevent renaming to an existing doctor's name
+        Doctor? existingDoctor = await repo.Doctors.GetFirstAsync(x =>
+            x.Name.ToLower() == model.Name.ToLower() &&
+            x.BranchId == model.BranchId &&
+            x.DoctorId != model.DoctorId &&
+            !x.DeletedOn.HasValue);
+
+        if (existingDoctor != null)
+        {
+            return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Another doctor is already using this name.", ""));
+        }
+
         doctor.BranchId = model.BranchId;
         doctor.Name = model.Name;
         doctor.Degree = model.Degree;
@@ -168,10 +183,8 @@ public class DoctorsController(
 
         repo.Doctors.Update(doctor);
         return await repo.SaveAsync()
-            ? ResponseHelper.OK_Result(null,
-                new DefaultResponseMessageModel("Successfully updated Doctor.", ""))
-            : ResponseHelper.Bad_Request(null,
-                new DefaultResponseMessageModel("Unable to update Doctor.", ""));
+            ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully updated Doctor.", ""))
+            : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to update Doctor.", ""));
     }
 
     [HttpDelete("{id:long}")]
@@ -180,24 +193,30 @@ public class DoctorsController(
     public async Task<IActionResult> Delete(long? id)
     {
         Doctor? doctor = await repo.Doctors.GetFirstAsync(x => x.DoctorId == id);
-
         if (doctor == null)
         {
-            return ResponseHelper.NotFound_Request(null,
-                new DefaultResponseMessageModel("Doctor not Found.", ""));
+            return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Doctor not Found.", ""));
         }
 
         string userName = User.Identity?.Name ?? string.Empty;
-
         doctor.DeletedOn = DateTime.Now;
         doctor.DeletedBy = userName;
-
         repo.Doctors.Update(doctor);
+
+        // SECURITY FIX: Lockout the associated login account when a doctor is deleted!
+        if (!string.IsNullOrEmpty(doctor.Id))
+        {
+            AspNetUser? userAccount = await repo.AspNetUsers.GetFirstAsync(x => x.Id == doctor.Id);
+            if (userAccount != null)
+            {
+                userAccount.LockoutEnd = DateTimeOffset.MaxValue; // Permanently locks the account
+                repo.AspNetUsers.Update(userAccount);
+            }
+        }
+
         return await repo.SaveAsync()
-            ? ResponseHelper.OK_Result(null,
-                new DefaultResponseMessageModel("Successfully deleted Doctor.", ""))
-            : ResponseHelper.Bad_Request(null,
-                new DefaultResponseMessageModel("Unable to delete Doctor.", ""));
+            ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully deleted Doctor and revoked access.", ""))
+            : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to delete Doctor.", ""));
     }
 
     #endregion
