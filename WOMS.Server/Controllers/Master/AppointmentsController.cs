@@ -75,21 +75,38 @@ public class AppointmentsController(IRepositoryWrapper repo) : ControllerBase
     [EndpointDescription("Creates new Appointment.")]
     public async Task<IActionResult> Create(Appointment model)
     {
-        DoctorSchedule? schedule = await repo.DoctorSchedules.GetFirstAsync(x =>
-        x.ScheduleId == model.ScheduleId &&
-        x.BranchId == model.BranchId);
+        DoctorSchedule? selectedSchedule = await repo.DoctorSchedules.GetFirstAsync(x =>
+            x.ScheduleId == model.ScheduleId && x.BranchId == model.BranchId);
 
-        if (schedule != null && schedule.MaxPatient.HasValue)
+        if (selectedSchedule == null)
         {
-            IReadOnlyList<Appointment>? currentAppointments = await repo.Appointments.GetAsync(x =>
+            return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Invalid schedule selected.", ""));
+        }
+
+        ViAppointment? existingBooking = await repo.ViAppointments.GetFirstAsync(x =>
+            x.PatientId == model.PatientId &&
+            x.DoctorId == selectedSchedule.DoctorId &&
+            x.AppointmentDate == model.AppointmentDate &&
+            !x.DeletedOn.HasValue &&
+            x.AppointmentStatus != "Cancelled");
+
+        if (existingBooking != null)
+        {
+            return ResponseHelper.Bad_Request(null,
+                new DefaultResponseMessageModel("This patient already has an appointment with this doctor on this date.", ""));
+        }
+
+        if (selectedSchedule.MaxPatient.HasValue)
+        {
+            int count = await repo.Appointments.CountAsync(x =>
                 x.ScheduleId == model.ScheduleId &&
                 x.AppointmentDate == model.AppointmentDate &&
                 !x.DeletedOn.HasValue);
 
-            if (currentAppointments.Count >= schedule.MaxPatient.Value)
+            if (count >= selectedSchedule.MaxPatient.Value)
             {
                 return ResponseHelper.Bad_Request(null,
-                    new DefaultResponseMessageModel("This time slot is full. Please select another time or date.", ""));
+                    new DefaultResponseMessageModel("This time slot is full. Please select another.", ""));
             }
         }
 
@@ -100,10 +117,8 @@ public class AppointmentsController(IRepositoryWrapper repo) : ControllerBase
         repo.Appointments.Create(model);
 
         return await repo.SaveAsync()
-            ? ResponseHelper.Created_Result("api/master", null,
-                new DefaultResponseMessageModel("Successfully created new Appointment.", ""))
-            : ResponseHelper.Bad_Request(null,
-                new DefaultResponseMessageModel("Unable to create Appointment", ""));
+            ? ResponseHelper.Created_Result("api/master", null, new DefaultResponseMessageModel("Successfully created.", ""))
+            : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to create Appointment", ""));
     }
 
     [HttpDelete("{ano:long}/{branchId:long}")]
@@ -115,7 +130,9 @@ public class AppointmentsController(IRepositoryWrapper repo) : ControllerBase
             x.Ano == ano &&
             x.BranchId == branchId);
         if (appointment is null)
+        {
             return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Unable to find Appointment", ""));
+        }
 
         appointment.Status = "Cancelled";
         appointment.UpdatedOn = DateTime.Now;
