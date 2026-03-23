@@ -51,10 +51,13 @@
         <p-button icon="pi pi-arrow-left" [rounded]="true" [text]="true" severity="secondary"
             (onClick)="cancelForm()"></p-button>
         <div>
-            <h2 class="text-2xl font-bold m-0 text-gray-900 dark:text-white">{{ isEdit ? 'Edit Staff Account' : 'Create
-                Staff Account' }}</h2>
-            <p class="text-gray-500 dark:text-gray-400 m-0 text-sm">{{ isEdit ? 'Update employee contact details and
-                roles.' : 'Generate login credentials for a new employee.' }}</p>
+            <h2 class="text-2xl font-bold m-0 text-gray-900 dark:text-white">
+                {{ isEdit ? 'Edit Staff Account' : 'Create Staff Account' }}
+            </h2>
+            <p class="text-gray-500 dark:text-gray-400 m-0 text-sm">
+                {{ isEdit ? 'Update employee contact details and roles.' : 'Generate login credentials for a new
+                employee.' }}
+            </p>
         </div>
     </div>
 
@@ -65,7 +68,14 @@
             <div class="flex flex-col gap-2">
                 <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Username <span *ngIf="!isEdit"
                         class="text-red-500">*</span></label>
-                <input formControlName="userName" pInputText placeholder="e.g. john_reception" class="w-full" />
+                <input formControlName="userName" pInputText placeholder="e.g. john_reception" class="w-full"
+                    [ngClass]="{'ng-invalid ng-dirty': f['userName'].invalid && (f['userName'].dirty || f['userName'].touched)}" />
+                <small *ngIf="f['userName'].invalid && (f['userName'].dirty || f['userName'].touched)"
+                    class="text-red-500">
+                    <span *ngIf="f['userName'].errors?.['required']">Username is required.</span>
+                    <span *ngIf="f['userName'].errors?.['pattern']">Only letters, numbers, and underscores
+                        allowed.</span>
+                </small>
             </div>
 
             <div class="flex flex-col gap-2">
@@ -77,19 +87,34 @@
             <div class="flex flex-col gap-2 md:col-span-2">
                 <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Email Address <span
                         class="text-red-500">*</span></label>
-                <input formControlName="email" type="email" pInputText placeholder="staff@clinic.com" class="w-full" />
+                <input formControlName="email" type="email" pInputText placeholder="staff@clinic.com" class="w-full"
+                    [ngClass]="{'ng-invalid ng-dirty': f['email'].invalid && (f['email'].dirty || f['email'].touched)}" />
+                <small *ngIf="f['email'].invalid && (f['email'].dirty || f['email'].touched)" class="text-red-500">
+                    <span *ngIf="f['email'].errors?.['required']">Email is required.</span>
+                    <span *ngIf="f['email'].errors?.['email']">Please enter a valid email address.</span>
+                </small>
             </div>
 
             <div class="flex flex-col gap-2">
                 <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Phone Number</label>
-                <input formControlName="phoneNumber" pInputText placeholder="09-XXXXXXXXX" class="w-full" />
+                <input formControlName="phoneNumber" pInputText placeholder="09-XXXXXXXXX" class="w-full"
+                    [ngClass]="{'ng-invalid ng-dirty': f['phoneNumber'].invalid && (f['phoneNumber'].dirty || f['phoneNumber'].touched)}" />
+                <small *ngIf="f['phoneNumber'].invalid && (f['phoneNumber'].dirty || f['phoneNumber'].touched)"
+                    class="text-red-500">
+                    Invalid phone number format.
+                </small>
             </div>
 
             <div *ngIf="!isEdit" class="flex flex-col gap-2">
                 <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Temporary Password <span
                         class="text-red-500">*</span></label>
-                <p-password formControlName="password" [toggleMask]="true" styleClass="w-full"
-                    inputStyleClass="w-full"></p-password>
+                <p-password formControlName="password" [toggleMask]="true" styleClass="w-full" inputStyleClass="w-full"
+                    [ngClass]="{'ng-invalid ng-dirty': f['password'].invalid && (f['password'].dirty || f['password'].touched)}"></p-password>
+                <small *ngIf="f['password'].invalid && (f['password'].dirty || f['password'].touched)"
+                    class="text-red-500">
+                    <span *ngIf="f['password'].errors?.['required']">Password is required.</span>
+                    <span *ngIf="f['password'].errors?.['minlength']">Password must be at least 6 characters.</span>
+                </small>
             </div>
         </div>
 
