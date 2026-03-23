@@ -24,6 +24,7 @@ export class SettingComponent implements OnInit {
   branchs: BranchModel[] = [];
   selectedbranch!: BranchModel;
   disabledbranch: boolean = false;
+  isDoctor: boolean = false;
 
   constructor(
     private branchService: BranchService,
@@ -37,9 +38,16 @@ export class SettingComponent implements OnInit {
   }
 
   loadData() {
+    const userRole = (this.sharedService.getUserRole() ?? '').toLowerCase();
+
+    if (userRole === 'doctor') {
+      this.isDoctor = true;
+      return;
+    }
     this.branchService.get().subscribe({
       next: (res) => {
-        this.branchs = res.data as BranchModel[];
+        const allBranches = res.data as BranchModel[];
+        this.branchs = allBranches.filter(branch => branch.status === true);
         // let userRole = this.sharedService.getUserRole() ?? '';
         // if (userRole == 'branch') {
         //   this.disabledbranch = true;
@@ -55,21 +63,25 @@ export class SettingComponent implements OnInit {
     }
     else {
       this.sharedService.setDefaultBranchId(this.selectedbranch?.branchId.toString());
-      
+
       const userRole = (this.sharedService.getUserRole() ?? '').toLowerCase();
 
       if (userRole === 'doctor') {
         this.router.navigate(['/doctor-dashboard']);
-      } 
+      }
       else if (userRole === 'pharmacist') {
         this.router.navigate(['/pharmacist-dashboard']);
-      } 
+      }
       else if (userRole === 'receptionist') {
         this.router.navigate(['/reception-dashboard']);
-      } 
+      }
       else {
         this.router.navigate(['/dashboard']);
       }
     }
+  }
+  
+  goToDashboard(): void {
+    this.router.navigate(['/doctor-dashboard']);
   }
 }
