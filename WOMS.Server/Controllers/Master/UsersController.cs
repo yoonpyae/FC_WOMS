@@ -90,32 +90,32 @@ public class UsersController(
     [EndpointSummary("Update User")]
     public async Task<IActionResult> UpdateUser(string id, [FromBody] UserUpdateDto model)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest("Invalid data.");
-        }
+        if (!ModelState.IsValid) return BadRequest("Invalid data.");
 
         IdentityUser? user = await userManager.FindByIdAsync(id);
-        if (user == null)
-        {
-            return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("User not found.", ""));
-        }
+        if (user == null) return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("User not found.", ""));
 
-        //  Check if the new email belongs to someone else
         IdentityUser? existingEmailUser = await userManager.FindByEmailAsync(model.Email);
         if (existingEmailUser != null && existingEmailUser.Id != id)
-        {
             return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Email is already used by another account.", ""));
-        }
 
-        //  Role Check (Don't silently fail if role is invalid)
         if (!await roleManager.RoleExistsAsync(model.Role))
-        {
             return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Invalid Role selected.", ""));
-        }
 
-        //  Prevent self-demotion from SuperAdmin
-        if (user.UserName == User.Identity?.Name)
+        // BULLETPROOF SELF-DEMOTION CHECK
+        string? currentLoggedInUserId = userManager.GetUserId(User)
+                                     ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                                     ?? User.FindFirst("sub")?.Value;
+
+        string? currentLoggedInUserName = userManager.GetUserName(User)
+                                       ?? User.Identity?.Name
+                                       ?? User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value
+                                       ?? User.FindFirst("unique_name")?.Value;
+
+        bool isSelfUpdate = (!string.IsNullOrEmpty(currentLoggedInUserId) && string.Equals(user.Id, currentLoggedInUserId, StringComparison.OrdinalIgnoreCase)) ||
+                            (!string.IsNullOrEmpty(currentLoggedInUserName) && string.Equals(user.UserName, currentLoggedInUserName, StringComparison.OrdinalIgnoreCase));
+
+        if (isSelfUpdate)
         {
             IList<string> currentRolesForSelf = await userManager.GetRolesAsync(user);
             if (currentRolesForSelf.Contains("SuperAdmin") && model.Role != "SuperAdmin")
@@ -150,12 +150,30 @@ public class UsersController(
     {
         IdentityUser? user = await userManager.FindByIdAsync(id);
         if (user == null)
-        {
             return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("User not found.", ""));
-        }
 
-        // Prevent self-deletion
-        if (user.UserName == User.Identity?.Name)
+        // 1. Try default Identity methods first
+        string? currentLoggedInUserId = userManager.GetUserId(User);
+        string? currentLoggedInUserName = userManager.GetUserName(User);
+
+        // 2. Fallback to hunting through raw JWT Claims if standard mappings fail
+        currentLoggedInUserId ??= User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                               ?? User.FindFirst("sub")?.Value
+                               ?? User.FindFirst("id")?.Value;
+
+        currentLoggedInUserName ??= User.Identity?.Name
+                                 ?? User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value
+                                 ?? User.FindFirst("unique_name")?.Value
+                                 ?? User.FindFirst("preferred_username")?.Value;
+
+        // 3. Perform Case-Insensitive Checks against BOTH ID and Username
+        bool isSelfDeleteById = !string.IsNullOrEmpty(currentLoggedInUserId) &&
+                                string.Equals(user.Id, currentLoggedInUserId, StringComparison.OrdinalIgnoreCase);
+
+        bool isSelfDeleteByName = !string.IsNullOrEmpty(currentLoggedInUserName) &&
+                                  string.Equals(user.UserName, currentLoggedInUserName, StringComparison.OrdinalIgnoreCase);
+
+        if (isSelfDeleteById || isSelfDeleteByName)
         {
             return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("You cannot delete your own account.", ""));
         }
