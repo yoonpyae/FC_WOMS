@@ -1,11 +1,4 @@
 ﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-using WOMS.Server.Models;
 
 namespace WOMS.Server.Controllers.Auth
 {
@@ -103,19 +96,20 @@ namespace WOMS.Server.Controllers.Auth
                     }
 
                     // Save changes to the repository
-                    await _repo.SaveAsync();
+                    _ = await _repo.SaveAsync();
 
                     // Log the successful token generation
                     _logger.LogInformation("Access token generated! [UserId:{id}] [UserName:{username}]",
                         user.Id,
                         user.UserName);
 
-                    var doctor = await _repo.Doctors.GetFirstAsync(x => x.Id == user.Id);
+                    Doctor? doctor = await _repo.Doctors.GetFirstAsync(x => x.Id == user.Id);
 
                     // Return a successful response with the token details
                     return ResponseHelper.OK_Result(
                         new
                         {
+                            token = accessToken,
                             access_token = accessToken,
                             refresh_token = refreshToken,
                             expiration = 30,
@@ -127,7 +121,8 @@ namespace WOMS.Server.Controllers.Auth
                                 user.PhoneNumber,
                                 user_role = role.ToLower(),
                                 doctorId = doctor?.DoctorId ?? 0,
-                                doctorName= doctor?.Name
+                                doctorName = doctor?.Name,
+                                branchId = doctor?.BranchId ?? 0
                             }
                         },
                         new DefaultResponseMessageModel("Successfully generated access token.", "")
@@ -206,13 +201,14 @@ namespace WOMS.Server.Controllers.Auth
                 tokenClaim.TokenExpiry = refreshTokenExpiry;
 
                 _repo.TokenClaims.Update(tokenClaim);
-                await _repo.SaveAsync();
+                _ = await _repo.SaveAsync();
 
                 _logger.LogDebug("New Refresh Token generated! [RefreshToken:{Refresh_Token}]", newRefreshToken);
 
                 return ResponseHelper.OK_Result(
                     new
                     {
+                        token = accessToken,
                         access_token = newAccessToken,
                         refresh_token = newRefreshToken,
                         expiration = 30,
@@ -263,21 +259,21 @@ namespace WOMS.Server.Controllers.Auth
                     tokenClaim.TokenExpiry = null;
                     _repo.TokenClaims.Update(tokenClaim);
 
-                    await _repo.SaveAsync();
+                    _ = await _repo.SaveAsync();
                 }
 
                 _logger.LogDebug("Revoke Token successfully! [UserId:{UserId}]", user.Id);
                 return ResponseHelper.OK_Result(new
+                {
+                    user = new
                     {
-                        user = new
-                        {
-                            user.Id,
-                            user.UserName,
-                            user.Email,
-                            user.PhoneNumber,
-                            user_role = string.Empty
-                        }
-                    },
+                        user.Id,
+                        user.UserName,
+                        user.Email,
+                        user.PhoneNumber,
+                        user_role = string.Empty
+                    }
+                },
                     new DefaultResponseMessageModel("Token revoked successfully.", ""));
             }
             catch (Exception exp)
@@ -318,7 +314,7 @@ namespace WOMS.Server.Controllers.Auth
                 return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("User not found", ""));
             }
 
-            await _userManager.AddClaimAsync(user, new Claim("Master_Read", "Branch"));
+            _ = await _userManager.AddClaimAsync(user, new Claim("Master_Read", "Branch"));
             return ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully Created", ""));
         }
 
