@@ -104,7 +104,7 @@ export class LoginComponent implements OnInit {
     const token = res.data.access_token;
     const refreshToken = res.data.refresh_token;
 
-    // 1. Handle Token Storage based on Checkbox
+    // Handle Token Storage based on Checkbox
     if (this.isRemberMeChecked) {
       window.localStorage.setItem('access_token', token);
       window.localStorage.setItem('refresh_token', refreshToken);
@@ -125,10 +125,13 @@ export class LoginComponent implements OnInit {
     if (res.data.user.doctorId) {
       this.cookieService.set('doctorId', res.data.user.doctorId.toString(), expiryDays);
       this.cookieService.set('doctorName', res.data.user.doctorName, expiryDays);
+      if (res.data.user.branchId && res.data.user.branchId !== 0) {
+        this.sharedService.setDefaultBranchId(res.data.user.branchId.toString());
+      }
     }
   }
 
   openForgotPassword() {
-  this.showForgotPasswordDialog = true;
-}
+    this.showForgotPasswordDialog = true;
+  }
 }
