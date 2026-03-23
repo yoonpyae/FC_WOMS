@@ -54,6 +54,7 @@ public class StockItemsController(
             PurchasePrice = 0,
             SalePrice = 0,
             GroundBalance = 0,
+            BranchId=model.BranchId,
             CreatedBy = model.CreatedBy,
             CreatedOn = model.CreatedOn,
             Status = true,
