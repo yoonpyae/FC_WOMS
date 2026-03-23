@@ -122,21 +122,29 @@ export class DoctorComponent implements OnInit {
   });
 
 
+  get f() { return this.doctorForm.controls; }
+
   ngOnInit(): void {
     this.loadData();
   }
 
   loadData(): void {
     let branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
+    if (!branchId) {
+      this.messageService.add({ key: 'globalMessage', severity: 'error', summary: 'Error', detail: 'Invalid Branch Selected.' });
+      return;
+    }
+
     this.loading = true;
     this.doctorService.get(branchId).subscribe({
       next: (res) => {
         this.doctor = res.data as DoctorModel[];
-        this.loading = false;
-
-        this.loggerService.info(this.doctor)
       },
-      error: err => { },
+      error: err => {
+        this.loggerService.error(err);
+        this.messageService.add({ key: 'globalMessage', severity: 'error', summary: 'Error', detail: 'Failed to load doctors.' });
+        this.loading = false;
+      },
       complete: () => {
         this.loading = false;
       }
@@ -145,8 +153,12 @@ export class DoctorComponent implements OnInit {
 
   create(): void {
     let branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
-    this.doctorForm.reset();
-    this.doctorForm.patchValue({
+
+    this.isEdit = false;
+    this.modalVisible = true;
+
+    // Fully reset form state and validations
+    this.doctorForm.reset({
       doctorId: 0,
       id: '',
       branchId: branchId,
@@ -156,21 +168,19 @@ export class DoctorComponent implements OnInit {
       xrayFee: 0,
       ultrasoundFee: 0
     });
-
-    this.isEdit = false;
-    this.modalVisible = true;
-
+    this.doctorForm.markAsUntouched();
+    this.doctorForm.markAsPristine();
   }
 
   update(): void {
-    this.isEdit = true;
-    this.doctorForm.reset();
     if (this.selectedDoctor) {
-      this.doctorForm.patchValue(this.selectedDoctor); 
+      this.isEdit = true;
+      this.doctorForm.reset();
+      this.doctorForm.patchValue(this.selectedDoctor);
       this.modalVisible = true;
     } else {
       this.modalVisible = false;
-      this.messageService.add({ key: 'globalMessage', severity: 'warn', summary: 'Warning', detail: "Please choose Doctor." });
+      this.messageService.add({ key: 'globalMessage', severity: 'warn', summary: 'Warning', detail: "Please choose a Doctor from the table first." });
     }
   }
 
@@ -241,57 +251,46 @@ export class DoctorComponent implements OnInit {
   }
 
   submit(): void {
-    const model = this.doctorForm.value as DoctorModel;
-
-    this.loggerService.info(model);
-    if (this.doctorForm.valid) {
-      const branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
-      model.branchId = branchId;
-
-      this.isSubmitting = true;
-      this.loggerService.info(model);
-      if (!this.isEdit) {
-        this.doctorService.create(this.doctorForm.value).subscribe(
-          {
-            next: res => {
-              this.modalVisible = false;
-              this.loadData();
-              this.messageService.add({ key: 'globalMessage', severity: 'success', summary: 'Success', detail: res.message.en });
-            },
-            error: err => {
-              this.messageService.add({ key: 'globalMessage', severity: 'warn', summary: 'Warning', detail: err.message.en });
-              this.isSubmitting = false;
-            },
-            complete: () => {
-              this.isSubmitting = false;
-            }
-          }
-        );
-      } else {
-        this.doctorService.update(this.doctorForm.value).subscribe(
-          {
-            next: res => {
-              this.modalVisible = false;
-              this.loadData();
-              this.messageService.add({ key: 'globalMessage', severity: 'success', summary: 'Success', detail: res.message.en });
-            },
-            error: err => {
-              this.messageService.add({ key: 'globalMessage', severity: 'warn', summary: 'Warning', detail: err.message.en });
-              this.isSubmitting = false;
-            },
-            complete: () => {
-              this.isSubmitting = false;
-              this.selectedDoctor = null as any;
-            }
-          }
-        );
-      }
-    } else {
-      Object.keys(this.doctorForm.controls).forEach(field => {
-        const control = this.doctorForm.get(field);
-        control?.markAsDirty({ onlySelf: true });
-      });
+    if (this.doctorForm.invalid) {
+      this.doctorForm.markAllAsTouched(); // Trigger all UI red text
+      this.messageService.add({ key: 'globalMessage', severity: 'warn', summary: 'Validation Error', detail: 'Please fill all required fields correctly.' });
+      return;
     }
+
+    const model = this.doctorForm.value as DoctorModel;
+    const branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
+    model.branchId = branchId;
+
+    this.isSubmitting = true;
+
+    const request$ = this.isEdit
+      ? this.doctorService.update(model)
+      : this.doctorService.create(model);
+
+    request$.subscribe({
+      next: res => {
+        this.modalVisible = false;
+        this.loadData();
+        this.messageService.add({ key: 'globalMessage', severity: 'success', summary: 'Success', detail: res.message.en });
+      },
+      error: err => {
+        this.loggerService.error(err);
+
+        // Bulletproof error extraction
+        let errorMsg = 'Operation failed.';
+        if (err.error.message.en) errorMsg = err.error.message.en;
+        else if (err.message.en) errorMsg = err.message.en;
+        else if (typeof err.error.message === 'string') errorMsg = err.error.message;
+        else if (typeof err.error === 'string') errorMsg = err.error;
+
+        this.messageService.add({ key: 'globalMessage', severity: 'error', summary: 'Error', detail: errorMsg });
+        this.isSubmitting = false;
+      },
+      complete: () => {
+        this.isSubmitting = false;
+        this.selectedDoctor = null as any;
+      }
+    });
   }
 
   //#region Event Method
