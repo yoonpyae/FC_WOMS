@@ -67,7 +67,7 @@ export class EntryComponent implements OnInit {
 
   @Input() isEdit: boolean = false;
   @Output() onSubmitted = new EventEmitter<boolean>();
-  
+
   genders = [{ label: 'Male' }, { label: 'Female' }];
 
   private formBuilder = inject(FormBuilder);
@@ -80,9 +80,7 @@ export class EntryComponent implements OnInit {
     stateId: [0, Validators.required],
     townshipId: [0, Validators.required],
     addressDetail: [''],
-    phone: new FormControl('', {
-      validators: [Validators.required, Validators.pattern("^(0(1|9)[0-9]{7,9})$")]
-    }),
+    phone: ['', [Validators.required, Validators.pattern(/^[0-9+\-\s()]*$/)]],
     gender: ['', Validators.required],
     status: true,
   });
