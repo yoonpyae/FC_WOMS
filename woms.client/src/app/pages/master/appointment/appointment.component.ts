@@ -85,6 +85,7 @@ export class AppointmentComponent implements OnInit {
     doctorId: [0, Validators.required],
     branchId: [0, Validators.required],
     appointmentDate: [new Date()],
+    scheduleId: [null, Validators.required],
     patientId: [''],
     name: ['', Validators.required],
     phoneNo: new FormControl('', {
@@ -186,7 +187,7 @@ export class AppointmentComponent implements OnInit {
             key: 'globalMessage',
             severity: 'warn',
             summary: 'Booking Failed',
-            detail: err.error?.message?.en || "Could not complete booking."
+            detail: err.error.message.en || "Could not complete booking."
           });
           this.isSubmitting = false;
         },
@@ -319,7 +320,9 @@ preventNegativeInput($event: KeyboardEvent): void {
 // #region Helpers
 
 OnDoctorChange(event: any): void {
+  this.schedules = [];
   this.loggerService.info("Doctor changed");
+  this.selectedSchedule = null as any;
   if(this.selectedDoctor) {
   this.appointmentForm.get('doctorId')?.setValue(this.selectedDoctor.doctorId);
   this.GetDutytime(this.selectedAppointmentDate);
