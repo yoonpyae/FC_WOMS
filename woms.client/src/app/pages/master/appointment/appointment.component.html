@@ -195,7 +195,8 @@
                 styleClass="p-button-text">
             </p-button>
 
-            <p-button label="Confirm" icon="pi pi-check" type="submit" [loading]="isSubmitting" severity="success">
+            <p-button label="Confirm" icon="pi pi-check" type="submit" [loading]="isSubmitting"
+                [disabled]="appointmentForm.invalid || !selectedSchedule" severity="success">
             </p-button>
 
         </div>
