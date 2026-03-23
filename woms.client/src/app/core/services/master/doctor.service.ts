@@ -53,12 +53,19 @@ export class DoctorService {
     return this.httpClient.put<RootModel>(`${environment.main_url}/master/doctors`, model);
   }
 
-  updateSchedule(model: ScheduleModel) {
-    return this.httpClient.put<RootModel>(`${environment.main_url}/master/schedules`, model);
+  updateSchedule(schedule: ScheduleModel): Observable<RootModel> {
+    const branchId = schedule.branchId;
+    const scheduleId = schedule.scheduleId;
+
+    return this.httpClient.put<RootModel>(`${environment.main_url}/master/doctorschedules/${scheduleId}?branchId=${branchId}`, schedule);
   }
 
   delete(id: number) {
     return this.httpClient.delete<RootModel>(`${environment.main_url}/master/doctors/${id}`, {});
+  }
+
+  deleteSchedule(id: number, branchId: number) {
+    return this.httpClient.delete<RootModel>(`${environment.main_url}/master/doctorschedules/${id}?branchId=${branchId}`);
   }
 
   uploadPhoto(id: number, file: File): Observable<RootModel> {
