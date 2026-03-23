@@ -25,6 +25,7 @@ import { Location } from '@angular/common';
 import { ImageModule } from 'primeng/image';
 import { SharedService } from '@shared_services/shared.service';
 import { environment } from '@env/environment';
+import { SelectModule } from 'primeng/select';
 
 @Component({
   selector: 'app-detail',
@@ -49,7 +50,8 @@ import { environment } from '@env/environment';
     AvatarModule,
     FieldsetModule,
     FileUploadModule,
-    ImageModule
+    ImageModule,
+    SelectModule
   ],
   templateUrl: './detail.component.html',
   providers: [
@@ -115,11 +117,15 @@ export class DetailComponent implements OnInit {
     { label: 'Sunday', value: 'Sunday' }
   ];
 
+  startTimeUI: Date | null = null;
+  endTimeUI: Date | null = null;
+  isEditSchedule: boolean = false;
 
   attachModal: boolean = false;
   constructor(
     private doctorService: DoctorService,
     private messageService: MessageService,
+    private confirmationService: ConfirmationService,
     private sharedService: SharedService,
     private route: ActivatedRoute,
     private loggerService: LoggerService,
@@ -151,87 +157,19 @@ export class DetailComponent implements OnInit {
     });
   }
 
-  //#region Profile Photo
-
-  onSelectedPhotos(event: any) {
-    this.files = event.currentFiles.filter((file: File) => {
-      if (file.size > 2 * 1024 * 1024) { // 2MB limit
-        this.messageService.add({
-          key: 'globalMessage',
-          severity: 'error',
-          summary: 'Error',
-          detail: `File ${file.name} exceeds the 2MB limit.`,
-        });
-        return false;
-      }
-      return true;
-    });
-
-    if (this.files && this.files.length > 0) {
-      this.isFileSelected = true;
-      this.files.forEach((file: File) => {
-        this.loggerService.info(this.files);
-      });
-    }
-  }
-
-  choose(event: any, callback: Function) {
-    callback();
-  }
-
-  importPhoto(clearCallback: Function): void {
-    if (!this.selectedDoctor || this.files.length === 0) {
-      this.messageService.add({
-        key: 'globalMessage',
-        severity: 'warn',
-        summary: 'Warning',
-        detail: 'Please select a photo before uploading.',
-      });
-      return;
-    }
-    this.loading = true;
-    const selectedFile = this.files[0]; // Get the first selected file
-
-    this.doctorService.uploadPhoto(this.selectedDoctor.doctorId, selectedFile).subscribe({
-      next: () => {
-        this.messageService.add({
-          key: 'globalMessage',
-          severity: 'success',
-          summary: 'Success',
-          detail: 'File uploaded successfully.',
-        });
-        this.uploadVisible = false;
-        this.loadData();
-        this.loading = false;
-        clearCallback(); // Call clearCallback after successful upload
-      },
-      error: (err) => {
-        this.messageService.add({
-          key: 'globalMessage',
-          severity: 'error',
-          summary: 'Error',
-          detail: err.message || 'File upload failed.',
-        });
-        this.loading = false;
-      },
-    });
-  }
-
-  upload(rowData: any): void {
-    this.selectedDoctor = rowData;
-    this.loggerService.info(rowData);
-    this.uploadVisible = true;
-  }
-
-  // #endregion
 
   openScheduleDialog(): void {
     this.scheduleDialogVisible = true;
+    this.isEditSchedule = false;
+
+    this.startTimeUI = null;
+    this.endTimeUI = null;
+
     this.newSchedule = {
       scheduleId: 0,
       doctorId: this.doctorId,
       branchId: Number.parseInt(this.sharedService.getDefaultBranchId() ?? "0"),
-      dayOfWeek: '',
+      dayOfWeek: 'Monday', // Default to Monday
       startTime: '',
       endTime: '',
       maxPatient: 10,
@@ -239,61 +177,112 @@ export class DetailComponent implements OnInit {
     };
   }
 
+  parseTime(timeStr: string): Date | null {
+    if (!timeStr) return null;
+    const [hours, minutes] = timeStr.split(':');
+    const d = new Date();
+    d.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+    return d;
+  }
+
   saveSchedule(): void {
-    const branchId = Number.parseInt(this.sharedService.getDefaultBranchId() ?? '0');
+    if (!this.newSchedule.dayOfWeek) {
+      this.messageService.add({ severity: 'warn', summary: 'Validation', detail: 'Please select a Day.' });
+      return;
+    }
+    if (!this.startTimeUI || !this.endTimeUI) {
+      this.messageService.add({ severity: 'warn', summary: 'Validation', detail: 'Please provide both Start and End times.' });
+      return;
+    }
+    if (this.startTimeUI >= this.endTimeUI) {
+      this.messageService.add({ severity: 'warn', summary: 'Validation', detail: 'Start time must be before End time.' });
+      return;
+    }
+
     this.isSubmitting = true;
 
-    // First get an auto-generated schedule id from the server
-    this.doctorService.getScheduleAutoId(branchId).subscribe({
+    const formatTime = (date: Date) => {
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
+    };
+
+    // Update the row directly
+    this.newSchedule.startTime = formatTime(this.startTimeUI);
+    this.newSchedule.endTime = formatTime(this.endTimeUI);
+
+    // Send the raw object back to the server
+    const request$ = this.isEditSchedule
+      ? this.doctorService.updateSchedule(this.newSchedule) 
+      : this.doctorService.createSchedule(this.newSchedule);
+
+    request$.subscribe({
       next: (res: any) => {
-        if (res && res.success) {
-          // server may return an object or a plain value in data
-          const autoId = (res.data && res.data.scheduleId) ? res.data.scheduleId : (res.data ?? 0);
-          this.newSchedule.scheduleId = autoId;
-
-          // now create the schedule
-          this.doctorService.createSchedule(this.newSchedule).subscribe({
-            next: (createRes: any) => {
-              this.isSubmitting = false;
-              if (createRes && createRes.success) {
-                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Schedule added successfully' });
-                this.scheduleDialogVisible = false;
-                this.loadSchedules();
-              } else {
-                const detailMsg = createRes?.message ?? createRes?.data ?? 'Unable to create schedule.';
-                this.messageService.add({ severity: 'error', summary: 'Error', detail: detailMsg });
-              }
-            },
-            error: (err: any) => {
-              this.isSubmitting = false;
-              const msg = err?.error?.message ?? err?.message ?? 'An error occurred while creating schedule.';
-              this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
-            }
-          });
-
-        } else {
-          this.isSubmitting = false;
-          const errMsg = res?.message ?? 'Unable to obtain schedule id.';
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: errMsg });
-        }
+        const msg = this.isEditSchedule ? 'Schedule updated successfully.' : 'Schedule added successfully.';
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: msg });
+        this.scheduleDialogVisible = false;
+        this.loadSchedules();
       },
       error: (err: any) => {
+        // This will display the EXACT string error from C#
+        let errorMsg = 'Unable to save schedule.';
+        if (err.error.message.en) errorMsg = err.error.message.en;
+        else if (err.error.message) errorMsg = err.error.message;
+        else if (typeof err.error === 'string') errorMsg = err.error;
+
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: errorMsg });
+        this.isSubmitting = false; 
+      },
+      complete: () => {
         this.isSubmitting = false;
-        const msg = err?.error?.message ?? err?.message ?? 'An error occurred while obtaining schedule id.';
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
+      }
+    });
+  }
+
+  formatTo12Hour(timeString: string): string {
+    if (!timeString) return '';
+    const parts = timeString.split(':');
+    if (parts.length < 2) return timeString;
+
+    let hours = parseInt(parts[0], 10);
+    const minutes = parts[1];
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+
+    return `${hours}:${minutes} ${ampm}`;
+  }
+
+  // Hook up the delete button!
+  deleteSchedule(schedule: ScheduleModel): void {
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete the schedule for ${schedule.dayOfWeek}?`,
+      header: 'Confirm Deletion',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        const branchId = Number.parseInt(this.sharedService.getDefaultBranchId() ?? "0");
+        this.doctorService.deleteSchedule(schedule.scheduleId, branchId).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Schedule removed.' });
+            this.loadSchedules();
+          },
+          error: (err) => {
+            let errorMsg = err.error.message.en || 'Failed to delete schedule.';
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: errorMsg });
+          }
+        });
       }
     });
   }
 
   loadSchedules(): void {
     const branchId = Number.parseInt(this.sharedService.getDefaultBranchId() ?? "0");
-
-    // getByDoctor expects (doctorId, branchId)
     this.doctorService.getByDoctor(this.doctorId, branchId).subscribe({
       next: (res) => {
         const data = res?.data ?? [];
-        // Defensive: backend may return schedules for whole branch; ensure only this doctor's schedules are shown
-        this.schedules = Array.isArray(data) ? data.filter((s: any) => (s.doctorId == this.doctorId || s.doctorId == Number(this.doctorId))) : [];
+        this.schedules = Array.isArray(data) ? data.filter((s: any) => (s.doctorId == this.doctorId)) : [];
       }
     });
   }
