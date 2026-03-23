@@ -30,9 +30,6 @@
             <tr style="white-space:nowrap">
                 <th pFrozenColumn [style]="{ width:'10px' }">#</th>
                 <th></th>
-                <th pSortableColumn="doctorId">Id
-                    <p-sortIcon field="doctorId"></p-sortIcon>
-                </th>
                 <th pSortableColumn="name">Doctor Name
                     <p-sortIcon field="name"></p-sortIcon>
                 </th>
@@ -82,7 +79,6 @@
                         [style]="{'background-color':'#5695FE', 'color': '#ffffff'}" shape="circle"
                         [routerLink]="['./detail', (doctor.doctorId)]" appendTo="body"></p-avatar>
                 </td>
-                <td>{{ doctor.doctorId }}</td>
 
                 <td>{{ doctor.name }}</td>
                 <td>{{ doctor.degree }}</td>
@@ -114,103 +110,94 @@
 
     <form [formGroup]="doctorForm" (ngSubmit)="submit()" class="space-y-6">
 
-        <!-- Input Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-            <!-- Doctor Name -->
             <div class="flex flex-col gap-2">
-                <label class="font-medium">Doctor Name</label>
-                <input pInputText formControlName="name" placeholder="Enter Doctor Name..." />
-                <small *ngIf="doctorForm.get('name')?.invalid && doctorForm.get('name')?.dirty"
-                    class="text-red-500 text-sm">
+                <label class="font-medium">Doctor Name <span class="text-red-500">*</span></label>
+                <input pInputText formControlName="name" placeholder="Enter Doctor Name..."
+                    [ngClass]="{'ng-invalid ng-dirty': f['name'].invalid && (f['name'].dirty || f['name'].touched)}" />
+                <small *ngIf="f['name'].invalid && (f['name'].dirty || f['name'].touched)" class="text-red-500 text-sm">
                     Doctor Name is required.
                 </small>
             </div>
 
-            <!-- Degree -->
             <div class="flex flex-col gap-2">
-                <label class="font-medium">Degree</label>
-                <input pInputText formControlName="degree" placeholder="Enter Degree..." />
-                <small *ngIf="doctorForm.get('degree')?.invalid && doctorForm.get('degree')?.dirty"
+                <label class="font-medium">Degree <span class="text-red-500">*</span></label>
+                <input pInputText formControlName="degree" placeholder="Enter Degree..."
+                    [ngClass]="{'ng-invalid ng-dirty': f['degree'].invalid && (f['degree'].dirty || f['degree'].touched)}" />
+                <small *ngIf="f['degree'].invalid && (f['degree'].dirty || f['degree'].touched)"
                     class="text-red-500 text-sm">
                     Degree is required.
                 </small>
             </div>
 
-            <!-- Specialized -->
             <div class="flex flex-col gap-2">
-                <label class="font-medium">Specialized</label>
-                <input pInputText formControlName="specialized" placeholder="Enter Specialized..." />
-                <small *ngIf="doctorForm.get('specialized')?.invalid && doctorForm.get('specialized')?.dirty"
+                <label class="font-medium">Specialized <span class="text-red-500">*</span></label>
+                <input pInputText formControlName="specialized" placeholder="Enter Specialized..."
+                    [ngClass]="{'ng-invalid ng-dirty': f['specialized'].invalid && (f['specialized'].dirty || f['specialized'].touched)}" />
+                <small *ngIf="f['specialized'].invalid && (f['specialized'].dirty || f['specialized'].touched)"
                     class="text-red-500 text-sm">
                     Specialized is required.
                 </small>
             </div>
 
-            <!-- Consultant Fee -->
             <div class="flex flex-col gap-2">
-                <label class="font-medium">Consultant Fee</label>
+                <label class="font-medium">Consultant Fee <span class="text-red-500">*</span></label>
                 <input type="number" min="0" pInputText formControlName="consultantFee"
-                    (keydown)="preventNegativeInput($event)" />
-                <small *ngIf="doctorForm.get('consultantFee')?.invalid && doctorForm.get('consultantFee')?.dirty"
+                    (keydown)="preventNegativeInput($event)"
+                    [ngClass]="{'ng-invalid ng-dirty': f['consultantFee'].invalid && (f['consultantFee'].dirty || f['consultantFee'].touched)}" />
+                <small *ngIf="f['consultantFee'].invalid && (f['consultantFee'].dirty || f['consultantFee'].touched)"
                     class="text-red-500 text-sm">
-                    Consultant Fee is required.
+                    Valid Consultant Fee is required.
                 </small>
             </div>
 
-            <!-- ECG Fee -->
             <div class="flex flex-col gap-2">
-                <label class="font-medium">ECG Fee</label>
+                <label class="font-medium">ECG Fee <span class="text-red-500"></span></label>
                 <input type="number" min="0" pInputText formControlName="ecgfee"
-                    (keydown)="preventNegativeInput($event)" />
-                <small *ngIf="doctorForm.get('ecgfee')?.invalid && doctorForm.get('ecgfee')?.dirty"
+                    (keydown)="preventNegativeInput($event)"
+                    [ngClass]="{'ng-invalid ng-dirty': f['ecgfee'].invalid && (f['ecgfee'].dirty || f['ecgfee'].touched)}" />
+                <small *ngIf="f['ecgfee'].invalid && (f['ecgfee'].dirty || f['ecgfee'].touched)"
                     class="text-red-500 text-sm">
-                    ECG Fee is required.
+                    Valid ECG Fee is required.
                 </small>
             </div>
 
-            <!-- X-Ray Fee -->
             <div class="flex flex-col gap-2">
-                <label class="font-medium">X-Ray Fee</label>
+                <label class="font-medium">X-Ray Fee <span class="text-red-500"></span></label>
                 <input type="number" min="0" pInputText formControlName="xrayFee"
-                    (keydown)="preventNegativeInput($event)" />
-                <small *ngIf="doctorForm.get('xrayFee')?.invalid && doctorForm.get('xrayFee')?.dirty"
+                    (keydown)="preventNegativeInput($event)"
+                    [ngClass]="{'ng-invalid ng-dirty': f['xrayFee'].invalid && (f['xrayFee'].dirty || f['xrayFee'].touched)}" />
+                <small *ngIf="f['xrayFee'].invalid && (f['xrayFee'].dirty || f['xrayFee'].touched)"
                     class="text-red-500 text-sm">
-                    X-Ray Fee is required.
+                    Valid X-Ray Fee is required.
                 </small>
             </div>
 
-            <!-- Ultrasound Fee -->
             <div class="flex flex-col gap-2 md:col-span-2">
-                <label class="font-medium">Ultrasound Fee</label>
+                <label class="font-medium">Ultrasound Fee <span class="text-red-500"></span></label>
                 <input type="number" min="0" pInputText formControlName="ultrasoundFee"
-                    (keydown)="preventNegativeInput($event)" />
-                <small *ngIf="doctorForm.get('ultrasoundFee')?.invalid && doctorForm.get('ultrasoundFee')?.dirty"
+                    (keydown)="preventNegativeInput($event)"
+                    [ngClass]="{'ng-invalid ng-dirty': f['ultrasoundFee'].invalid && (f['ultrasoundFee'].dirty || f['ultrasoundFee'].touched)}" />
+                <small *ngIf="f['ultrasoundFee'].invalid && (f['ultrasoundFee'].dirty || f['ultrasoundFee'].touched)"
                     class="text-red-500 text-sm">
-                    Ultrasound Fee is required.
+                    Valid Ultrasound Fee is required.
                 </small>
             </div>
 
         </div>
 
-        <!-- Status -->
         <div class="flex items-center gap-3 pt-2">
             <p-toggle-switch formControlName="status"></p-toggle-switch>
             <span class="font-medium">Active Status</span>
         </div>
 
-        <!-- Buttons -->
         <div class="flex justify-end gap-3 pt-4">
-
-            <!-- Cancel Button -->
-            <p-button label="Cancel" icon="pi pi-times" severity="secondary" type="button" (onClick)="onCancel()">
-            </p-button>
-
-            <!-- Save / Update Button -->
+            <p-button label="Cancel" icon="pi pi-times" severity="secondary" type="button"
+                (onClick)="onCancel()"></p-button>
             <p-button icon="pi pi-check" [label]="isEdit ? 'Update' : 'Save'" type="submit" [loading]="isSubmitting"
                 [severity]="isEdit ? 'info' : 'success'">
             </p-button>
-
         </div>
     </form>
 
