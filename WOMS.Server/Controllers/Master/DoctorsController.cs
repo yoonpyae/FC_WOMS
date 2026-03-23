@@ -67,7 +67,9 @@ public class DoctorsController(
             doctor.Ecgfee,
             doctor.XrayFee,
             doctor.UltrasoundFee,
-            doctor.Status
+            doctor.Status,
+            doctor.CreatedOn,
+            doctor.UpdatedOn
         };
         return ResponseHelper.OK_Result(result, null);
     }
