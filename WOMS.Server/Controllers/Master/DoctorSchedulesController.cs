@@ -48,9 +48,25 @@ namespace WOMS.Server.Controllers.Master
         [EndpointDescription("Get an DoctorSchedules max Id")]
         public async Task<IActionResult> GetAutoScheduleId(long branchId)
         {
-            DoctorSchedule? lastRecord = await repo.DoctorSchedules.GetFirstAsync(x => x.BranchId == branchId, q => q.OrderByDescending(x => x.ScheduleId));
-            long maxId = (lastRecord?.ScheduleId ?? 0) + 1;
-            return ResponseHelper.OK_Result(maxId, null);
+            long multiplier = 100000;
+
+            DoctorSchedule? lastRecord = await repo.DoctorSchedules.GetFirstAsync(
+                x => x.BranchId == branchId,
+                q => q.OrderByDescending(x => x.ScheduleId)
+            );
+
+            long nextId;
+
+            if (lastRecord == null)
+            {
+                nextId = (branchId * multiplier) + 1;
+            }
+            else
+            {
+                nextId = lastRecord.ScheduleId + 1;
+            }
+
+            return ResponseHelper.OK_Result(nextId, null);
         }
 
         [HttpPost]
@@ -79,11 +95,21 @@ namespace WOMS.Server.Controllers.Master
             if (overlap)
                 return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("This schedule overlaps with an existing schedule for this day.", ""));
 
+            long multiplier = 100000;
             DoctorSchedule? lastRecord = await repo.DoctorSchedules.GetFirstAsync(
-                x => x.BranchId == model.BranchId && x.DoctorId == model.DoctorId,
+                x => x.BranchId == model.BranchId, // Filter by Branch
                 q => q.OrderByDescending(x => x.ScheduleId));
 
-            model.ScheduleId = (lastRecord?.ScheduleId ?? 0) + 1;
+            if (lastRecord == null)
+            {
+                // First record for this branch: e.g., Branch 1 starts at 100001
+                model.ScheduleId = (model.BranchId * multiplier) + 1;
+            }
+            else
+            {
+                // Increment the existing ID
+                model.ScheduleId = lastRecord.ScheduleId + 1;
+            }
 
             model.CreatedOn = DateTime.Now;
             model.CreatedBy = User.Identity?.Name ?? string.Empty;
