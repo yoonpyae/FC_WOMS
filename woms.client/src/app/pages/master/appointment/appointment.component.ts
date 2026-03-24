@@ -183,13 +183,13 @@ export class AppointmentComponent implements OnInit {
           this.messageService.add({ key: 'globalMessage', severity: 'success', summary: 'Success', detail: res.message.en });
         },
         error: err => {
+          this.isSubmitting = false;
           this.messageService.add({
             key: 'globalMessage',
             severity: 'warn',
             summary: 'Booking Failed',
             detail: err.error.message.en || "Could not complete booking."
           });
-          this.isSubmitting = false;
         },
         complete: () => {
           this.isSubmitting = false;
@@ -283,100 +283,100 @@ export class AppointmentComponent implements OnInit {
 
     this.exportService.exportSelectColsWithDynamicHeader(exportData, columns, 'Appointment_Report');
   }
-// #endregion
+  // #endregion
 
-// #region UI & Event Handlers
+  // #region UI & Event Handlers
 
-onPatientChange(): void {
-  if(this.selectedPatient) {
-  this.appointmentForm.get('patientId')?.setValue(this.selectedPatient.patientId);
-  this.appointmentForm.get('name')?.setValue(this.selectedPatient.name);
-  this.appointmentForm.get('phoneNo')?.setValue(this.selectedPatient.phone);
-} else {
-  this.appointmentForm.get('patientId')?.setValue('');
-  this.appointmentForm.get('name')?.setValue('');
-  this.appointmentForm.get('phoneNo')?.setValue('');
-}
+  onPatientChange(): void {
+    if (this.selectedPatient) {
+      this.appointmentForm.get('patientId')?.setValue(this.selectedPatient.patientId);
+      this.appointmentForm.get('name')?.setValue(this.selectedPatient.name);
+      this.appointmentForm.get('phoneNo')?.setValue(this.selectedPatient.phone);
+    } else {
+      this.appointmentForm.get('patientId')?.setValue('');
+      this.appointmentForm.get('name')?.setValue('');
+      this.appointmentForm.get('phoneNo')?.setValue('');
+    }
   }
 
-clearSelection(): void {
-  this.selectedAppointment = null as any;
-}
-
-setAutoFocus() {
-  setTimeout(() => {
-    this.nameInput?.nativeElement?.focus();
-  }, 0);
-}
-
-preventNegativeInput($event: KeyboardEvent): void {
-  let inputChar = $event.key;
-  if(inputChar === '-' || inputChar === 'e') {
-  $event.preventDefault();
-}
-  }
-// #endregion
-
-// #region Helpers
-
-OnDoctorChange(event: any): void {
-  this.schedules = [];
-  this.loggerService.info("Doctor changed");
-  this.selectedSchedule = null as any;
-  if(this.selectedDoctor) {
-  this.appointmentForm.get('doctorId')?.setValue(this.selectedDoctor.doctorId);
-  this.GetDutytime(this.selectedAppointmentDate);
-} else {
-  this.appointmentForm.get('doctorId')?.setValue(null);
-}
+  clearSelection(): void {
+    this.selectedAppointment = null as any;
   }
 
-selectSchedule(slot: any) {
-  this.selectedSchedule = slot;
-  // If you want to store the scheduleId in your Reactive Form:
-  this.appointmentForm.patchValue({ scheduleId: slot.scheduleId });
-}
-
-GetDutytime(selectedDate: Date): void {
-  if(!selectedDate || !this.selectedDoctor) return;
-
-// Ensure we have a clean string for day of week
-const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const dayOfWeek = days[selectedDate.getDay()];
-
-const branchId = Number(this.sharedService.getDefaultBranchId() ?? 0);
-const doctorId = Number(this.selectedDoctor.doctorId);
-
-this.doctorService.getScheduleByDoctorDay(doctorId, dayOfWeek, branchId).subscribe({
-  next: (res) => {
-    const data = res?.data ?? [];
-    this.schedules = Array.isArray(data)
-      ? data.filter((s: any) => s.doctorId == doctorId)
-      : [];
-  }
-});
+  setAutoFocus() {
+    setTimeout(() => {
+      this.nameInput?.nativeElement?.focus();
+    }, 0);
   }
 
-getSeverity(status: string) {
-  if (!status) return 'secondary';
-
-  switch (status.toLowerCase()) {
-    case 'confirmed': return 'info';
-    case 'completed': return 'success';
-    case 'cancelled': return 'danger';
-    default: return 'secondary';
+  preventNegativeInput($event: KeyboardEvent): void {
+    let inputChar = $event.key;
+    if (inputChar === '-' || inputChar === 'e') {
+      $event.preventDefault();
+    }
   }
-}
+  // #endregion
 
-getIcon(status: string) {
-  if (!status) return 'pi pi-question-circle';
+  // #region Helpers
 
-  switch (status.toLowerCase()) {
-    case 'confirmed': return 'pi pi-clock';
-    case 'completed': return 'pi pi-check-circle';
-    case 'cancelled': return 'pi pi-times-circle';
-    default: return 'pi pi-question-circle';
+  OnDoctorChange(event: any): void {
+    this.schedules = [];
+    this.loggerService.info("Doctor changed");
+    this.selectedSchedule = null as any;
+    if (this.selectedDoctor) {
+      this.appointmentForm.get('doctorId')?.setValue(this.selectedDoctor.doctorId);
+      this.GetDutytime(this.selectedAppointmentDate);
+    } else {
+      this.appointmentForm.get('doctorId')?.setValue(null);
+    }
   }
-}
+
+  selectSchedule(slot: any) {
+    this.selectedSchedule = slot;
+    // If you want to store the scheduleId in your Reactive Form:
+    this.appointmentForm.patchValue({ scheduleId: slot.scheduleId });
+  }
+
+  GetDutytime(selectedDate: Date): void {
+    if (!selectedDate || !this.selectedDoctor) return;
+
+    // Ensure we have a clean string for day of week
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayOfWeek = days[selectedDate.getDay()];
+
+    const branchId = Number(this.sharedService.getDefaultBranchId() ?? 0);
+    const doctorId = Number(this.selectedDoctor.doctorId);
+
+    this.doctorService.getScheduleByDoctorDay(doctorId, dayOfWeek, branchId).subscribe({
+      next: (res) => {
+        const data = res?.data ?? [];
+        this.schedules = Array.isArray(data)
+          ? data.filter((s: any) => s.doctorId == doctorId)
+          : [];
+      }
+    });
+  }
+
+  getSeverity(status: string) {
+    if (!status) return 'secondary';
+
+    switch (status.toLowerCase()) {
+      case 'confirmed': return 'info';
+      case 'completed': return 'success';
+      case 'cancelled': return 'danger';
+      default: return 'secondary';
+    }
+  }
+
+  getIcon(status: string) {
+    if (!status) return 'pi pi-question-circle';
+
+    switch (status.toLowerCase()) {
+      case 'confirmed': return 'pi pi-clock';
+      case 'completed': return 'pi pi-check-circle';
+      case 'cancelled': return 'pi pi-times-circle';
+      default: return 'pi pi-question-circle';
+    }
+  }
   // #endregion
 }
