@@ -43,6 +43,23 @@ public class SuppliersController(
     [EndpointDescription("Create New Supplier")]
     public async Task<IActionResult> Create(Supplier model)
     {
+        bool nameExists = await repo.Suppliers.AnyAsync(x =>
+                x.CompanyName.ToLower() == model.CompanyName.ToLower() &&
+                x.BranchId == model.BranchId &&
+                !x.DeletedOn.HasValue);
+
+        if (nameExists)
+            return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("A supplier with this company name already exists.", ""));
+
+        // Prevent Duplicate Phone/Email
+        bool contactExists = await repo.Suppliers.AnyAsync(x =>
+            (x.Phone == model.Phone || x.Email == model.Email) &&
+            x.BranchId == model.BranchId &&
+            !x.DeletedOn.HasValue);
+
+        if (contactExists)
+            return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Phone number or Email is already registered to another supplier.", ""));
+        
         model.CreatedOn = DateTime.Now;
         model.CreatedBy = User.Identity?.Name ?? string.Empty;
 

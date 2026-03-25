@@ -110,12 +110,12 @@
             </div>
 
             <div class="flex flex-col gap-2">
-                <label>Capacity</label>
-                <input formControlName="capacity" pInputText type="number" placeholder="Enter Capacity..." required
-                    min="0" (keypress)="preventNegativeInput($event)" />
-                <small *ngIf="packetTypeForm.controls['capacity'].invalid && packetTypeForm.get('capacity')?.dirty"
-                    class="p-text text-sm text-red-500">
-                    Capacity is required.
+                <label class="font-medium">Capacity (Units per Packet)</label>
+                <input formControlName="capacity" pInputText type="number" [min]="1"
+                    (keydown)="preventNegativeInput($event)" placeholder="e.g. 10" />
+                <small *ngIf="packetTypeForm.get('capacity')?.invalid && packetTypeForm.get('capacity')?.touched"
+                    class="text-red-500">
+                    Capacity must be at least 1.
                 </small>
             </div>
 

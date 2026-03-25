@@ -84,8 +84,25 @@ export class ConsultationComponent implements OnInit {
   selectedPatient!: ViPatientModel;
   stockItems: StockItemModel[] = [];
   selectedStockItems: any[] = [];
-  dosages: string[] = ['Select dosage', '10mg', '20mg', '500mg'];
-  frequencies: string[] = ['Select frequency', 'Once daily', 'Twice daily', 'Once daily at bedtime'];
+
+  dosages: string[] = [
+    '5mg', '10mg', '20mg', '50mg', '100mg', '250mg', '500mg', '1g',
+    '5ml (1 tsp)', '10ml (2 tsp)', '1 puff', 'Apply thin layer'
+  ];
+
+  frequencies: string[] = [
+    'OD (Once daily)',      // 15 chars
+    'BD (Twice daily)',     // 16 chars
+    'TDS (3 times daily)',  // 19 chars
+    'QDS (4 times daily)',  // 19 chars
+    'PRN (As needed)',      // 15 chars
+    'HS (At bedtime)',      // 15 chars
+    'AC (Before meals)',    // 17 chars
+    'PC (After meals)',     // 16 chars
+    'Stat (Immediately)',   // 18 chars
+    'Every 4 hours',        // 13 chars
+    'Every 6 hours'
+  ];
   patientId = '';
   name = '';
   itemCode = '';
@@ -144,21 +161,21 @@ export class ConsultationComponent implements OnInit {
     return this.consultationForm.get('prescriptions') as FormArray;
   }
 
-  addMedication() {
-    const medGroup = this.formBuilder.group({
-      consultationId: ['TEMP_ID'],
-      itemCode: ['', Validators.required],
-      dosage: ['Select dosage'],
-      frequency: ['Select frequency'],
-      duration: [3],
-      instruction: [''],
-      quantity: [1]
-    });
-    this.prescriptionsArray.push(medGroup);
-
-    this.selectedStockItems.push(null);
+addMedication() {
+  const medGroup = this.formBuilder.group({
+    prescriptionId: [0],
+    consultationId: [this.isEdit ? this.selectedConsultation.consultationId : 'TEMP_ID'],
+    itemCode: ['', Validators.required],
+    dosage: [null, [Validators.required, Validators.maxLength(50)]], // Added limit
+    frequency: [null, [Validators.required, Validators.maxLength(20)]], // Added limit
+    duration: [3, [Validators.required, Validators.min(1)]],
+    instruction: [''],
+    quantity: [1, [Validators.required, Validators.min(1)]]
+  });
+  this.prescriptionsArray.push(medGroup);
+  this.selectedStockItems.push(null);
   }
-
+  
   removeMedication(index: number) {
     this.prescriptionsArray.removeAt(index);
     this.selectedStockItems.splice(index, 1);
@@ -391,32 +408,16 @@ export class ConsultationComponent implements OnInit {
     const doctorId = this.currentDoctorId;
 
     this.fetchingPatientInfo = true;
-
     this.consultationService.getPatientInfo(patientId, branchId, doctorId).subscribe({
       next: (res: any) => {
         this.patientInfo = res.data?.patient;
         this.appointmentInfo = res.data?.appointment;
 
-        if (this.patientInfo) {
-          this.selectedPatient = this.patientInfo;
-          this.name = this.patientInfo.name;
-        }
-
-        if (!this.isEdit) {
-          if (this.appointmentInfo) {
-            this.consultationForm.patchValue({ ano: this.appointmentInfo.ano });
-          } else {
-            this.consultationForm.patchValue({ ano: null });
-          }
+        if (!this.isEdit && this.appointmentInfo) {
+          this.consultationForm.patchValue({ ano: this.appointmentInfo.ano });
         }
       },
-      error: (err: any) => {
-        this.loggerService.error(err);
-        this.fetchingPatientInfo = false;
-      },
-      complete: () => {
-        this.fetchingPatientInfo = false;
-      }
+      complete: () => this.fetchingPatientInfo = false
     });
   }
   //#

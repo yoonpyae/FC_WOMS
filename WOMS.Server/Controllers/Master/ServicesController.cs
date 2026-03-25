@@ -39,6 +39,18 @@ public class ServicesController(IRepositoryWrapper repo) : ControllerBase
     [EndpointDescription("Creates a new service.")]
     public async Task<IActionResult> Create(Service model)
     {
+        Service? duplicate = await repo.Services.GetFirstAsync(x =>
+        x.ServiceName == model.ServiceName &&
+        x.Fee == model.Fee &&
+        x.BranchId == model.BranchId &&
+        !x.DeletedOn.HasValue);
+
+        if (duplicate != null)
+        {
+            return ResponseHelper.Bad_Request(null,
+                new DefaultResponseMessageModel("A service with this name and fee already exists in this branch.", ""));
+        }
+
         model.CreatedOn = DateTime.Now;
         model.CreatedBy = User.Identity?.Name ?? string.Empty;
 
@@ -58,13 +70,16 @@ public class ServicesController(IRepositoryWrapper repo) : ControllerBase
     public async Task<IActionResult> Update(Service model)
     {
         Service? existingService = await repo.Services.GetFirstAsync(x => x.ServiceId == model.ServiceId && x.BranchId == model.BranchId);
+
         if (existingService is null)
-            return ResponseHelper.NotFound_Request(null,
-                new DefaultResponseMessageModel("Unable to find Service", ""));
+            return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Service not found in the branch.", ""));
+
         existingService.ServiceName = model.ServiceName;
         existingService.Fee = model.Fee;
+        existingService.IsActive = model.IsActive;
         existingService.UpdatedOn = DateTime.Now;
         existingService.UpdatedBy = User.Identity?.Name ?? string.Empty;
+
         repo.Services.Update(existingService);
         return await repo.SaveAsync()
             ? ResponseHelper.OK_Result(null,
@@ -73,7 +88,7 @@ public class ServicesController(IRepositoryWrapper repo) : ControllerBase
                 new DefaultResponseMessageModel("Unable to update Service", ""));
     }
 
-    [HttpDelete("{id:long}")]
+    [HttpDelete("{id:long}/{branchId:long}")]
     [EndpointSummary("Delete")]
     [EndpointDescription("Deletes a service with specified id.")]
     public async Task<IActionResult> Delete(long id, long branchId)

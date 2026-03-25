@@ -36,6 +36,16 @@
         [EndpointDescription("Create new Packet Type")]
         public async Task<IActionResult> Create(PacketType model)
         {
+            bool exists = await repo.PacketTypes.AnyAsync(x =>
+        x.TypeName.ToLower() == model.TypeName.ToLower() &&
+        x.BranchId == model.BranchId &&
+        !x.DeletedOn.HasValue);
+
+            if (exists)
+            {
+                return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("A packet type with this name already exists in this branch.", ""));
+            }
+
             model.CreatedOn = DateTime.Now;
             model.CreatedBy = User.Identity?.Name;
 
@@ -52,6 +62,17 @@
         [EndpointDescription("Update Packet Type")]
         public async Task<IActionResult> Edit(PacketType model)
         {
+            bool nameConflict = await repo.PacketTypes.AnyAsync(x =>
+        x.TypeName.ToLower() == model.TypeName.ToLower() &&
+        x.BranchId == model.BranchId &&
+        x.TypeCode != model.TypeCode &&
+        !x.DeletedOn.HasValue);
+
+            if (nameConflict)
+            {
+                return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Another packet type already uses this name.", ""));
+            }
+
             PacketType? packetType = await repo.PacketTypes.GetFirstAsync(x =>
                     x.TypeCode == model.TypeCode &&
                     x.BranchId == model.BranchId);

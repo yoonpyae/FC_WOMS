@@ -43,6 +43,14 @@ public class StockItemsController(
     [EndpointDescription("Creates new stock item.")]
     public async Task<IActionResult> Create(StockItemEntryModel model)
     {
+        bool nameExists = await repo.StockItems.AnyAsync(x =>
+                x.ItemName.ToLower() == model.ItemName.ToLower() &&
+                x.BranchId == model.BranchId &&
+                !x.DeletedOn.HasValue);
+
+        if (nameExists)
+            return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("This item name already exists in this branch.", "")); 
+        
         model.CreatedOn = DateTime.Now;
         model.CreatedBy = User.Identity?.Name ?? string.Empty;
         repo.StockItems.Create(model);
@@ -107,52 +115,52 @@ public class StockItemsController(
             : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to update stock item", ""));
     }
 
-    //[HttpDelete("{itemCode}")]
-    //[EndpointSummary("Delete")]
-    //[EndpointDescription("Delete stock item")]
-    //public async Task<IActionResult> Delete(string ItemCode)
-    //{
-    //    bool purchaseDetail = await repo.PurchaseDetails.AnyAsync(x => x.ItemCode == ItemCode);
+    [HttpDelete("{itemCode}")]
+    [EndpointSummary("Delete")]
+    [EndpointDescription("Delete stock item")]
+    public async Task<IActionResult> Delete(string ItemCode)
+    {
+        bool purchaseDetail = await repo.PurchaseDetails.AnyAsync(x => x.ItemCode == ItemCode);
 
-    //    if (purchaseDetail == false)
-    //    {
-    //        StockItem? stockItem = await repo.StockItems.GetFirstAsync(x => x.ItemCode == ItemCode);
+        if (purchaseDetail == false)
+        {
+            StockItem? stockItem = await repo.StockItems.GetFirstAsync(x => x.ItemCode == ItemCode);
 
-    //        if (stockItem == null)
-    //        {
-    //            return ResponseHelper.NotFound_Request(null,
-    //                new DefaultResponseMessageModel("Item code not found", ""));
-    //        }
+            if (stockItem == null)
+            {
+                return ResponseHelper.NotFound_Request(null,
+                    new DefaultResponseMessageModel("Item code not found", ""));
+            }
 
-    //        stockItem.DeletedOn = DateTime.Now;
-    //        stockItem.DeletedBy = User.Identity?.Name ?? string.Empty;
-    //        repo.StockItems.Update(stockItem);
+            stockItem.DeletedOn = DateTime.Now;
+            stockItem.DeletedBy = User.Identity?.Name ?? string.Empty;
+            repo.StockItems.Update(stockItem);
 
-    //        MainStock? mainStock = await repo.MainStocks.GetFirstAsync(x => x.ItemCode == ItemCode);
-    //        if (mainStock != null)
-    //        {
-    //            mainStock.DeletedOn = DateTime.Now;
-    //            mainStock.DeletedBy = User.Identity?.Name ?? string.Empty;
-    //            repo.MainStocks.Update(mainStock);
-    //        }
+            MainStock? mainStock = await repo.MainStocks.GetFirstAsync(x => x.ItemCode == ItemCode);
+            if (mainStock != null)
+            {
+                mainStock.DeletedOn = DateTime.Now;
+                mainStock.DeletedBy = User.Identity?.Name ?? string.Empty;
+                repo.MainStocks.Update(mainStock);
+            }
 
-    //        PharmacyStock? pharmacyStock = await repo.PharmacyStocks.GetFirstAsync(x => x.ItemCode == ItemCode);
-    //        if (pharmacyStock != null)
-    //        {
-    //            pharmacyStock.DeletedOn = DateTime.Now;
-    //            pharmacyStock.DeletedBy = User.Identity?.Name ?? string.Empty;
-    //            repo.PharmacyStocks.Update(pharmacyStock);
-    //        }
+            //PharmacyStock? pharmacyStock = await repo.PharmacyStocks.GetFirstAsync(x => x.ItemCode == ItemCode);
+            //if (pharmacyStock != null)
+            //{
+            //    pharmacyStock.DeletedOn = DateTime.Now;
+            //    pharmacyStock.DeletedBy = User.Identity?.Name ?? string.Empty;
+            //    repo.PharmacyStocks.Update(pharmacyStock);
+            //}
 
-    //        return await repo.SaveAsync()
-    //            ? ResponseHelper.OK_Result(null,
-    //                new DefaultResponseMessageModel("Successfully delete stock item.", ""))
-    //            : ResponseHelper.Bad_Request(null,
-    //                new DefaultResponseMessageModel("Unable to delete item item.", ""));
-    //    }
+            return await repo.SaveAsync()
+                ? ResponseHelper.OK_Result(null,
+                    new DefaultResponseMessageModel("Successfully delete stock item.", ""))
+                : ResponseHelper.Bad_Request(null,
+                    new DefaultResponseMessageModel("Unable to delete item item.", ""));
+        }
 
-    //    return ResponseHelper.Bad_Request(null,
-    //        new DefaultResponseMessageModel("Item Code record exists", ""));
+        return ResponseHelper.Bad_Request(null,
+            new DefaultResponseMessageModel("Item Code record exists", ""));
 
-    //}
+    }
 }

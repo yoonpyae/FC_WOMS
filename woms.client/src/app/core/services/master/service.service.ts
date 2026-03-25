@@ -32,7 +32,7 @@ export class ServiceService {
     return this.httpClinet.put<RootModel>(`${environment.main_url}/master/services`, model);
   }
 
-  delete(id: number): Observable<RootModel> {
-    return this.httpClinet.delete<RootModel>(`${environment.main_url}/master/services/${id}`);
+  delete(id: number, branchId: number): Observable<any> {
+    return this.httpClinet.delete<RootModel>(`${environment.main_url}/master/services/${id}/${branchId}`);
   }
 }

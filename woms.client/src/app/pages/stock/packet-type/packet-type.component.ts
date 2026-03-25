@@ -104,7 +104,8 @@ export class PacketTypeComponent implements OnInit {
         this.loggerService.info(this.packetTypes);
       },
       error: err => {
-
+        this.loading = false; // Stop spinner on error
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load packet types.' });
       },
       complete: () => {
         this.loading = false;

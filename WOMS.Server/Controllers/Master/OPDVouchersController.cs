@@ -54,6 +54,24 @@ public class OPDVouchersController(IRepositoryWrapper repo, IIdGenerateService i
     {
         try
         {
+            //  Validation for Negative Values
+            if (model.TotalAmount < 0 || model.DiscountAmount < 0 || model.PaidAmount < 0)
+                return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Amounts cannot be negative.", ""));
+
+            //  Prevent Double-Billing same Consultation
+            List<string> consultationIds = model.Items.Where(i => !string.IsNullOrEmpty(i.ConsultationId)).Select(i => i.ConsultationId).ToList();
+            if (consultationIds.Any())
+            {
+                var alreadyBilled = await repo.OPDVoucherItems.GetFirstAsync(x => consultationIds.Contains(x.ConsultationId));
+                if (alreadyBilled != null)
+                    return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("One of the selected consultations has already been billed.", ""));
+            }
+
+            //  Calculation Integrity Check
+            double expectedLeft = model.TotalAmount - model.DiscountAmount - model.PaidAmount;
+            if (Math.Abs(expectedLeft - model.LeftAmount) > 0.01) // Check for rounding errors
+                return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Calculation mismatch detected.", ""));
+
             string vno = idGenerateService.GetOPDVNo(model.BranchId);
 
             bool isFullyPaid = model.LeftAmount == 0 && model.PaidAmount == model.TotalAmount;

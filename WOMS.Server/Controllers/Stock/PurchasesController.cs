@@ -120,7 +120,6 @@ public class PurchasesController(
                 repo.PurchaseDetails.Create(itemDetail);
             }
 
-
             return await repo.SaveAsync()
                 ? ResponseHelper.Created_Result("api/Purchases", null,
                     new DefaultResponseMessageModel("Successfully created new Purchase and updated SalePrice and PurchasePrice in MainStock and PharmacyStock.", ""))

@@ -194,8 +194,8 @@
 
                             <div class="flex flex-wrap gap-2 pt-4 mt-2 border-t border-gray-200">
                                 <p-button *ngIf="!isViewMode" icon="pi pi-check" label="Save Voucher" severity="success"
-                                    class="flex-1" styleClass="w-full" [loading]="isSubmitting"
-                                    (onClick)="submit()"></p-button>
+                                    [disabled]="cookieData.length === 0 || opdVoucherForm.invalid" class="flex-1"
+                                    styleClass="w-full" [loading]="isSubmitting" (onClick)="submit()"></p-button>
                                 <p-button *ngIf="!isViewMode" icon="pi pi-refresh" label="Clear" severity="secondary"
                                     class="flex-1" styleClass="w-full p-button-outlined" (onClick)="clear()"></p-button>
 

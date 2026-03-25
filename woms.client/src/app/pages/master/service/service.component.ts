@@ -92,7 +92,7 @@ export class ServiceComponent implements OnInit {
     this.loadData();
   }
 
-    loadData(): void {
+  loadData(): void {
     let branchId: number = Number.parseInt((this.sharedService.getDefaultBranchId() ?? "0"));
     this.loading = true;
     this.serviceService.get(branchId).subscribe({
@@ -158,12 +158,14 @@ export class ServiceComponent implements OnInit {
 
   delete(): void {
     if (this.selectedService != null) {
+      const branchId = this.selectedService.branchId;
       this.confirmationService.confirm({
         message: 'Are You Sure Want To Delete?',
         header: 'Delete Confirmation',
         icon: 'pi pi-info-circle',
         accept: () => {
-          this.serviceService.delete(this.selectedService.serviceId).subscribe({
+          this.loading = true;
+          this.serviceService.delete(this.selectedService.serviceId, branchId).subscribe({
             next: (res) => {
               this.messageService.add({
                 key: 'globalMessage',

@@ -270,8 +270,9 @@ export class PharmacyCreateVoucherComponent implements OnInit {
     let discountAmount = Number(this.pharmacyVoucherForm.controls['discountAmount'].value) || 0;
     let paidAmount = Number(this.pharmacyVoucherForm.controls['paidAmount'].value) || 0;
 
-    let netAmount = totalAmount - discountAmount;
-    let leftAmount = netAmount - paidAmount;
+    // Use rounding to fix precision errors
+    const netAmount = Math.round((totalAmount - discountAmount) * 100) / 100;
+    const leftAmount = Math.round((netAmount - paidAmount) * 100) / 100;
 
     this.pharmacyVoucherForm.controls['totalAmount'].setValue(totalAmount);
     this.pharmacyVoucherForm.controls['netAmount'].setValue(Math.max(netAmount, 0));

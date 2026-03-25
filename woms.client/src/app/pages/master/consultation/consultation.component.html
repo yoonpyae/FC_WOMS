@@ -162,15 +162,20 @@
                             ngDefaultControl placeholder="Select medication..." [style]="{ width: '100%' }" required>
                         </app-item-code-dropdown>
                     </div>
-
-                    <div class="grid grid-cols-12 gap-4 mb-4">
+                    <div class="flex flex-col mb-4">
                         <div class="col-span-12 md:col-span-6 flex flex-col">
                             <label class="text-sm font-semibold mb-2">Dosage</label>
-                            <p-select [options]="dosages" formControlName="dosage" class="w-full"></p-select>
+                            <p-select [options]="dosages" formControlName="dosage" placeholder="Select dosage"
+                                class="w-full">
+                            </p-select>
                         </div>
+                    </div>
+                    <div class="flex flex-col mb-4">
                         <div class="col-span-12 md:col-span-6 flex flex-col">
                             <label class="text-sm font-semibold mb-2">Frequency</label>
-                            <p-select [options]="frequencies" formControlName="frequency" class="w-full"></p-select>
+                            <p-select [options]="frequencies" formControlName="frequency" [editable]="true"
+                                placeholder="Select or type..." class="w-full">
+                            </p-select>
                         </div>
                     </div>
 
@@ -229,7 +234,8 @@
                     </div>
 
                     <div class="flex flex-col gap-2 text-sm text-gray-700 mt-1">
-                        <p><i class="pi pi-user mr-2 text-gray-400"></i> {{ patientInfo.gender || 'Unknown' }} • DOB: {{
+                        <p><i class="pi pi-user mr-2 text-gray-400"></i> {{ patientInfo.gender || 'Unknown' }} •
+                            DOB: {{
                             patientInfo.dob | date:'yyyy-MM-dd' }}</p>
                         <p><i class="pi pi-phone mr-2 text-gray-400"></i> {{ patientInfo.phone || '-' }}</p>
                     </div>
@@ -239,7 +245,8 @@
                                 class="pi pi-calendar-clock mr-2"></i>Scheduled Appointment</h5>
                         <div class="flex flex-col gap-2 text-sm text-blue-900">
                             <p><span class="opacity-75 w-16 inline-block">Time:</span> <strong>{{
-                                    appointmentInfo.appointmentDate + 'T' + appointmentInfo.startTime | date:'shortTime'
+                                    appointmentInfo.appointmentDate + 'T' + appointmentInfo.startTime |
+                                    date:'shortTime'
                                     }}</strong></p>
                             <p><span class="opacity-75 w-16 inline-block">Doctor:</span> <strong>{{
                                     appointmentInfo.doctorName }}</strong></p>

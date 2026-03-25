@@ -383,7 +383,8 @@ export class OPDVoucherEntryComponent implements OnInit {
   }
 
   saveItemsToCookie(items: OPDItemCookieData[]): void {
-    this.cookieService.set(this.OPD_COOKIE_NAME, JSON.stringify(items), 1);
+    const key = `${this.OPD_COOKIE_NAME}_${this.opdVoucherForm.get('branchId')?.value}`;
+    this.cookieService.set(key, JSON.stringify(items), 1);
   }
 
   loadItemsFromCookie(): void {
@@ -410,13 +411,18 @@ export class OPDVoucherEntryComponent implements OnInit {
   onAmountChange(): void {
     const totalAmount = this.cookieData.reduce((sum, item) => sum + (item.amount || 0), 0);
     const discountAmount = Number(this.opdVoucherForm.get('discountAmount')?.value) || 0;
-    const paidAmount = Number(this.opdVoucherForm.get('paidAmount')?.value) || 0;
+    let paidAmount = Number(this.opdVoucherForm.get('paidAmount')?.value) || 0;
 
-    const leftAmount = totalAmount - discountAmount - paidAmount;
+    const netAmount = totalAmount - discountAmount;
+
+    if (paidAmount > netAmount) {
+      paidAmount = netAmount;
+      this.opdVoucherForm.patchValue({ paidAmount: netAmount }, { emitEvent: false });
+    }
 
     this.opdVoucherForm.patchValue({
       totalAmount: totalAmount,
-      leftAmount: Math.max(leftAmount, 0)
+      leftAmount: Math.max(netAmount - paidAmount, 0)
     }, { emitEvent: false });
   }
 

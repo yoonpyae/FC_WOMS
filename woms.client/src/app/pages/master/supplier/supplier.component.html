@@ -134,7 +134,7 @@
 
             <!-- Contact Person -->
             <div class="col-span-6 flex flex-col gap-2">
-                <label>Contatct Person</label>
+                <label>Contact Person</label>
                 <input formControlName="contactPerson" pInputText placeholder="Enter Contact Person..." required />
             </div>
 
@@ -153,9 +153,9 @@
             <div class="col-span-6 flex flex-col gap-2">
                 <label class="font-semibold">Township</label>
                 <p-select [options]="townships" [(ngModel)]="SelectedTownship" (onChange)="onTownshipChange()"
-                    optionLabel="townshipName" dataKey="townshipId" placeholder="Select Township"
-                    [ngModelOptions]="{ standalone: true }" [filter]="true" filterBy="townshipName" [showClear]="true"
-                    appendTo="body">
+                    [disabled]="!SelectedState" optionLabel="townshipName" dataKey="townshipId"
+                    placeholder="Select Township" [ngModelOptions]="{ standalone: true }" [filter]="true"
+                    filterBy="townshipName" [showClear]="true" appendTo="body">
                 </p-select>
             </div>
 

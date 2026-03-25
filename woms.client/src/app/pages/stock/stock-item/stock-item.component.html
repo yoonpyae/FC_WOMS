@@ -3,7 +3,7 @@
     <!-- #region table -->
     <p-table #dt1 [value]="stockItems" [paginator]="true" [rows]="20" sortField="createdOn" [sortOrder]="-1"
         [loading]="loading" styleClass="p-datatable-striped" [showCurrentPageReport]="true"
-        [globalFilterFields]="['itemCode','itemName']" [tableStyle]="{ 'min-width': '50rem' }"
+        [globalFilterFields]="['itemCode','itemName','chemicalName']" [tableStyle]="{ 'min-width': '50rem' }"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         [rowsPerPageOptions]="[20,50,100]" selectionMode="single" [(selection)]="selectedStockItem" dataKey="itemCode">
 

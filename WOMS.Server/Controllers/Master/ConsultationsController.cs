@@ -116,6 +116,14 @@ namespace WOMS.Server.Controllers.Master
         [EndpointDescription("Creates a new consultation record with multiple prescriptions.")]
         public async Task<IActionResult> CreateConsultation(ConsultationEntryModel payload)
         {
+            if (payload.Consultation.Ano != null)
+            {
+                Consultation? existing = await repo.Consultations.GetFirstAsync(x =>
+                    x.Ano == payload.Consultation.Ano && !x.DeletedOn.HasValue);
+                if (existing != null)
+                    return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("A consultation already exists for this appointment.", ""));
+            }
+
             Consultation consultation = payload.Consultation;
             List<Prescription> prescriptions = payload.Prescriptions;
 
@@ -178,14 +186,9 @@ namespace WOMS.Server.Controllers.Master
             List<Prescription> incomingPrescriptions = payload.Prescriptions;
 
             Consultation? consultation = await repo.Consultations.GetFirstAsync(x => x.ConsultationId == model.ConsultationId && x.BranchId == model.BranchId);
-            if (consultation == null)
-            {
-                return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Consultation record not found.", ""));
-            }
+            if (consultation == null) return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Consultation record not found.", ""));
 
-            // 1. Update Consultation fields
-            consultation.Ano = model.Ano;
-            consultation.DoctorId = model.DoctorId;
+            // Update Consultation
             consultation.Symptoms = model.Symptoms;
             consultation.Diagnosis = model.Diagnosis;
             consultation.Notes = model.Notes;
@@ -194,63 +197,47 @@ namespace WOMS.Server.Controllers.Master
             consultation.UpdatedBy = User.Identity?.Name ?? string.Empty;
             repo.Consultations.Update(consultation);
 
-            // 2. Handle Prescriptions Sync
-            // Fetch all existing active prescriptions for this consultation
-            var existingPrescriptions = await repo.Prescriptions.GetAsync(x => x.ConsultationId == model.ConsultationId && x.BranchId == model.BranchId && !x.DeletedOn.HasValue);
+            // Sync Prescriptions using ID instead of ItemCode
+            var existingPrescriptions = await repo.Prescriptions.GetAsync(x => x.ConsultationId == model.ConsultationId && !x.DeletedOn.HasValue);
 
-            // A. Find Prescriptions to Delete (Removed from the frontend array)
-            var incomingItemCodes = incomingPrescriptions.Select(p => p.ItemCode).ToList();
-            var prescriptionsToDelete = existingPrescriptions.Where(e => !incomingItemCodes.Contains(e.ItemCode)).ToList();
-
-            foreach (var del in prescriptionsToDelete)
+            // Delete ones not in the incoming list
+            var incomingIds = incomingPrescriptions.Select(p => p.PrescriptionId).ToList();
+            var toDelete = existingPrescriptions.Where(e => !incomingIds.Contains(e.PrescriptionId));
+            foreach (var del in toDelete)
             {
                 del.DeletedOn = DateTime.Now;
                 del.DeletedBy = User.Identity?.Name ?? string.Empty;
                 repo.Prescriptions.Update(del);
             }
 
-            // Grab the highest PrescriptionId in case we need to add new ones
-            Prescription? lastRecord = await repo.Prescriptions.GetFirstAsync(
-                x => x.BranchId == model.BranchId,
-                q => q.OrderByDescending(x => x.PrescriptionId));
-            long currentMaxId = lastRecord?.PrescriptionId ?? 0;
-
-            // B. Find Prescriptions to Update or Add
+            // Update or Add
             foreach (var incoming in incomingPrescriptions)
             {
-                // Check if the medication already exists in this consultation by ItemCode
-                var existing = existingPrescriptions.FirstOrDefault(e => e.ItemCode == incoming.ItemCode);
-
-                if (existing != null)
+                // If ID <= 0, it's a new item from the frontend
+                if (incoming.PrescriptionId <= 0)
                 {
-                    // UPDATE existing medication
-                    existing.Dosage = incoming.Dosage;
-                    existing.Frequency = incoming.Frequency;
-                    existing.Duration = incoming.Duration;
-                    existing.Instruction = incoming.Instruction;
-                    existing.Quantity = incoming.Quantity;
-                    existing.UpdatedOn = DateTime.Now;
-                    existing.UpdatedBy = User.Identity?.Name ?? string.Empty;
-                    repo.Prescriptions.Update(existing);
+                    // Note: Ideally use DB Identity here. If manual, fetch MaxId ONCE outside this loop.
+                    incoming.ConsultationId = model.ConsultationId;
+                    incoming.BranchId = model.BranchId;
+                    incoming.CreatedOn = DateTime.Now;
+                    repo.Prescriptions.Create(incoming);
                 }
                 else
                 {
-                    // ADD new medication
-                    currentMaxId++;
-                    incoming.PrescriptionId = currentMaxId;
-                    incoming.ConsultationId = model.ConsultationId;
-                    incoming.BranchId = model.BranchId;
-                    incoming.Date = consultation.VisitDate;
-                    incoming.CreatedOn = DateTime.Now;
-                    incoming.CreatedBy = User.Identity?.Name ?? string.Empty;
-                    repo.Prescriptions.Create(incoming);
+                    var existing = existingPrescriptions.FirstOrDefault(e => e.PrescriptionId == incoming.PrescriptionId);
+                    if (existing != null)
+                    {
+                        existing.ItemCode = incoming.ItemCode;
+                        existing.Dosage = incoming.Dosage;
+                        existing.Frequency = incoming.Frequency;
+                        existing.Quantity = incoming.Quantity;
+                        existing.UpdatedOn = DateTime.Now;
+                        repo.Prescriptions.Update(existing);
+                    }
                 }
             }
 
-            // 3. Save everything in one transaction
-            return await repo.SaveAsync()
-                ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully updated consultation and prescriptions.", ""))
-                : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to update records.", ""));
+            return await repo.SaveAsync() ? ResponseHelper.OK_Result(null, null) : ResponseHelper.Bad_Request(null, null);
         }
 
         [HttpDelete("{id}")]
