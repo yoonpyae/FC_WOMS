@@ -7,12 +7,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 namespace WOMS.Server.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class AuthorizeAttribute : Attribute, IAsyncAuthorizationFilter
+    public class AuthorizeAttribute : Attribute, IAuthorizationFilter
     {
-        public string? Policy { get; set; } = null;
-        public string? Claim { get; set; } = null;
 
-        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
+        public void OnAuthorization(AuthorizationFilterContext context)
         {
             // skip authorization if action is decorated with [AllowAnonymous] attribute
             var allowAnonymous = context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any();
@@ -39,7 +37,6 @@ namespace WOMS.Server.Attributes
 
                 string userId = claims?.FirstOrDefault(x => x.Type.Equals("UserId", StringComparison.OrdinalIgnoreCase))?.Value ?? string.Empty;
 
-                List<AspNetUserClaim> userClaims = await _dbContext.AspNetUserClaims.Where(x => x.UserId == userId).ToListAsync();
 
                 bool validUser = true;
 
@@ -53,22 +50,7 @@ namespace WOMS.Server.Attributes
                     validUser = false;
                 }
 
-                if (Policy != null && Claim != null && role != "Cashier")
-                {
-                    if (!userClaims.Any(x => x.ClaimType == Policy && x.ClaimValue == Claim))
-                    {
-                        // not logged in
-                        context.Result = new JsonResult(new
-                        {
-                            success = false,
-                            code = StatusCodes.Status403Forbidden,
-                            data = "",
-                            message = $"Request Permission denied. [{Policy}]",
-                        })
-                        { StatusCode = StatusCodes.Status403Forbidden };
-                        return;
-                    }
-                }
+               
 
                 if (!validUser)
                 {
