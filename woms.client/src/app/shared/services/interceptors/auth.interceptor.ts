@@ -10,7 +10,7 @@ export const authInterceptorFn: HttpInterceptorFn = (request, next) => {
 	const loggerService = inject(LoggerService);
 	const router = inject(Router);
 
-	const token = window.localStorage.getItem('access_token');
+	const token = sessionStorage.getItem('access_token');
 	if (request.url.includes('auth')) {
 		request = request.clone({
 			setHeaders: {
