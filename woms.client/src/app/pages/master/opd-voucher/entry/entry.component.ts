@@ -126,10 +126,10 @@ export class OPDVoucherEntryComponent implements OnInit {
 
   ngOnInit(): void {
     const branchId = Number.parseInt(this.sharedService.getDefaultBranchId() ?? '0');
-    this.opdVoucherForm.patchValue({ branchId });
+    this.opdVoucherForm.patchValue({ branchId }, { emitEvent: false });
+
     this.getServices(branchId);
 
-    // Check URL for View Mode
     this.route.queryParams.subscribe(params => {
       this.viewVno = params['viewVno'] || null;
 
@@ -150,13 +150,32 @@ export class OPDVoucherEntryComponent implements OnInit {
   loadExistingVoucher(vno: string, branchId: number) {
     this.loading = true;
 
+    this.cookieService.delete(this.getCookieKey());
+
     forkJoin({
       header: this.opdVoucherService.getById(vno, branchId),
       details: this.opdVoucherService.GetByDetails(vno, branchId)
     }).subscribe({
       next: (res: any) => {
         const headerData = res.header.data;
-        const detailsData = res.details.data;
+
+        const detailsData = res.details.data || [];
+
+        const mappedDetails: OPDItemCookieData[] = detailsData.map((item: any) => {
+          const isService = item.serviceId !== 0;
+          return {
+            opdvno: item.opdvno,
+            serviceId: item.serviceId,
+            consultationId: item.consultationId,
+            itemType: isService ? 'Service' : 'Consultation',
+            itemName: isService
+              ? (item.serviceName || 'Service')
+              : (item.doctorName ? `Consultation - Dr. ${item.doctorName}` : 'Consultation'),
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            amount: item.amount || (item.quantity * item.unitPrice)
+          };
+        });
 
         this.opdVoucherForm.patchValue({
           opdvno: headerData.opdvno,
@@ -173,32 +192,13 @@ export class OPDVoucherEntryComponent implements OnInit {
         });
 
         this.patientName = headerData.patientName;
-        this.patientId = headerData.patientId;
         this.doctorName = headerData.doctorName;
 
-        this.cookieData = detailsData.map((item: any) => {
-          const isService = item.serviceId !== 0;
-          return {
-            opdvno: item.opdvno,
-            serviceId: item.serviceId,
-            consultationId: item.consultationId,
-            itemType: isService ? 'Service' : 'Consultation',
-            itemName: isService ? (item.serviceName || 'Service') : 'Consultation',
-            quantity: item.quantity,
-            unitPrice: item.unitPrice,
-            amount: item.amount || item.totalItemAmount
-          };
-        });
+        // Save the DB data to the cookie so the table has something to show
+        this.saveItemsToCookie(mappedDetails);
+        this.cookieData = mappedDetails;
 
-        this.opdVoucherForm.disable();
-
-        if (headerData.leftAmount > 0) {
-          this.allowPaymentUpdate = true;
-          this.opdVoucherForm.get('paidAmount')?.enable();
-          this.opdVoucherForm.get('paymentType')?.enable();
-        } else {
-          this.allowPaymentUpdate = false;
-        }
+        this.onAmountChange();
       },
       error: (err) => this.loggerService.error("Failed to load voucher details"),
       complete: () => this.loading = false
@@ -334,8 +334,8 @@ export class OPDVoucherEntryComponent implements OnInit {
 
     const newItem: OPDItemCookieData = {
       opdvno: "",
-      serviceId: formVals.serviceId || 0,
-      consultationId: formVals.consultationId || '',
+      serviceId: this.selectedEntryType === 'Service' ? (formVals.serviceId || 0) : 0,
+      consultationId: this.selectedEntryType === 'Consultation' ? (formVals.consultationId || '') : '',
       itemType: this.selectedEntryType,
       itemName: displayItemName,
       quantity: formVals.quantity,
@@ -345,14 +345,23 @@ export class OPDVoucherEntryComponent implements OnInit {
 
     const existingItems = this.getItemsFromCookie();
 
-    const existingItem = existingItems.find(item =>
-      item.itemType === this.selectedEntryType &&
-      (this.selectedEntryType === 'Service' ? item.serviceId === newItem.serviceId : item.consultationId === newItem.consultationId)
-    );
+    const existingItem = existingItems.find(item => {
+      if (item.itemType !== this.selectedEntryType) return false;
+
+      if (this.selectedEntryType === 'Service') {
+        // Match by ID primarily, fallback to Name
+        return item.serviceId === newItem.serviceId ||
+          item.itemName.toLowerCase() === newItem.itemName.toLowerCase();
+      } else {
+        return item.consultationId === newItem.consultationId;
+      }
+    });
 
     if (existingItem) {
-      existingItem.quantity = (existingItem.quantity || 0) + (newItem.quantity || 0);
-      existingItem.amount = (existingItem.amount || 0) + (newItem.amount || 0);
+      // If it exists, overwrite/update instead of just adding to it
+      existingItem.quantity = (newItem.quantity || 0);
+      existingItem.amount = (newItem.amount || 0);
+      existingItem.unitPrice = newItem.unitPrice;
     } else {
       existingItems.push(newItem);
     }
@@ -377,14 +386,18 @@ export class OPDVoucherEntryComponent implements OnInit {
     this.selectedConsultation = null as any;
   }
 
+  private getCookieKey(): string {
+    const branchId = this.opdVoucherForm.get('branchId')?.value || '0';
+    return `${this.OPD_COOKIE_NAME}_${branchId}`;
+  }
+
   getItemsFromCookie(): OPDItemCookieData[] {
-    const cookieData = this.cookieService.get(this.OPD_COOKIE_NAME);
+    const cookieData = this.cookieService.get(this.getCookieKey());
     try { return cookieData ? JSON.parse(cookieData) : []; } catch { return []; }
   }
 
   saveItemsToCookie(items: OPDItemCookieData[]): void {
-    const key = `${this.OPD_COOKIE_NAME}_${this.opdVoucherForm.get('branchId')?.value}`;
-    this.cookieService.set(key, JSON.stringify(items), 1);
+    this.cookieService.set(this.getCookieKey(), JSON.stringify(items), 1); // Use helper
   }
 
   loadItemsFromCookie(): void {
@@ -403,13 +416,16 @@ export class OPDVoucherEntryComponent implements OnInit {
   }
 
   clearAllItemsFromCookie(): void {
-    this.cookieService.delete(this.OPD_COOKIE_NAME);
+    this.cookieService.delete(this.getCookieKey());
     this.cookieData = [];
     this.onAmountChange();
   }
 
   onAmountChange(): void {
+    this.cookieData = this.getItemsFromCookie();
+
     const totalAmount = this.cookieData.reduce((sum, item) => sum + (item.amount || 0), 0);
+
     const discountAmount = Number(this.opdVoucherForm.get('discountAmount')?.value) || 0;
     let paidAmount = Number(this.opdVoucherForm.get('paidAmount')?.value) || 0;
 
