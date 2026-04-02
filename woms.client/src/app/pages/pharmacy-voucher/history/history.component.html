@@ -189,6 +189,23 @@
     </p-table>
 </div>
 
+<p-toast position="bottom-center" key="undo" [preventOpenDuplicates]="true">
+    <ng-template let-message pTemplate="message">
+        <div class="flex items-center justify-between w-full gap-4 p-2">
+            <div class="flex items-center gap-2">
+                <i class="pi pi-check-circle text-green-500 text-xl"></i>
+                <span class="font-medium text-gray-900 dark:text-white">{{ message.detail }}</span>
+            </div>
+
+            <div class="shrink-0">
+                <p-button size="small" label="Undo" icon="pi pi-undo" severity="secondary"
+                    styleClass="whitespace-nowrap" (onClick)="undoDelete(message.data)">
+                </p-button>
+            </div>
+        </div>
+    </ng-template>
+</p-toast>
+
 <!-- Credit Payment Dialog -->
 <p-dialog header="Credit Payment" [(visible)]="PaymentVisible" (onHide)="clearSelection()" [breakpoints]="{
     '1920px': '30vw',
