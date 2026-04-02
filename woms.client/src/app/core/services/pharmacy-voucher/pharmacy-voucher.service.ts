@@ -39,4 +39,8 @@ export class PharmacyVoucherService {
   delete(vno: string): Observable<RootModel> {
     return this.httpClient.delete<RootModel>(`${environment.main_url}/pharmacy/pharmacyvouchers/${vno}`);
   }
+
+  restore(vno: string): Observable<RootModel> {
+    return this.httpClient.put<RootModel>(`${environment.main_url}/pharmacy/pharmacyvouchers/${vno}/restore`, {});
+  }
 }
