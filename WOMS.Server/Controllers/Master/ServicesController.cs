@@ -93,13 +93,25 @@ public class ServicesController(IRepositoryWrapper repo) : ControllerBase
     [EndpointDescription("Deletes a service with specified id.")]
     public async Task<IActionResult> Delete(long id, long branchId)
     {
+        //  Prevent deletion if the service is already billed in an OPD Voucher
+        var isBilled = await repo.OPDVoucherItems.GetFirstAsync(x => x.ServiceId == id);
+        if (isBilled != null)
+        {
+            return ResponseHelper.Bad_Request(null,
+                new DefaultResponseMessageModel("Cannot delete this Service because it has already been billed in an OPD Voucher.", ""));
+        }
+
+        // Proceed with soft delete
         Service? existingService = await repo.Services.GetFirstAsync(x => x.ServiceId == id && x.BranchId == branchId);
         if (existingService is null)
             return ResponseHelper.NotFound_Request(null,
                 new DefaultResponseMessageModel("Unable to find Service", ""));
+
         existingService.DeletedOn = DateTime.Now;
         existingService.DeletedBy = User.Identity?.Name ?? string.Empty;
+
         repo.Services.Update(existingService);
+
         return await repo.SaveAsync()
             ? ResponseHelper.OK_Result(null,
                 new DefaultResponseMessageModel("Successfully deleted Service.", ""))
