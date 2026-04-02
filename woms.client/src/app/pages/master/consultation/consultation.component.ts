@@ -161,21 +161,21 @@ export class ConsultationComponent implements OnInit {
     return this.consultationForm.get('prescriptions') as FormArray;
   }
 
-addMedication() {
-  const medGroup = this.formBuilder.group({
-    prescriptionId: [0],
-    consultationId: [this.isEdit ? this.selectedConsultation.consultationId : 'TEMP_ID'],
-    itemCode: ['', Validators.required],
-    dosage: [null, [Validators.required, Validators.maxLength(50)]], // Added limit
-    frequency: [null, [Validators.required, Validators.maxLength(20)]], // Added limit
-    duration: [3, [Validators.required, Validators.min(1)]],
-    instruction: [''],
-    quantity: [1, [Validators.required, Validators.min(1)]]
-  });
-  this.prescriptionsArray.push(medGroup);
-  this.selectedStockItems.push(null);
+  addMedication() {
+    const medGroup = this.formBuilder.group({
+      prescriptionId: [0],
+      consultationId: [this.isEdit ? this.selectedConsultation.consultationId : 'TEMP_ID'],
+      itemCode: ['', Validators.required],
+      dosage: [null, [Validators.required, Validators.maxLength(50)]], // Added limit
+      frequency: [null, [Validators.required, Validators.maxLength(20)]], // Added limit
+      duration: [3, [Validators.required, Validators.min(1)]],
+      instruction: [''],
+      quantity: [1, [Validators.required, Validators.min(1)]]
+    });
+    this.prescriptionsArray.push(medGroup);
+    this.selectedStockItems.push(null);
   }
-  
+
   removeMedication(index: number) {
     this.prescriptionsArray.removeAt(index);
     this.selectedStockItems.splice(index, 1);
@@ -335,13 +335,11 @@ addMedication() {
   }
 
   delete(): void {
-    // 1. Check if a row is actually selected in the table
     if (!this.selectedConsultation) {
       this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Please select a record to delete.' });
       return;
     }
 
-    // 2. Show the PrimeNG confirmation dialog
     this.confirmationService.confirm({
       message: `Are you sure you want to delete the consultation record for ${this.selectedConsultation.patientName}?`,
       header: 'Confirm Deletion',
@@ -349,11 +347,9 @@ addMedication() {
       acceptButtonStyleClass: 'p-button-danger',
       rejectButtonStyleClass: 'p-button-text p-button-secondary',
 
-      // 3. If the user clicks "Yes" (Accept)
       accept: () => {
         this.loading = true;
 
-        // Call your backend delete API passing the string ID
         this.consultationService.delete(this.selectedConsultation.consultationId).subscribe({
           next: (res: any) => {
             this.messageService.add({
@@ -362,18 +358,23 @@ addMedication() {
               detail: res.message?.en ?? 'Consultation deleted successfully.'
             });
 
-            // @ts-ignore (If TypeScript complains about nulling the strict type)
+            // @ts-ignore
             this.selectedConsultation = null;
             this.loadData();
           },
           error: (err: any) => {
             this.loggerService.error("Delete Error");
+
+            const backendErrorMessage = err.error.message.en;
+
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
-              detail: 'An error occurred while deleting the record.'
+              detail: backendErrorMessage ?? 'An error occurred while deleting the record.'
             });
+
             this.loading = false;
+            this.loadData();
           }
         });
       }
