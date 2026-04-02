@@ -297,7 +297,7 @@ export class PharmacyVoHistoryComponent implements OnInit {
 
   //#endregion
 
-  //#region Delete
+  //#region Delete & Undo
   delete(voucher: ViPharmacyVoucherModel): void {
     if (this.selectedPharmacyVoucherHistory != null) {
       this.confirmationService.confirm({
@@ -306,14 +306,26 @@ export class PharmacyVoHistoryComponent implements OnInit {
         icon: 'pi pi-info-circle',
         accept: () => {
           this.loading = true;
-          this.pharmacyVoucherService.delete(this.selectedPharmacyVoucherHistory.vno).subscribe({
+
+          // Capture the VNO before we nullify the selection
+          const vnoToDelete = this.selectedPharmacyVoucherHistory.vno;
+
+          this.pharmacyVoucherService.delete(vnoToDelete).subscribe({
             next: (res) => {
-              this.messageService.add({ key: 'globalMessage', severity: 'success', summary: 'Success', detail: res.message.en, });
+              // Trigger the custom Undo Toast
+              this.messageService.add({
+                key: 'undo',
+                severity: 'success',
+                detail: `Voucher ${vnoToDelete} has been deleted.`,
+                data: vnoToDelete, // Pass the VNO to the toast button
+                life: 6000 // Give them 6 seconds to click undo
+              });
+
               this.loadData();
               this.selectedPharmacyVoucherHistory = null as any;
             },
             error: (err) => {
-              this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.message });
+              this.messageService.add({ key: 'globalMessage', severity: 'error', summary: 'Error', detail: err.error.message });
             },
             complete: () => {
               this.loading = false;
@@ -330,6 +342,34 @@ export class PharmacyVoHistoryComponent implements OnInit {
         detail: 'Please choose Pharmacy Voucher.',
       });
     }
+  }
+
+  undoDelete(vno: string): void {
+    // Hide the toast immediately upon clicking Undo
+    this.messageService.clear('undo');
+    this.loading = true;
+
+    // Call your new Restore endpoint (Make sure to add this to your service!)
+    this.pharmacyVoucherService.restore(vno).subscribe({
+      next: (res: any) => {
+        this.messageService.add({
+          key: 'globalMessage',
+          severity: 'success',
+          summary: 'Restored',
+          detail: `Voucher ${vno} was successfully restored.`
+        });
+        this.loadData();
+      },
+      error: (err: any) => {
+        this.messageService.add({
+          key: 'globalMessage',
+          severity: 'error',
+          summary: 'Restore Failed',
+          detail: err.error?.message?.en ?? 'Could not restore the record.'
+        });
+        this.loading = false;
+      }
+    });
   }
   //#endregion
 
