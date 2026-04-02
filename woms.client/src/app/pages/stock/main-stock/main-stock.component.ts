@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MainStockModel, ViMainStockModel } from '@core_models/stock/main-stock.model';
 import { PacketTypeModel } from '@core_models/stock/packet-type.model';
@@ -21,7 +21,8 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-
+import { Table } from 'primeng/table';
+import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-main-stock',
   imports: [
@@ -47,6 +48,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
   templateUrl: './main-stock.component.html'
 })
 export class MainStockComponent implements OnInit {
+  @ViewChild('dt1') dt1!: Table;
   mainstocks: ViMainStockModel[] = [];
   selectedMainStock!: MainStockModel;
   packetTypes: PacketTypeModel[] = [];
@@ -66,6 +68,7 @@ export class MainStockComponent implements OnInit {
     private sharedService: SharedService,
     private exportService: ExportService,
     private packetTypeService: PacketTypeService,
+    private route: ActivatedRoute
   ) {
     this.items = [
       {
@@ -103,6 +106,33 @@ export class MainStockComponent implements OnInit {
         this.loading = false;
 
         this.loggerService.info(this.mainstocks);
+
+        const filterType = this.route.snapshot.queryParamMap.get('filter');
+
+        const outOfStockCount = this.mainstocks.filter(item => item.groundBalance === 0).length;
+        const lowStockCount = this.mainstocks.filter(item => (item.groundBalance ?? -1) > 0 && (item.groundBalance ?? -1) <= 10).length;
+
+        if (outOfStockCount > 0 && filterType !== 'low-stock') {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Out of Stock Alert',
+            detail: `Attention! ${outOfStockCount} item(s) have 0 ground balance.`,
+            life: 6000
+          });
+        }
+
+        if (lowStockCount > 0 && filterType !== 'out-of-stock') {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Low Stock Alert',
+            detail: `${lowStockCount} item(s) are running low (10 or fewer remaining).`,
+            life: 6000
+          });
+        }
+
+        setTimeout(() => {
+          this.applyRouteFilters();
+        });
       },
       error: err => {
 
@@ -114,6 +144,23 @@ export class MainStockComponent implements OnInit {
     this.getPackettype();
   }
   //#endregion
+
+  applyRouteFilters(): void {
+    const filterType = this.route.snapshot.queryParamMap.get('filter');
+
+    if (filterType === 'out-of-stock') {
+      // Filters exactly to 0
+      this.dt1.filter(0, 'groundBalance', 'equals');
+    } else if (filterType === 'low-stock') {
+      // Filters to 10 or less (You can change '10' to whatever your low-stock threshold is)
+      this.dt1.filter(10, 'groundBalance', 'lte');
+    }
+  }
+
+  clearFilters(searchBox: HTMLInputElement): void {
+    this.dt1.clear(); // Clears all table filters
+    searchBox.value = ''; // Clears the global search input
+  }
 
   //#region CRUD 
   update(): void {
