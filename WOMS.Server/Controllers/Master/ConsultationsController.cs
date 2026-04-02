@@ -245,6 +245,15 @@ namespace WOMS.Server.Controllers.Master
         [EndpointDescription("Deletes a consultation record and its associated prescriptions.")]
         public async Task<IActionResult> Delete(string id)
         {
+            //  Prevent deletion if the consultation is already billed in an OPD Voucher
+            var isBilled = await repo.OPDVoucherItems.GetFirstAsync(x => x.ConsultationId == id);
+            if (isBilled != null)
+            {
+                return ResponseHelper.Bad_Request(null,
+                    new DefaultResponseMessageModel("Cannot delete this Consultation because it has already been billed in an OPD Voucher.", ""));
+            }
+
+            //  Proceed with soft delete
             Consultation? consultation = await repo.Consultations.GetFirstAsync(x => x.ConsultationId == id);
             if (consultation == null)
             {
@@ -268,7 +277,7 @@ namespace WOMS.Server.Controllers.Master
                 }
             }
 
-            // 3. Save changes
+            // Save changes
             return await repo.SaveAsync()
                 ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully deleted consultation and prescriptions.", ""))
                 : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to delete records.", ""));
