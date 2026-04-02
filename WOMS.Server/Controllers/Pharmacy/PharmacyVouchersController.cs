@@ -206,21 +206,78 @@ public class PharmacyVouchersController(
 
     [HttpDelete("{vno}")]
     [EndpointSummary("Delete")]
-    [EndpointDescription("Deletes a pharmacy voucher by Vno.")]
+    [EndpointDescription("Deletes a pharmacy voucher and returns stock to MainStock.")]
     public async Task<IActionResult> Delete(string vno)
     {
         PharmacyVoucher? pharmacyVoucher = await repo.PharmacyVouchers.GetFirstAsync(x => x.Vno == vno);
         if (pharmacyVoucher == null)
         {
-            return ResponseHelper.NotFound_Request(null,
-                new DefaultResponseMessageModel("Pharmacy voucher not found.", ""));
+            return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Pharmacy voucher not found.", ""));
         }
+
+        IReadOnlyList<PharmacyVoucherDetail> details = await repo.PharmacyVoucherDetails.GetAsync(x => x.Vno == vno) ?? [];
+        foreach (var detail in details)
+        {
+            MainStock? mainStock = await repo.MainStocks.GetFirstAsync(x => x.ItemCode == detail.ItemCode && x.TypeCode == detail.TypeCode);
+            if (mainStock != null)
+            {
+                mainStock.GroundBalance += detail.Qty; // Add back to inventory
+                mainStock.UpdatedBy = User.Identity?.Name ?? string.Empty;
+                mainStock.UpdatedOn = DateTime.Now;
+                repo.MainStocks.Update(mainStock);
+            }
+        }
+
         pharmacyVoucher.DeletedOn = DateTime.Now;
         pharmacyVoucher.DeletedBy = User.Identity?.Name ?? string.Empty;
         repo.PharmacyVouchers.Update(pharmacyVoucher);
+
         return await repo.SaveAsync()
             ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully deleted pharmacy voucher.", ""))
             : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to delete pharmacy voucher.", ""));
+    }
+
+    [HttpPut("{vno}/restore")]
+    [EndpointSummary("Restore")]
+    [EndpointDescription("Restores a soft-deleted pharmacy voucher and deducts stock.")]
+    public async Task<IActionResult> Restore(string vno)
+    {
+        PharmacyVoucher? pharmacyVoucher = await repo.PharmacyVouchers.GetFirstAsync(x => x.Vno == vno);
+        if (pharmacyVoucher == null)
+        {
+            return ResponseHelper.NotFound_Request(null, new DefaultResponseMessageModel("Pharmacy voucher not found.", ""));
+        }
+
+        IReadOnlyList<PharmacyVoucherDetail> details = await repo.PharmacyVoucherDetails.GetAsync(x => x.Vno == vno) ?? [];
+
+        foreach (var detail in details)
+        {
+            MainStock? mainStockCheck = await repo.MainStocks.GetFirstAsync(x => x.ItemCode == detail.ItemCode && x.TypeCode == detail.TypeCode);
+            if (mainStockCheck == null || mainStockCheck.GroundBalance < detail.Qty)
+            {
+                return ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel($"Cannot restore. Insufficient stock for Item {detail.ItemCode}.", ""));
+            }
+        }
+
+        foreach (var detail in details)
+        {
+            MainStock? mainStock = await repo.MainStocks.GetFirstAsync(x => x.ItemCode == detail.ItemCode && x.TypeCode == detail.TypeCode);
+            if (mainStock != null)
+            {
+                mainStock.GroundBalance -= detail.Qty; // Deduct from inventory
+                mainStock.UpdatedBy = User.Identity?.Name ?? string.Empty;
+                mainStock.UpdatedOn = DateTime.Now;
+                repo.MainStocks.Update(mainStock);
+            }
+        }
+
+        pharmacyVoucher.DeletedOn = null;
+        pharmacyVoucher.DeletedBy = null;
+        repo.PharmacyVouchers.Update(pharmacyVoucher);
+
+        return await repo.SaveAsync()
+            ? ResponseHelper.OK_Result(null, new DefaultResponseMessageModel("Successfully restored pharmacy voucher.", ""))
+            : ResponseHelper.Bad_Request(null, new DefaultResponseMessageModel("Unable to restore pharmacy voucher.", ""));
     }
     #endregion
 }
