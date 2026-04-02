@@ -121,46 +121,43 @@ public class StockItemsController(
     public async Task<IActionResult> Delete(string ItemCode)
     {
         bool purchaseDetail = await repo.PurchaseDetails.AnyAsync(x => x.ItemCode == ItemCode);
-
-        if (purchaseDetail == false)
+        if (purchaseDetail)
         {
-            StockItem? stockItem = await repo.StockItems.GetFirstAsync(x => x.ItemCode == ItemCode);
-
-            if (stockItem == null)
-            {
-                return ResponseHelper.NotFound_Request(null,
-                    new DefaultResponseMessageModel("Item code not found", ""));
-            }
-
-            stockItem.DeletedOn = DateTime.Now;
-            stockItem.DeletedBy = User.Identity?.Name ?? string.Empty;
-            repo.StockItems.Update(stockItem);
-
-            MainStock? mainStock = await repo.MainStocks.GetFirstAsync(x => x.ItemCode == ItemCode);
-            if (mainStock != null)
-            {
-                mainStock.DeletedOn = DateTime.Now;
-                mainStock.DeletedBy = User.Identity?.Name ?? string.Empty;
-                repo.MainStocks.Update(mainStock);
-            }
-
-            //PharmacyStock? pharmacyStock = await repo.PharmacyStocks.GetFirstAsync(x => x.ItemCode == ItemCode);
-            //if (pharmacyStock != null)
-            //{
-            //    pharmacyStock.DeletedOn = DateTime.Now;
-            //    pharmacyStock.DeletedBy = User.Identity?.Name ?? string.Empty;
-            //    repo.PharmacyStocks.Update(pharmacyStock);
-            //}
-
-            return await repo.SaveAsync()
-                ? ResponseHelper.OK_Result(null,
-                    new DefaultResponseMessageModel("Successfully delete stock item.", ""))
-                : ResponseHelper.Bad_Request(null,
-                    new DefaultResponseMessageModel("Unable to delete item item.", ""));
+            return ResponseHelper.Bad_Request(null,
+                new DefaultResponseMessageModel("Cannot delete. This Item Code is used in a Purchase record.", ""));
         }
 
-        return ResponseHelper.Bad_Request(null,
-            new DefaultResponseMessageModel("Item Code record exists", ""));
+        bool usedInPharmacyVoucher = await repo.PharmacyVoucherDetails.AnyAsync(x => x.ItemCode == ItemCode);
+        if (usedInPharmacyVoucher)
+        {
+            return ResponseHelper.Bad_Request(null,
+                new DefaultResponseMessageModel("Cannot delete. This Item Code is used in a Pharmacy Voucher.", ""));
+        }
 
+        StockItem? stockItem = await repo.StockItems.GetFirstAsync(x => x.ItemCode == ItemCode);
+
+        if (stockItem == null)
+        {
+            return ResponseHelper.NotFound_Request(null,
+                new DefaultResponseMessageModel("Item code not found", ""));
+        }
+
+        stockItem.DeletedOn = DateTime.Now;
+        stockItem.DeletedBy = User.Identity?.Name ?? string.Empty;
+        repo.StockItems.Update(stockItem);
+
+        MainStock? mainStock = await repo.MainStocks.GetFirstAsync(x => x.ItemCode == ItemCode);
+        if (mainStock != null)
+        {
+            mainStock.DeletedOn = DateTime.Now;
+            mainStock.DeletedBy = User.Identity?.Name ?? string.Empty;
+            repo.MainStocks.Update(mainStock);
+        }
+
+        return await repo.SaveAsync()
+            ? ResponseHelper.OK_Result(null,
+                new DefaultResponseMessageModel("Successfully delete stock item.", ""))
+            : ResponseHelper.Bad_Request(null,
+                new DefaultResponseMessageModel("Unable to delete item item.", ""));
     }
 }
