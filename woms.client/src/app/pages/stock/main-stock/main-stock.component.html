@@ -15,8 +15,13 @@
                     <p-splitButton label="Edit" icon="pi pi-pen-to-square" [model]="items"
                         (onClick)="update()"></p-splitButton>
                 </div>
-                <div class="md:col-span-6 sm:col-span-6 col-span-6 flex sm:mb-3">
-                    <p-iconfield iconPosition="left" class="ml-auto">
+                <div class="md:col-span-6 sm:col-span-6 col-span-6 flex justify-end gap-2 sm:mb-3">
+
+                    <p-button icon="pi pi-filter-slash" severity="secondary" pTooltip="Clear Filters"
+                        tooltipPosition="top" (onClick)="clearFilters(search)">
+                    </p-button>
+
+                    <p-iconfield iconPosition="left">
                         <p-inputicon>
                             <i class="pi pi-search"></i>
                         </p-inputicon>
@@ -74,7 +79,11 @@
 
         <!-- #region body -->
         <ng-template #body let-mainStock>
-            <tr class="whitespace-nowrap" [pSelectableRow]="mainStock">
+            <tr class="whitespace-nowrap" [pSelectableRow]="mainStock" [ngClass]="{
+                    'bg-red-50 text-red-600 font-medium': mainStock.groundBalance === 0,
+                    'bg-amber-50 text-amber-600 font-medium': mainStock.groundBalance > 0 && mainStock.groundBalance <= 10
+                }">
+
                 <td>
                     <span class="pi pi-circle" [class.pi-check-circle]="selectedMainStock === mainStock"></span>
                 </td>
@@ -84,7 +93,16 @@
                 <td>{{ mainStock.purchasePrice | number : '1.0-0' }}</td>
                 <td>{{ mainStock.salePrice | number : '1.0-0' }}</td>
                 <td>{{ mainStock.avgPrice | number : '1.0-0' }}</td>
-                <td>{{ mainStock.groundBalance | number: '1.0-0'}}</td>
+
+                <td>
+                    <span *ngIf="mainStock.groundBalance > 10">{{ mainStock.groundBalance | number: '1.0-0'}}</span>
+
+                    <p-tag *ngIf="mainStock.groundBalance > 0 && mainStock.groundBalance <= 10" severity="warning"
+                        value="Low ({{mainStock.groundBalance}})"></p-tag>
+
+                    <p-tag *ngIf="mainStock.groundBalance === 0" severity="danger" value="Out of Stock (0)"></p-tag>
+                </td>
+
                 <td>
                     <p-tag value="{{ mainStock.status?'Active':'Inactive' }}"
                         [severity]="mainStock.status?'success':'info'"
