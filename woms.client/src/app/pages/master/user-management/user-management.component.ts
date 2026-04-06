@@ -132,7 +132,7 @@ export class UserManagementComponent implements OnInit {
       },
       error: (err) => {
         this.loggerService.error(err);
-
+        this.isSubmitting = false;
         let errorMsg = 'Operation failed.';
 
         if (err.error.message.en) {
@@ -149,7 +149,7 @@ export class UserManagementComponent implements OnInit {
         }
 
         this.messageService.add({ severity: 'error', summary: 'Error', detail: errorMsg });
-        this.isSubmitting = false;
+
       },
       complete: () => this.isSubmitting = false
     });
