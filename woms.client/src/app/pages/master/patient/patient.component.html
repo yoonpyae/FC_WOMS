@@ -2,7 +2,7 @@
 <div class="card">
     <p-table #dt1 [value]="patients" [paginator]="true" [rows]="20" sortField="createdOn" [sortOrder]="-1"
         [loading]="loading" styleClass="p-datatable-striped" [showCurrentPageReport]="true"
-        [globalFilterFields]="['patientId','name', 'age','nrc']" [tableStyle]="{ 'min-width': '50rem' }"
+        [globalFilterFields]="['patientId','name', 'phone','townshipName']" [tableStyle]="{ 'min-width': '50rem' }"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         [rowsPerPageOptions]="[20, 50, 100]" selectionMode="single" [(selection)]="selectedPatient" dataKey="patientId">
         <ng-template #caption>
