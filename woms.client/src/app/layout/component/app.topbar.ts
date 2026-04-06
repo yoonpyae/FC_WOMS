@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { ConfirmationService, ConfirmEventType, MenuItem } from 'primeng/api';
+import { ConfirmationService, ConfirmEventType, MenuItem, MessageService } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
@@ -14,6 +14,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { AuthService } from '../../core/services/auth.service';
 import { SharedService } from '../../shared/services/shared.service';
 import { BreadCrumbComponent } from "@shared_component/bread-crumb/bread-crumb.component";
+import { ToastModule } from 'primeng/toast';
 
 export interface layoutConfig {
   preset?: string;
@@ -34,12 +35,14 @@ export interface layoutConfig {
     AvatarModule,
     BadgeModule,
     ConfirmDialogModule,
+    ToastModule,
     AppConfigurator,
     LazyProgressBarComponent,
     BreadCrumbComponent
   ],
-  providers: [AuthService, ConfirmationService],
+  providers: [AuthService, ConfirmationService, MessageService],
   template: `
+  <p-toast position="top-right"></p-toast>
     <div class="layout-topbar bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border-b border-surface-200 dark:border-surface-700 shadow-sm transition-colors duration-200 h-[4rem] px-4 flex items-center justify-between sticky top-0 z-50 w-full relative">
       <app-lazy-progress-bar></app-lazy-progress-bar>
       
@@ -132,11 +135,12 @@ export class AppTopbar {
     private confirmationService: ConfirmationService,
     private sharedService: SharedService,
     private router: Router,
+    private messageService: MessageService,
     @Inject(DOCUMENT) private document: Document
   ) { }
 
   ngOnInit(): void {
-    this.loadThemeFromCookie(); 
+    this.loadThemeFromCookie();
 
     this.fullName = this.sharedService.getUserName() ?? "";
     this.roleName = this.sharedService.getUserRole() ?? "";
@@ -145,7 +149,7 @@ export class AppTopbar {
       {
         label: 'Setting',
         icon: 'pi pi-cog',
-        routerLink: ['/setting'] 
+        routerLink: ['/setting']
       },
       {
         label: 'Logout',
@@ -159,7 +163,7 @@ export class AppTopbar {
   }
 
   toggleDarkMode() {
-    this.saveThemeToCookie(); 
+    this.saveThemeToCookie();
     this.applyTheme();
   }
 
@@ -170,7 +174,7 @@ export class AppTopbar {
   private loadThemeFromCookie() {
     const cookieValue = this.getCookieValue('darkTheme');
     if (cookieValue) {
-      this._config.darkTheme = cookieValue === 'true' ? true : false; 
+      this._config.darkTheme = cookieValue === 'true' ? true : false;
       this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: cookieValue === 'true' ? true : false }));
     } else {
       this.checkSystemPreference();
@@ -195,7 +199,7 @@ export class AppTopbar {
     return null;
   }
 
-  private getCookieExpiryDate(days: number = 365): string { 
+  private getCookieExpiryDate(days: number = 365): string {
     const date = new Date();
     date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
     return date.toUTCString();
@@ -213,10 +217,19 @@ export class AppTopbar {
       header: 'Confirm Logout',
       icon: 'pi pi-info-circle',
       accept: () => {
-        this.authService.logoutForce();
-        this.router.navigate(['./auth/login']);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Logged Out',
+          detail: 'You have successfully logged out. Redirecting...'
+        });
+
+        // 2. Wait 1 second so the user sees the toast, then clear auth & route
+        setTimeout(() => {
+          this.authService.logoutForce();
+          this.router.navigate(['./auth/login']);
+        }, 1000);
       },
-      reject: (type: ConfirmEventType) => {},
+      reject: (type: ConfirmEventType) => { },
       key: 'logoutDialog'
     });
   }
