@@ -16,7 +16,8 @@ import { NotificationService } from '../../../core/services/notification.service
 import { SharedService } from '../../../shared/services/shared.service';
 import { DialogModule } from 'primeng/dialog';
 
-
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 @Component({
   selector: 'app-login',
   imports: [
@@ -27,10 +28,11 @@ import { DialogModule } from 'primeng/dialog';
     PasswordModule,
     ButtonModule,
     CheckboxModule,
-    DialogModule
+    DialogModule,
+    ToastModule
   ],
   providers: [
-    AuthService
+    AuthService, MessageService 
   ],
   templateUrl: './login.component.html',
   styles: [`
@@ -56,7 +58,8 @@ export class LoginComponent implements OnInit {
     @Inject(PLATFORM_ID) private platformId: Object,
     private loggerService: LoggerService,
     private cookieService: CookieService,
-    private router: Router) {
+    private router: Router,
+    private messageService: MessageService) {
   }
 
   ngOnInit(): void {
@@ -69,7 +72,15 @@ export class LoginComponent implements OnInit {
       {
         next: (res: RootModel) => {
           this.setValueToSession(res);
-          this.isLoading = false;
+         
+          this.messageService.add({ 
+            severity: 'success', 
+            summary: 'Welcome Back', 
+            detail: 'Login successful. Redirecting...' 
+          });
+
+          setTimeout(() => {
+            this.isLoading = false;
 
           if (this.sharedService.getDefaultBranchId() != "") {
 
@@ -89,13 +100,20 @@ export class LoginComponent implements OnInit {
             }
 
           }
-          else {
-            this.router.navigate(['setting']);
-          }
-
+       else {
+              this.router.navigate(['setting']);
+            }
+          }, 1000);
         },
-        error: (res) => { this.isLoading = false; },
-        complete: () => { this.isLoading = false; }
+        error: (res) => { 
+          this.isLoading = false; 
+          // Show Error Toast
+          this.messageService.add({ 
+            severity: 'error', 
+            summary: 'Login Failed', 
+            detail: 'Invalid username or password. Please try again.' 
+          });
+        }
       }
     );
   }
