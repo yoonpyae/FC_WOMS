@@ -1,7 +1,7 @@
 <div class="card">
     <p-table #dt1 [value]="doctor" [paginator]="true" [rows]="20" [loading]="loading" styleClass="p-datatable-striped"
         sortField="createdOn" [sortOrder]="-1" [showCurrentPageReport]="true"
-        [globalFilterFields]="['doctorId','id','spalized','ecgfee','xrayFee','degree','name']"
+        [globalFilterFields]="['specialized','id','spalized','ecgfee','xrayFee','degree','name']"
         [tableStyle]="{ 'min-width': '50rem' }"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         [rowsPerPageOptions]="[20,50,100]" selectionMode="single" [(selection)]="selectedDoctor" dataKey="doctorId">
