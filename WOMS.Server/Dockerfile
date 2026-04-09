@@ -5,7 +5,7 @@ EXPOSE 5003
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-COPY ["WOMS.Server/WOMS.Server.csproj", "WOMS.Server/"]
+COPY ["WOMS.Server.csproj", "./"]
 RUN dotnet restore "WOMS.Server.csproj"
 
 COPY . .
