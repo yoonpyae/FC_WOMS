@@ -1,0 +1,12 @@
+Version" '3.8'
+
+Services:
+  woms-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5003:5003"
+    environment:
+      - ASPNETCORE_URLS=http://+:5003
+    restart: unless-stopped
