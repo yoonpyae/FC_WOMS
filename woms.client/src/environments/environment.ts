@@ -2,7 +2,7 @@ export const environment = {
   production: true,
   docker: false,
 
-  main_url: 'http://13.212.206.216:5003/api',
+  main_url: 'http://13.212.76.8:5003/api',
   web_url: 'https://localhost:7126',
 
   debug: true,
