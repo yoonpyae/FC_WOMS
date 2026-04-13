@@ -14,7 +14,7 @@
                 string.IsNullOrEmpty(context.Request.Headers["Postman-Token"]) &&
                 string.IsNullOrEmpty(context.Request.Headers["Mobile-Request"]) &&
                 !(referer ?? "").Contains("localhost:7126") &&
-                    !(referer ?? "").Contains("13.212.76.8:5003:5003"))
+                    !(referer ?? "").Contains("13.212.76.8:5003"))
             {
                 context.Request.EnableBuffering();
                 context.Request.Body = EncryptionService.DecryptStream(context.Request.Body);
