@@ -18,7 +18,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY --from=build /app/dist/woms.client/browser /usr/share/nginx/html
 
-EXPOSE 80
+EXPOSE 6008
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
