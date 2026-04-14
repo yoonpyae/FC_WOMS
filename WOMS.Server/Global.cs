@@ -48,7 +48,8 @@ internal class GLOBAL
         Uri uri = new(origin);
         _ = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "n/a";
 
-        bool isAllowed = uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase);
+        bool isAllowed = uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase) 
+            || uri.Host.Equals("13.212.76.8");
 
         return isAllowed;
     }
