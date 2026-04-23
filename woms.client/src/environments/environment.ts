@@ -2,7 +2,7 @@ export const environment = {
   production: true,
   docker: false,
 
-  main_url: 'http://familyclinics.site/api',
+  main_url: '/api',
   web_url: 'https://localhost:7126',
 
   debug: true,
