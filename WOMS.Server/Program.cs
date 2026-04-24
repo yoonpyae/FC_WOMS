@@ -57,7 +57,7 @@ app.MapScalarApiReference("/docs", options =>
 
     if (app.Environment.IsDevelopment())
     {
-        _ = options.AddServer(new ScalarServer("http://13.212.76.8:6007")
+        _ = options.AddServer(new ScalarServer("http://54.169.50.229:6007")
         { Description = "UAT Local Mode" }); // THis is  Testing Mode For Analystic
     }
 });

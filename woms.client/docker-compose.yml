@@ -4,7 +4,7 @@ services:
   web:
     build: .
     ports:
-      - "6008:80"      # host 6008 -> container 80
+      - "80:80"      # host 6008 -> container 80
     restart: unless-stopped
     networks:
       - webnet
